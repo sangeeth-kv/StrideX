@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StrideX User Signup</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex items-center justify-center h-screen bg-gray-900" style="background-color: #6f8e80;">
+    <div class="flex w-4/5 max-w-5xl bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+        <!-- Left Section (Logo) -->
+        <div class="w-1/2 flex items-center justify-center p-10 bg-gray-700" style="background-color: #8FB0A1;">
+            <img src="/admin/imgs/logos/logo-png.png" alt="StrideX Logo" style="width: 900px;" class="w-3/4">
+        </div>
+        
+        <!-- Right Section (Signup Form) -->
+        <div class="w-1/2 p-10 flex flex-col justify-center text-white" style="background-color: #8FB0A1;">
+            <h2 class="text-3xl font-bold mb-6 text-center" style="color: rgb(251, 223, 223);">StrideX User Signup</h2>
+            <form action="/user/signup" method="POST" id="signupForm">
+                <div class="mb-4">
+                    <input type="text" name="fullname" placeholder="Full Name" value="<%= typeof fullname !== 'undefined' ? fullname : '' %>" class="w-full px-4 py-3 rounded-md bg-gray-600 text-white placeholder-gray-400">
+                    <p id="fullnameError" class="text-red-500 text-sm mt-1 hidden"></p>
+                </div>
+                <div class="mb-4">
+                    <input type="email" name="email" placeholder="Email"  value="<%= typeof email !== 'undefined' ? email: '' %>" class="w-full px-4 py-3 rounded-md bg-gray-600 text-white placeholder-gray-400">
+                    <p id="emailError" class="text-red-500 text-sm mt-1 hidden"></p>
+
+                </div>
+                <div class="mb-4">
+                    <input type="text" name="phoneNumber" placeholder="Phone Number" value="<%= typeof phoneNumber !== 'undefined' ? phoneNumber : '' %>" class="w-full px-4 py-3 rounded-md bg-gray-600 text-white placeholder-gray-400">
+                    <p id="phoneNumberError" class="text-red-500 text-sm mt-1 hidden"></p>
+
+                </div>
+                <div class="mb-4">
+                    <input type="password" name="password" placeholder="Password" class="w-full px-4 py-3 rounded-md bg-gray-600 text-white placeholder-gray-400">
+                    <p id="passwordError" class="text-red-500 text-sm mt-1 hidden"></p>
+
+                </div>
+                <div class="mb-4">
+                    <input type="password" name="confirmPassword" placeholder="Confirm Password" class="w-full px-4 py-3 rounded-md bg-gray-600 text-white placeholder-gray-400">
+                    <p id="confirmPasswordError" class="text-red-500 text-sm mt-1 hidden"></p>
+
+                </div>
+                <!-- <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-md" onclick="window.location.href='/user/otp-page'">Sign Up Now</button> -->
+                <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-md">Sign Up Now</button>
+
+            </form>
+            <hr class="my-6 border-gray-600">
+            <p class="text-center mb-4">Already have an account?</p>
+            <a href="/user/login" class="w-full flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-md">
+                Login Here
+            </a>
+        </div>
+    </div>
+    <!-- for modalllll -->
+ <!-- OTP Modal -->
+<div id="otpModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-96">
+        <h2 class="text-xl font-bold text-center mb-4">Enter OTP</h2>
+        <p class="text-center text-gray-600 mb-4">OTP has been sent to your email</p>
+        
+        <input type="text" id="otpInput" class="w-full px-4 py-2 border rounded-md mb-2" placeholder="Enter OTP">
+        
+        <p class="text-center text-sm text-red-600 mb-2">Expires in <span id="timer">60</span>s</p>
+
+        <button id="verifyOtpBtn"  class="w-full bg-green-500 text-white font-bold py-2 rounded-md mb-2">Verify OTP</button>
+
+        <button id="resendOtpBtn" class="w-full bg-blue-500 text-white font-bold py-2 rounded-md hidden">Resend OTP</button>
+        
+        <button onclick="closeModal()" class="w-full bg-gray-400 text-white font-bold py-2 rounded-md mt-2">Cancel</button>
+    </div>
+</div>
+
+</body>
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+
+
+<!-- <script>
+    document.getElementById("signupForm").addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const fullname = document.querySelector('input[name="fullname"]').value.trim();
+        const email = document.querySelector('input[name="email"]').value.trim();
+        const phoneNumber = document.querySelector('input[name="phoneNumber"]').value.trim();
+        const password = document.querySelector('input[name="password"]').value.trim();
+        const confirmPassword = document.querySelector('input[name="confirmPassword"]').value.trim();
+        localStorage.setItem("userEmail",email)
+        console.log(email)
+
+        if (!fullname || !email || !phoneNumber || !password || !confirmPassword) {
+            Swal.fire({
+                icon: "error",
+                title: "All fields are required!",
+            });
+            return;
+        }
+
+        try {
+            const response = await fetch("/user/signup", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ fullname, email, phoneNumber, password, confirmPassword })
+            });
+
+            const data = await response.json();
+                //  localStorage.setItem("otp", data.otp); 
+                // const otpToken=localStorage.setItem(data.otpToken)
+                
+                // console.log("this is otop and email"+data.email+" "+data.otp)
+
+            Swal.fire({ icon: data.status === "success" ? "success" : "error", title: data.message });
+
+            if (data.status === "success") {
+                // Redirect to OTP page
+              
+                setTimeout(() => {
+                    window.location.href = data.redirectUrl;
+                }, 2000);
+            }
+        } catch (error) {
+            Swal.fire({ icon: "error", title: "Something went wrong!" });
+        }
+    });
+</script> -->
+
+
+<script>
+    document.getElementById("signupForm").addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const fullname = document.querySelector('input[name="fullname"]').value.trim();
+        const email = document.querySelector('input[name="email"]').value.trim();
+        const phoneNumber = document.querySelector('input[name="phoneNumber"]').value.trim();
+        const password = document.querySelector('input[name="password"]').value.trim();
+        const confirmPassword = document.querySelector('input[name="confirmPassword"]').value.trim();
+
+        const fullnameError = document.getElementById("fullnameError");
+        const emailError = document.getElementById("emailError");
+        const phoneError = document.getElementById("phoneNumberError");
+        const passwordError = document.getElementById("passwordError");
+        const confirmPasswordError = document.getElementById("confirmPasswordError");
+        
+        fullnameError.textContent = "";
+        emailError.textContent = "";
+        phoneError.textContent = "";
+        passwordError.textContent = "";
+        confirmPasswordError.textContent = "";
+    
+        fullnameError.classList.add("hidden");
+        emailError.classList.add("hidden");
+        phoneError.classList.add("hidden");
+        passwordError.classList.add("hidden");
+        confirmPasswordError.classList.add("hidden");
+
+
+        let isValid = true;
+
+    // Full Name Validation
+    if (!fullname) {
+        fullnameError.textContent = "Full Name is required!";
+        fullnameError.classList.remove("hidden");
+        isValid = false;
+    }
+
+    // Email Validation (Regex for valid email)
+    const emailPattern = /^[a-zA-Z0-9][a-zA-Z0-9._-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!email) {
+        emailError.textContent = "Email is required!";
+        emailError.classList.remove("hidden");
+        isValid = false;
+    } else if (!emailPattern.test(email)) {
+        emailError.textContent = "Please enter a valid email!";
+        emailError.classList.remove("hidden");
+        isValid = false;
+    }
+
+    // Phone Number Validation (10 digits)
+    const phonePattern = /^[0-9]{10}$/;
+    if (!phoneNumber) {
+        phoneError.textContent = "Phone Number is required!";
+        phoneError.classList.remove("hidden");
+        isValid = false;
+    } else if (!phonePattern.test(phoneNumber)) {
+        phoneError.textContent = "Please enter a valid phone number!";
+        phoneError.classList.remove("hidden");
+        isValid = false;
+    }
+
+    // Password Validation (8+ characters, includes letters, numbers, and special characters)
+    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!password) {
+        passwordError.textContent = "Password is required!";
+        passwordError.classList.remove("hidden");
+        isValid = false;
+    } else if (!passwordPattern.test(password)) {
+        passwordError.textContent = "Password must be at least 8 characters and include letters, numbers, and special characters!";
+        passwordError.classList.remove("hidden");
+        isValid = false;
+    }
+
+    // Confirm Password Validation
+    if (!confirmPassword) {
+        confirmPasswordError.textContent = "Confirm Password is required!";
+        confirmPasswordError.classList.remove("hidden");
+        isValid = false;
+    } else if (password !== confirmPassword) {
+        confirmPasswordError.textContent = "Passwords do not match!";
+        confirmPasswordError.classList.remove("hidden");
+        isValid = false;
+    }
+
+    // Stop submission if validation fails
+    if (!isValid) {
+        return;
+    }
+
+        try {
+            const response = await fetch("/user/signup", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ fullname, email, phoneNumber, password, confirmPassword })
+            });
+
+            const data = await response.json();
+            console.log("this is data"+data)
+            if (data.status === "success") {
+                Swal.fire({ icon: "success", title: data.message });
+                
+                // console.log(data.otpToken)
+                // console.log(data)
+                // Store email and OTP token in localStorage
+                localStorage.setItem("userEmail", email);
+                // localStorage.setItem("otpToken", data.otpToken);
+
+                // Show OTP modal
+                document.getElementById("otpModal").classList.remove("hidden");
+                
+                // Start OTP timer
+                startOtpTimer();
+            } else {
+                Swal.fire({ icon: "error", title: data.message });
+            }
+        } catch (error) {
+            Swal.fire({ icon: "error", title: "Something went wrong!" });
+        }
+    });
+
+    // Function to start OTP countdown
+    function startOtpTimer() {
+        let timer = 60;
+        const timerElement = document.getElementById("timer");
+        const resendBtn = document.getElementById("resendOtpBtn");
+
+        timerElement.innerText = timer;
+        resendBtn.classList.add("hidden"); // Hide resend button initially
+
+        const countdown = setInterval(() => {
+            timer--;
+            timerElement.innerText = timer;
+
+            if (timer <= 0) {
+                clearInterval(countdown);
+                resendBtn.classList.remove("hidden"); // Show resend button
+            }
+        }, 1000);
+    }
+
+    // Function to close modal
+    function closeModal() {
+        document.getElementById("otpModal").classList.add("hidden");
+    }
+
+    // Verify OTP function
+    document.getElementById("verifyOtpBtn").addEventListener("click", async function () {
+        const otp = document.getElementById("otpInput").value.trim();
+        // const otpToken = localStorage.getItem("otpToken");
+        
+        // console.log("this is  otp tokeneenn"+otpToken)
+        if (!otp) {
+            Swal.fire({ icon: "error", title: "Please enter OTP!" });
+            return;
+        }
+
+        try {
+            const response = await fetch("/user/verify-otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ otp })
+            });
+
+            const data = await response.json();
+            Swal.fire({ icon: data.status === "success" ? "success" : "error", title: data.message });
+
+            if (data.status === "success") {
+                window.location.href = "/user/login";
+            }
+        } catch (error) {
+            Swal.fire({ icon: "error", title: "OTP verification failed!" });
+        }
+    });
+
+    // Resend OTP function
+    document.getElementById("resendOtpBtn").addEventListener("click", async function () {
+        const email = localStorage.getItem("userEmail");
+
+        try {
+            const response = await fetch("/user/resend-otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email })
+            });
+
+            const data = await response.json();
+            Swal.fire({ icon: "success", title: "New OTP sent!" });
+
+            // Update OTP token
+            // localStorage.setItem("otpToken", data.otpToken);
+
+            // Restart OTP timer
+            startOtpTimer();
+        } catch (error) {
+            Swal.fire({ icon: "error", title: "Failed to resend OTP!" });
+        }
+    });
+    
+    
+</script>
+
+
+  
+
+</html>

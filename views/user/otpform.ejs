@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StrideX OTP Verification</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Toastify CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</head>
+<body class="flex items-center justify-center h-screen bg-gray-900" style="background-color: #6f8e80;">
+    <div class="flex w-4/5 max-w-5xl bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+        <!-- Left Section (Logo) -->
+        <div class="w-1/2 flex items-center justify-center p-10 bg-gray-700" style="background-color: #8FB0A1;">
+            <img src="/admin/imgs/logos/logo-png.png" alt="StrideX Logo" class="w-3/4">
+        </div>
+        
+        <!-- Right Section (OTP Verification) -->
+        <div class="w-1/2 p-10 flex flex-col justify-center text-white" style="background-color: #8FB0A1;">
+            <h2 class="text-3xl font-bold mb-6 text-center" style="color: rgb(251, 223, 223);">Verify Your OTP</h2>
+            <form id="otpForm" onsubmit="verifyOTP(event)">
+                <input type="text" name="otp" id="otp-input" class="w-full px-4 py-3 rounded-md bg-gray-600 text-white text-center placeholder-gray-400" maxlength="6" placeholder="Enter OTP">
+                <button type="submit" id="verifyOtpBtn" class="w-full mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-md" disabled>Verify OTP</button>
+                <p id="timer-text" class="mt-3 text-center text-gray-300">Resend OTP in 60s</p>
+                <button type="button" id="resendOtpBtn" class="w-full mt-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-md" disabled>Resend OTP</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let timer = 60;
+        let interval;
+    
+        window.onload = function () {
+            document.getElementById("otpForm").addEventListener("submit", verifyOTP);
+            document.getElementById("resendOtpBtn").addEventListener("click", resendOTP);
+            document.getElementById("otp-input").addEventListener("input", function () {
+                document.getElementById("verifyOtpBtn").disabled = this.value.length !== 6;
+            });
+    
+            startTimer();
+        };
+    
+        function startTimer() {
+            document.getElementById("resendOtpBtn").disabled = true; 
+            interval = setInterval(() => {
+                if (timer > 0) {
+                    timer--;
+                    document.getElementById("timer-text").innerText = `Resend OTP in ${timer}s`;
+                } else {
+                    clearInterval(interval);
+                    document.getElementById("resendOtpBtn").disabled = false;
+                    document.getElementById("timer-text").innerText = "";
+                }
+            }, 1000);
+        }
+
+        function showToast(message, type = "success") {
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top", // Can be "top" or "bottom"
+                position: "center", // Can be "left", "center", or "right"
+                backgroundColor: type === "success" ? "green" : "red",
+                stopOnFocus: true
+            }).showToast();
+        }
+
+        async function verifyOTP(event) {
+    event.preventDefault();
+    const otp = document.getElementById("otp-input").value;
+    const email = localStorage.getItem("userEmail");
+
+    if (!email || !otp) {
+        showToast("Email or OTP is missing!", "error");
+        return;
+    }
+
+    try {
+        const response = await fetch("/user/verify-otp", {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({ email, otp })
+        });
+
+        const result = await response.json();
+
+        if (result.status === "success") {
+            showToast("OTP Verified Successfully!");
+
+            // localStorage.removeItem("userEmail"); // Clean up
+
+            // Delay redirect to allow the toast message to be seen
+            setTimeout(() => {
+                if (result.redirectUrl) {
+                    window.location.href = result.redirectUrl;
+                } else {
+                    showToast("Redirection URL missing in response.", "error");
+                }
+            }, 2000); // 2-second delay
+        } else {
+            showToast(result.message || "Verification failed", "error");
+        }
+    } catch (error) {
+        console.error("Error verifying OTP:", error);
+        showToast("Something went wrong. Please try again.", "error");
+    }
+}
+
+
+        async function resendOTP() {
+            const email = localStorage.getItem("userEmail");
+
+            if (!email) {
+                showToast("Email not found. Please try signing up again.", "error");
+                return;
+            }
+
+            try {
+                const response = await fetch("/user/resend-otp", {
+                    method: "POST",
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    },
+                    body: JSON.stringify({ email })
+                });
+
+                const result = await response.json();
+                if (result.status === "success") {
+                    showToast("New OTP sent to your email!");
+                    timer = 60;
+                    document.getElementById("resendOtpBtn").disabled = true;
+                    startTimer();
+                } else {
+                    showToast(result.message || "Failed to resend OTP", "error");
+                }
+            } catch (error) {
+                console.error("Error resending OTP:", error);
+                showToast("Failed to resend OTP. Please try again.", "error");
+            }
+        }
+    </script>
+</body>
+</html>
