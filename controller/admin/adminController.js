@@ -1,5 +1,4 @@
 const adminModel=require("../../model/adminModel")
-const productSchema=require("../../model/productModel")
 const bcrypt=require("bcrypt")
 
 
@@ -74,22 +73,5 @@ postLogin: async (req, res) => {
 loadDashboard:async (req,res) => {
     res.render("admin/dashboard")
 },
-productPage:async (req,res) => {
- 
-    try {
-        // Fetch products from database (assuming you're using Mongoose)
-        const product= await productSchema.find(); // Make sure `Product` is defined
-
-        // Render the page and pass the products array
-        res.render("admin/product", { product: product }); // Ensure "product" is the correct key
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("Internal Server Error");
-    }
-
-},
-loadAddProducts:async (req,res) => {
-    res.render("admin/addproducts")
-}
 }
 module.exports=adminController

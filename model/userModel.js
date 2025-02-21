@@ -23,6 +23,10 @@ const userSchema = new mongoose.Schema({
         unique: true, // ✅ Ensure unique Google ID
         sparse: true, // ✅ Allows non-Google users to have null Google ID
     },
+    isActive:{
+        type:Boolean,
+        default:true,
+    }
     
 });
 

@@ -3,6 +3,7 @@ require("dotenv").config();
 const express=require("express");
 const app=express();
 const path=require("path")
+// const bodyParser=require("body-parser")
 const adminRoutes=require("./routes/admin")
 const userRoutes=require("./routes/user")
 // const flash=require("express-flash")
@@ -30,10 +31,12 @@ app.use(session({
 // });
 app.use(express.urlencoded({extended:true}));
 app.use(express.json())
+// app.use(bodyParser.json({ limit: "100mb" })); // Increase JSON request size
+// app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }))
 
 
 
-
+app.use("/uploads", express.static("public/uploads"));
 
 
 
@@ -55,6 +58,8 @@ app.use(express.static("public"))
 
 app.use("/admin",adminRoutes)
 app.use("/user",userRoutes)
+
+
 
 
 connectDB();

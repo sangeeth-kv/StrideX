@@ -2,7 +2,7 @@ const express=require("express")
 const router=express.Router();
 const userController=require("../controller/user/userController");
 const passport=require("passport");
-const adminController = require("../controller/admin/adminController");
+// const adminController = require("../controller/admin/adminController");
 require("../config/passport")
 
 router.use(passport.initialize())
@@ -25,6 +25,7 @@ router.get("/auth/google", passport.authenticate("google", { scope: ["email", "p
 router.get( "/auth/google/callback",
     passport.authenticate("google", { failureRedirect: "/user/login" }),
     (req, res) => {
+        console.log("hei googglke")
         res.redirect("/user/home"); // Redirect to home after successful login
     }
 );
