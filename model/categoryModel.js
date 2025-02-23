@@ -3,6 +3,7 @@
   const categorySchema = new mongoose.Schema({
     name: { type: String, required: true },
     // offer: { type: Number, default: 0 },
+    image: { type: String }, // Optional: Store logo URL
     description: { type: String, required: true },
     isListed:{type:Boolean,default:true}
   },

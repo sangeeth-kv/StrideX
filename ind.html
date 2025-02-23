@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Bulb Animation</title>
+    <style>
+        body {
+            background-color: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .wire {
+            width: 5px;
+            height: 150px;
+            background-color: #444;
+            position: relative;
+        }
+
+        .bulb {
+            width: 80px;
+            height: 80px;
+            background-color: #444;
+            border-radius: 50%;
+            position: relative;
+            top: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 10px rgba(255, 255, 0, 0);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .bulb.glow {
+            background-color: yellow;
+            box-shadow: 0 0 30px rgba(255, 255, 0, 1);
+        }
+
+        .switch {
+            width: 10px;
+            height: 20px;
+            background-color: red;
+            position: absolute;
+            top: 140px;
+            left: -2.5px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+    </style>
+</head>
+<body>
+    <div class="wire">
+        <div class="switch"></div>
+        <div class="bulb"></div>
+    </div>
+
+    <script>
+        const switchElement = document.querySelector(".switch");
+        const bulb = document.querySelector(".bulb");
+        let isOn = false;
+
+        switchElement.addEventListener("click", () => {
+            isOn = !isOn;
+            bulb.classList.toggle("glow", isOn);
+            switchElement.style.transform = isOn ? "translateY(10px)" : "translateY(0px)";
+        });
+    </script>
+</body>
+</html>

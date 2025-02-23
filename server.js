@@ -36,7 +36,7 @@ app.use(express.json())
 
 
 
-app.use("/uploads", express.static("public/uploads"));
+app.use("/uploads", express.static("public/uploads"));  
 
 
 

@@ -1,10 +1,24 @@
 <%- include("partials/header") %>
 <head>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    /* UI Enhancement: Image thumbnail styling */
+    .category-thumbnail {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+    .img-preview {
+      margin-top: 10px;
+      max-width: 100%;
+      max-height: 200px;
+    }
+  </style>
 </head>  
 <body>
   <section class="content-main">
@@ -13,16 +27,17 @@
         <h2 class="content-title card-title">Category</h2>
       </div>
       <div class="d-flex gap-3 align-items-center">
-        <!-- Search Bar with Reset Icon -->
-        <div class="input-group">
-          <input type="text" class="form-control" placeholder="Search categories..." id="searchInput">
-          <button class="btn btn-outline-secondary" type="button" id="searchBtn">
-            <i class="bi bi-search"></i>
-          </button>
-          <button class="btn btn-outline-secondary" type="button" id="resetBtn">
-            <i class="bi bi-arrow-clockwise"></i>
-          </button>
-        </div>
+        <form action="/admin/category" method="GET" id="search-form">
+          <div class="input-group">
+            <input type="text" name="search" class="form-control" placeholder="Search categories..." id="searchInput" value="<%= search %>">
+            <button class="btn btn-outline-secondary" type="submit" id="searchBtn">
+              <i class="bi bi-search"></i>
+            </button>
+            <button class="btn btn-outline-secondary" type="button" id="resetBtn">
+              <i class="bi bi-arrow-clockwise"></i>
+            </button>
+          </div>
+        </form>
         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Add Category</button>
       </div>
     </div>
@@ -33,6 +48,7 @@
           <table class="table table-hover" id="categoriesTable">
             <thead>
               <tr>
+                <th>Image</th>
                 <th>Name</th>
                 <th>Description</th>
                 <th>Status</th>
@@ -41,55 +57,75 @@
             </thead>
             <tbody>
               <% categories.forEach(category => { %>
-              <tr>
-                <td class="text-start"><%= category.name %></td>
-                <td class="text-start">
-                  <% 
-                    const maxLength = 50;
-                    let fullDesc = category.description;
-                    let truncated = fullDesc.length > maxLength ? fullDesc.substring(0, maxLength) + "..." : fullDesc;
-                  %>
-                  <span class="category-desc" data-full="<%= fullDesc %>">
-                    <%= truncated %>
-                  </span>
-                  <% if (fullDesc.length > maxLength) { %>
-                  <a href="javascript:void(0);" class="read-more-link">read more</a>
-                  <% } %>
-                </td>
-                <td>
-                  <!-- <button class="btn toggle-status-btn <%= category.status === 'listed' ? 'btn-success' : 'btn-danger' %>" 
-                          data-id="<%= category._id %>">
-                    <%= category.status === 'listed' ? 'Listed' : 'Unlisted' %>
-                  </button> -->
-                  <button class="btn toggle-status-btn <%= category.isListed ? 'btn-success' : 'btn-danger' %>" 
-                    data-id="<%= category._id %>">
-              <%= category.isListed ? 'Listed' : 'Unlisted' %>
-            </button>
-            
-            
-                </td>
-                <td class="text-start">
-                  <div class="d-flex gap-2">
-                    <button class="btn btn-info text-white edit-category-btn" 
-                            data-bs-toggle="modal" 
-                            data-bs-target="#editCategoryModal"
-                            data-id="<%= category._id %>"
-                            data-name="<%= category.name %>"
-                            data-description="<%= category.description %>">
-                      Edit
+                <tr>
+                  <td>
+                    <% if (category.image) { %>
+                      <img src="<%= category.image %>" alt="Category Image" class="category-thumbnail category-image-popup" />
+                    <% } else { %>
+                      <i class="bi bi-card-image" style="font-size: 1.5rem;"></i>
+                    <% } %>
+                  </td>
+                  <td class="text-start"><%= category.name %></td>
+                  <td class="text-start">
+                    <% 
+                      const maxLength = 50;
+                      let fullDesc = category.description;
+                      let truncated = fullDesc.length > maxLength ? fullDesc.substring(0, maxLength) + "..." : fullDesc;
+                    %>
+                    <span class="category-desc" data-full="<%= fullDesc %>">
+                      <%= truncated %>
+                    </span>
+                    <% if (fullDesc.length > maxLength) { %>
+                      <a href="javascript:void(0);" class="read-more-link">read more</a>
+                    <% } %>
+                  </td>
+                  <td>
+                    <button class="btn toggle-status-btn <%= category.isListed ? 'btn-success' : 'btn-danger' %>" 
+                      data-id="<%= category._id %>">
+                      <%= category.isListed ? 'Listed' : 'Unlisted' %>
                     </button>
-                    <button class="btn btn-danger delete-category-btn" data-id="<%= category._id %>">
-                      Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
+                  </td>
+                  <td class="text-start">
+                    <div class="d-flex gap-2">
+                      <button class="btn btn-info text-white edit-category-btn" 
+                              data-bs-toggle="modal" 
+                              data-bs-target="#editCategoryModal"
+                              data-id="<%= category._id %>"
+                              data-name="<%= category.name %>"
+                              data-description="<%= category.description %>"
+                              data-image="<%= category.image ? category.image : 'default-image-path.jpg' %>">
+                        Edit
+                      </button>
+                    </div>
+                  </td>
+                </tr>
               <% }) %>
             </tbody>
           </table>
         </div>
       </div>
     </div>
+    
+    <!-- Pagination -->
+    <nav>
+      <ul class="pagination justify-content-center">
+        <% if (currentPage > 1) { %>
+          <li class="page-item">
+            <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">Previous</a>
+          </li>
+        <% } %>
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+            <a class="page-link" href="?page=<%= i %>&search=<%= search %>"><%= i %></a>
+          </li>
+        <% } %>
+        <% if (currentPage < totalPages) { %>
+          <li class="page-item">
+            <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">Next</a>
+          </li>
+        <% } %>
+      </ul>
+    </nav>
   </section>
 
   <!-- Add Category Modal -->
@@ -101,14 +137,19 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form id="addCategoryForm">
+          <form id="addCategoryForm" enctype="multipart/form-data">
             <div class="mb-3">
               <label for="addCategoryName" class="form-label">Name</label>
               <input type="text" class="form-control" id="addCategoryName" name="name" />
             </div>
             <div class="mb-3">
               <label for="addCategoryDescription" class="form-label">Description</label>
-              <textarea class="form-control" id="addCategoryDescription" name="description"></textarea>
+              <textarea class="form-control" id="addCategoryDescription" name="description" ></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="addCategoryImage" class="form-label">Category Image</label>
+              <input type="file" class="form-control" id="addCategoryImage" name="image" accept="image/png, image/jpeg, image/jpg" />
+              <img id="imgPreview" class="img-preview" src="#" alt="Image Preview" style="display:none;"/>
             </div>
             <button type="submit" class="btn btn-primary">Add Category</button>
           </form>
@@ -126,18 +167,20 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form id="editCategoryForm">
+          <form id="editCategoryForm"  enctype="multipart/form-data">
             <input type="hidden" id="editCategoryId" name="id"/>
             <div class="mb-3">
               <label for="editCategoryName" class="form-label">Name</label>
-              <input type="text" class="form-control" id="editCategoryName" name="name"/>
-              <p id="editcategoryNameError" class="text-red-500 text-sm mt-1 hidden"></p>
-
+              <input type="text" class="form-control" id="editCategoryName" name="name" />
             </div>
             <div class="mb-3">
               <label for="editCategoryDescription" class="form-label">Description</label>
-              <p id="editCategoryDescriptionError" class="text-red-500 text-sm mt-1 hidden"></p>
-              <textarea class="form-control" id="editCategoryDescription" name="description" ></textarea>
+              <textarea class="form-control" id="editCategoryDescription" name="description"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="editCategoryImage" class="form-label">Category Image</label>
+              <input type="file" class="form-control" id="addCategoryImage" name="image" accept="image/png, image/jpeg, image/jpg" />
+          
             </div>
             <button type="submit" class="btn btn-primary">Save Changes</button>
           </form>
@@ -146,214 +189,141 @@
     </div>
   </div>
 
-  <!-- Pagination -->
-  <nav>
-    <ul class="pagination justify-content-center">
-      <% if (currentPage > 1) { %>
-        <li class="page-item">
-          <a class="page-link" href="?page=<%= currentPage - 1 %>">Previous</a>
-        </li>
-      <% } %>
-  
-      <% for (let i = 1; i <= totalPages; i++) { %>
-        <li class="page-item <%= i === currentPage ? 'active' : '' %>">
-          <a class="page-link" href="?page=<%= i %>"><%= i %></a>
-        </li>
-      <% } %>
-  
-      <% if (currentPage < totalPages) { %>
-        <li class="page-item">
-          <a class="page-link" href="?page=<%= currentPage + 1 %>">Next</a>
-        </li>
-      <% } %>
-    </ul>
-  </nav>
-  
+  <!-- Toastify & Bootstrap Scripts -->
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-  <!-- Toastify JS -->
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-      // Add Category Form Submission
+      // Search functionality for categories
+      const searchForm = document.getElementById("search-form");
+      searchForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        const formData = new FormData(searchForm);
+        const queryParams = new URLSearchParams(formData);
+        window.location.href = `/admin/category?${queryParams.toString()}`;
+      });
+      
+      const resetBtn = document.getElementById("resetBtn");
+      resetBtn.addEventListener("click", function() {
+        document.getElementById("searchInput").value = "";
+        window.location.href = "/admin/category";
+      });
+      
+      // Preview uploaded image for Add Category
+      const addCategoryImage = document.getElementById("addCategoryImage");
+      const imgPreview = document.getElementById("imgPreview");
+      addCategoryImage.addEventListener("change", function() {
+        const file = this.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function() {
+            imgPreview.setAttribute("src", reader.result);
+            imgPreview.style.display = "block";
+          };
+          reader.readAsDataURL(file);
+        } else {
+          imgPreview.style.display = "none";
+        }
+      });
+      
+      // Add Category Form Submission with image upload
       document.getElementById("addCategoryForm").addEventListener("submit", async function(e) {
         e.preventDefault();
-        const categoryName = document.getElementById("addCategoryName").value;
-        const categoryDescription = document.getElementById("addCategoryDescription").value;
-
-        const formData = {
-            name: categoryName,
-            description: categoryDescription
-        };
-        
+        const formData = new FormData(this);
         try {
           const response = await fetch("/admin/add-category", {
             method: "POST",
-            headers: {"Content-type": "application/json"},
-            body: JSON.stringify(formData)
+            body: formData
           });
-
           const data = await response.json();
           if (data.success) {
-              Toastify({
-                  text: "Category added successfully!",
-                  duration: 3000,
-                  close: true,
-                  gravity: "top",
-                  position: "right",
-                  backgroundColor: "#28a745",
-              }).showToast();
-
-              setTimeout(() => {
-                  location.reload();
-              }, 1500);
-          } else {
-              Toastify({
-                  text: data.message || "Something went wrong!",
-                  duration: 3000,
-                  close: true,
-                  gravity: "top",
-                  position: "right",
-                  backgroundColor: "#dc3545",
-              }).showToast();
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          Toastify({
-              text: "An error occurred. Please try again.",
+            Toastify({
+              text: "Category added successfully!",
               duration: 3000,
               close: true,
               gravity: "top",
               position: "right",
-              backgroundColor: "#dc3545",
+              backgroundColor: "#28a745"
+            }).showToast();
+            setTimeout(() => location.reload(), 1500);
+          } else {
+            Toastify({
+              text: data.message || "Something went wrong!",
+              duration: 3000,
+              close: true,
+              gravity: "top",
+              position: "right",
+              backgroundColor: "#dc3545"
+            }).showToast();
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          Toastify({
+            text: "An error occurred. Please try again.",
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#dc3545"
           }).showToast();
         }
       });
-    //   console.log(dataset)
+      
       // Edit Category Modal population
       document.querySelectorAll(".edit-category-btn").forEach(button => {
         button.addEventListener("click", function() {
           const categoryId = this.dataset.id;
           const categoryName = this.dataset.name;
           const categoryDescription = this.dataset.description;
+          const categoryImage=this.dataset.image
+          console.log(categoryImage+"this is my imaege url")
           document.getElementById("editCategoryId").value = categoryId;
           document.getElementById("editCategoryName").value = categoryName;
           document.getElementById("editCategoryDescription").value = categoryDescription;
         });
       });
-
-      document.querySelectorAll(".delete-category-btn").forEach(button => {
-        button.addEventListener("click",async function (e) {
-            const categoryId=this.dataset.id
-            console.log("this is category id form dataset");
-            const response=await fetch(`/admin/delete-category/${categoryId}`,{
-                method:"POSt",
-                headers:{"Content-type":"application/json"},
-            })
-            
-            
-        })
-      });
-      // Delete category button
-    //   document.querySelectorAll(".delete-category-btn").forEach(button => {
-    //     button.addEventListener("click", function() {
-    //       const categoryId = this.dataset.id;
-    //       console.log(categoryId)
-    //       Swal.fire({
-    //         title: "Are you sure?",
-    //         text: `this is ${categoryId}`,
-    //         icon: "warning",
-    //         showCancelButton: true,
-    //         confirmButtonColor: "#d33",
-    //         cancelButtonColor: "#3085d6",
-    //         confirmButtonText: "Yes, delete it!"
-    //       }).then((result) => {
-    //         if (result.isConfirmed) {
-    //           fetch(`/admin/delete-category/${categoryId}`, { method: "DELETE" })
-    //             .then(response => response.json())
-    //             .then(() => {
-    //               Swal.fire("Deleted!", "Category has been deleted.", "success")
-    //                 .then(() => location.reload());
-    //             })
-    //             .catch(() => {
-    //               Swal.fire("Error", "Failed to delete category", "error");
-    //             });
-    //         }
-    //       });
-    //     });
-    //   });
-
+      
       // Edit Category Form Submission
       document.getElementById("editCategoryForm").addEventListener("submit", async function(e) {
         e.preventDefault();
-        const categoryId = document.getElementById("editCategoryId").value;
-        const editedCategoryName = document.getElementById("editCategoryName").value;
-        const editedCategoryDesc = document.getElementById("editCategoryDescription").value;
-    //     const editCategoryNameError = document.getElementById("editCategoryNameError");
-    //     const editCategoryDescriptionError = document.getElementById("editCategoryDescriptionError");
-        
-    //     editCategoryNameError.textContent= "";
-    //     editCategoryDescriptionError.textContent = "";
-
-    //     editCategoryNameError.classList.add("hidden");
-    //     editCategoryDescriptionError.classList.add("hidden");
-    //     if (!editedCategoryName || !editedCategoryDesc) {
-    //     fullnameError.textContent = "Full Name is required!";
-    //     fullnameError.classList.remove("hidden");
-    //     isValid = false;
-    // }
-    //     let isValid = true;
-        
-
-        console.log(editedCategoryDesc)
-
-        const formData = {
-          editedCategoryName,
-          editedCategoryDesc
-        };
+        const formData = new FormData(this);
         console.log(formData)
-
+        const categoryId = document.getElementById("editCategoryId").value;
+        console.log(categoryId)
         try {
-          const response= await fetch(`/admin/edit-category/${categoryId}`, {
+          const response = await fetch(`/admin/edit-category/${categoryId}`, {
             method: "PUT",
-            headers: {"Content-type": "application/json"},
-            body: JSON.stringify(formData)
+            body: formData
           });
-
-          const data=await response.json();
+          const data = await response.json();
           
-          console.log(data.message)
-          
-            if (data.success) {
-              Toastify({
-                  text: data.message,
-                  duration: 3000,
-                  close: true,
-                  gravity: "top",
-                  position: "right",
-                  backgroundColor: "#28a745",
-              }).showToast();
-
-              setTimeout(() => {
-                  location.reload();
-              }, 1500);
+          if (data.success) {
+            Toastify({
+              text: data.message,
+              duration: 3000,
+              close: true,
+              gravity: "top",
+              position: "right",
+              backgroundColor: "#28a745"
+            }).showToast();
+            setTimeout(() => location.reload(), 1500);
           } else {
-              Toastify({
-                  text: data.message || "Something went wrong!",
-                  duration: 3000,
-                  close: true,
-                  gravity: "top",
-                  position: "right",
-                  backgroundColor: "#dc3545",
-              }).showToast();
+            Toastify({
+              text: data.message || "Something went wrong!",
+              duration: 3000,
+              close: true,
+              gravity: "top",
+              position: "right",
+              backgroundColor: "#dc3545"
+            }).showToast();
           }
-          
         } catch (error) {
           console.error("Error:", error);
         }
       });
-
+      
       // Read More functionality for long descriptions
       document.querySelectorAll(".read-more-link").forEach(link => {
         link.addEventListener("click", function() {
@@ -366,54 +336,35 @@
           });
         });
       });
-
-      // Search functionality for categories
-      const searchInput = document.getElementById("searchInput");
-      const searchBtn = document.getElementById("searchBtn");
-      const resetBtn = document.getElementById("resetBtn");
-      const tableRows = document.querySelectorAll("#categoriesTable tbody tr");
-
-      searchBtn.addEventListener("click", function() {
-        const query = searchInput.value.toLowerCase().trim();
-        tableRows.forEach(row => {
-          const nameCell = row.querySelector("td:first-child").textContent.toLowerCase();
-          row.style.display = nameCell.includes(query) ? "" : "none";
-        });
-      });
-
-      // Reset search
-      resetBtn.addEventListener("click", function() {
-        searchInput.value = "";
-        tableRows.forEach(row => row.style.display = "");
-      });
-    });
-    
-    document.querySelectorAll(".toggle-status-btn").forEach(button => {
+      
+      // Toggle category status
+      document.querySelectorAll(".toggle-status-btn").forEach(button => {
       button.addEventListener("click", async function () {
-        const categoryId = this.dataset.id;
-        const buttonElement = this;
+      const categoryId = this.dataset.id;
+      const currentStatus = this.textContent.trim();
+      const newStatus = currentStatus === "Listed" ? "Unlisted" : "Listed";
 
+      Swal.fire({
+      title: `Are you sure?`,
+      text: `Do you want to ${newStatus.toLowerCase()} this category?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#28a745",
+      cancelButtonColor: "#dc3545",
+      confirmButtonText: `Yes, ${newStatus}`,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
         try {
           const response = await fetch(`/admin/toggle-category-status/${categoryId}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" }
           });
-
           const data = await response.json();
-          console.log(data)
-
           if (data.success) {
-            // Update button text and class based on the new status
-            if (data.newStatus) {
-              buttonElement.textContent = "Listed";
-              buttonElement.classList.remove("btn-danger");
-              buttonElement.classList.add("btn-success");
-    
-            } else {
-              buttonElement.textContent = "Unlisted";
-              buttonElement.classList.remove("btn-success");
-              buttonElement.classList.add("btn-danger");
-            }
+            this.textContent = data.newStatus ? "Listed" : "Unlisted";
+            this.classList.toggle("btn-success");
+            this.classList.toggle("btn-danger");
+            Swal.fire("Success", `Category is now ${newStatus.toLowerCase()}.`, "success");
           } else {
             Swal.fire("Error", data.message || "Failed to update status", "error");
           }
@@ -421,8 +372,25 @@
           console.error("Error:", error);
           Swal.fire("Error", "Something went wrong!", "error");
         }
+      }
+    });
+  });
+});   
+
+document.querySelectorAll(".category-image-popup").forEach(image => {
+    image.addEventListener("click", function() {
+      const imageUrl = this.getAttribute("src");
+      Swal.fire({
+        title: "Category Image",
+        imageUrl: imageUrl,
+        imageAlt: "Category Image",
+        showCloseButton: true,
+        showConfirmButton: false,
       });
     });
+  });
+    });
+
   </script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>

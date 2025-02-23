@@ -1,4 +1,5 @@
-const categorySchema=require("../../model/categoryModel")
+const categorySchema=require("../../model/categoryModel");
+// const { search } = require("../../routes/admin");
 
 
 const categoryController={
@@ -10,10 +11,21 @@ const categoryController={
             let limit = 5; // Number of categories per page
             let skip = (page - 1) * limit;
 
-            const totalCategories = await categorySchema.countDocuments(); // Total count
-            const totalPages = Math.ceil(totalCategories / limit);
+            //for searchh quetr frm url
+            const searchQuery=req.query.search?req.query.search.trim():"";
 
-            const categories = await categorySchema.find()
+            let filter={}
+            if(searchQuery){
+                filter.name={$regex:new RegExp(searchQuery,"i")};
+            }
+
+            
+           
+            const totalCategories = await categorySchema.countDocuments(filter); // Total count
+            const totalPages = Math.ceil(totalCategories / limit);
+    
+            const categories = await categorySchema.find(filter)
+                .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(limit);
 
@@ -21,6 +33,7 @@ const categoryController={
                 categories,
                 currentPage: page,
                 totalPages,
+                search:searchQuery,
             });
         } catch (error) {
             console.log(error)
@@ -40,21 +53,21 @@ const categoryController={
          
             
             const { id } = req.params;
-            console.log("this isidd"+id)
+            const imageUrl=req.file ? `/uploads/${req.file.filename}`:"";
+            console.log(req.body)
 
-        const { editedCategoryName, editedCategoryDesc } = req.body;
-        if(!editedCategoryName?.trim() || !editedCategoryDesc?.trim()){
+        const { name, description } = req.body;
+        if(!name?.trim() || !description?.trim()){
             return res.status(401).json({
-
                 message: 'Must fill all fields!',
                 status: 'error',
             });
         }
-        console.log(editedCategoryName+"  "+editedCategoryDesc)
+        // console.log(editedCategoryName+"  "+editedCategoryDesc)
 
         const existingCategory = await categorySchema.findOne({
             _id: { $ne: id }, // Exclude the current category being edited
-            name: { $regex: new RegExp(`^${editedCategoryName.trim()}$`, "i") }
+            name: { $regex: new RegExp(`^${name.trim()}$`, "i") }
         });
 
         if (existingCategory) {
@@ -64,9 +77,9 @@ const categoryController={
             });
         }
 
-         await categorySchema.findByIdAndUpdate(id, { name:editedCategoryName.trim(), description:editedCategoryDesc });
+         await categorySchema.findByIdAndUpdate(id, { name:name.trim(), description:description ,image:imageUrl});
 
-        res.status(200).json({ success: true, message: "Category updated successfully" });
+        res.status(200).json({ success: true, message: "Category updated successfully" ,imageUrl});
         } catch (error) {
             console.log(error)
              return res.status(500).send("internal server error")
@@ -75,6 +88,7 @@ const categoryController={
     addCategory:async (req,res) => {
         try {
             const {name,description}=req.body
+            const imageUrl=req.file ? `/uploads/${req.file.filename}`:"";
             console.log("this is name of product"+name )
             console.log("this is descro"+description)
             
@@ -93,7 +107,8 @@ const categoryController={
 
             const newcategory=new categorySchema({
                 name,
-                description
+                description,
+                image:imageUrl
             })
 
             await newcategory.save();
