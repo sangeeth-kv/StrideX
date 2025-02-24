@@ -180,7 +180,9 @@
             <div class="mb-3">
               <label for="editCategoryImage" class="form-label">Category Image</label>
               <input type="file" class="form-control" id="addCategoryImage" name="image" accept="image/png, image/jpeg, image/jpg" />
-          
+              <div class="mt-2">
+                <img id="editImgPreview" src="" alt="category Image" class="category-thumbnail" style="max-width: 100px; display: none;">
+              </div>
             </div>
             <button type="submit" class="btn btn-primary">Save Changes</button>
           </form>
@@ -289,7 +291,7 @@
       document.getElementById("editCategoryForm").addEventListener("submit", async function(e) {
         e.preventDefault();
         const formData = new FormData(this);
-        console.log(formData)
+  
         const categoryId = document.getElementById("editCategoryId").value;
         console.log(categoryId)
         try {
@@ -389,7 +391,28 @@ document.querySelectorAll(".category-image-popup").forEach(image => {
       });
     });
   });
+
+  
+  //image preview
+
+  document.getElementById("addCategoryImage").addEventListener("change", function() {
+    const file = this.files[0];
+    const imgPreview = document.getElementById("editImgPreview");
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function() {
+        imgPreview.src = reader.result;
+        imgPreview.style.display = "block";
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+
     });
+
+
+    
 
   </script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

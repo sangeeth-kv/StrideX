@@ -54,18 +54,15 @@ loadAddProducts:async (req,res) => {
 },
 addproducts:async (req,res) => {
     try {
-        // const {productName,description,categoryId,brand,offer,stock,variants}=req.body
-        const { productName, description, categoryId, brand, stock, variants } = req.body;
-        console.log("ad produc is working "+ productName,description)
+        // const {name,description,categoryId,brand,offer,stock,variants}=req.body
+        const { name, description, categoryId, brand, stock, variants } = req.body;
+        console.log("ad produc is working "+ name,description)
 
-        if (!productName || !description || !categoryId || !brand) {
+        if (!name || !description || !categoryId || !brand) {
             return res.status(400).json({ success: false, message: "All required fields must be filled!" });
         }
         console.log(categoryId+"this is category iddddd")
-        // const categoryObjectId = new mongoose.Types.ObjectId(categoryId);
-
-        // const categoryObjectId = new mongoose.Types.ObjectId(categoryId);
-        // console.log("converted iddddd"+categoryObjectId)
+      
         console.log(req.files)
         console.log("erk ekre");
         console.log("Variants received:", req.body.variants);
@@ -76,7 +73,7 @@ addproducts:async (req,res) => {
         console.log("parsed done")
 
           const newProduct = new productSchema({
-            productName,
+            name,
             description,
             categoryId,
             brand,
@@ -114,8 +111,23 @@ deleteProducts:async (req,res) => {
     const categories= await categorySchema.find({},"name").lean();
     res.status(200).json(categories)
 },
-editProduct:async (req,res) => {
-    
+loadEditProductPage:async (req,res) => {
+    try {
+        console.log(req.params)
+        console.log("wrkingg");
+        
+        res.render("admin/editproducts")
+    } catch (error) {
+        res.status(500).send("server error")
+        console.log(error)
+    }
+},
+editProducts:async (req,res) => {
+    try {
+        
+    } catch (error) {
+        res.status(500).send("server error")
+    }
 }
 }
 

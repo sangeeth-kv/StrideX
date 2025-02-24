@@ -21,19 +21,22 @@ router.post(
 router.get("/addproducts", productController.loadAddProducts);
 router.get("/fetchbrands", productController.fetchBrands);
 router.get("/fetchcategories", productController.fetchCategories);
+router.get("/editproducts/:id",productController.loadEditProductPage)
 
 //for categorys CategoryController
 
 router.get("/category", categoryController.loadCategoryPage);
 // router.post("/add-category", categoryController.addCategory);
 router.post("/add-category",upload.single("image"),categoryController.addCategory);
-router.get("/edit-category", categoryController.loadEditCategory);
+// router.get("/edit-category", categoryController.loadEditCategory);
 router.put("/edit-category/:id",upload.single("image"), categoryController.editCategory);
 router.post("/toggle-category-status/:id",categoryController.listUnlistCategory);
 
 //for brands brandController
 
 router.get("/brands", brandController.loadBrandPage);
-router.post("/add-brand",brandController.addBrands)
+router.post("/add-brands",upload.single("image"),brandController.addBrands)
+router.put("/edit-brands/:id",upload.single("image"),brandController.editBrands)
+router.post("/list-unlist/:id",brandController.listUnlistBrand)
 
 module.exports = router;

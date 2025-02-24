@@ -40,14 +40,14 @@ const categoryController={
             res.status(500).send("internal server error")
         }
     },
-    loadEditCategory:async (req,res) => {
-        try {
-            res.render("admin/editcategory")
-        } catch (error) {
-            console.log(error)
-            res.status(500).send("internal server error")
-        }
-    },
+    // loadEditCategory:async (req,res) => {
+    //     try {
+    //         res.render("admin/editcategory")
+    //     } catch (error) {
+    //         console.log(error)
+    //         res.status(500).send("internal server error")
+    //     }
+    // },
     editCategory:async (req,res) => {
         try {
          

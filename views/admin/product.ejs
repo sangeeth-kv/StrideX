@@ -2,78 +2,84 @@
 <head>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
 </head>
+
 <div class="content-header">
     <div>
         <h2 class="content-title card-title active">Products</h2>
     </div>
+    <!-- Add Product Button -->
+    <div class="text-end">
+        <a href="/admin/addproducts" class="btn btn-primary">Add Product</a>
+    </div>
 </div>
+
 <header class="card-header text-center mb-20">
     <form action="" method="get" class="d-inline">
         <div class="input-group input-group-sm border border-1 border-grey rounded-pill" style="width: 500px; margin-left: 230px;">
             <input type="text" class="form-control border-0 rounded-pill" placeholder="Search products or brands" name="search">
-            <button class="btn  border-0" type="submit">Search</button>
+            <button class="btn border-0" type="submit">Search</button>
         </div>
     </form>
 </header>
+
 <div class="right mt-5">
     <table class="table table-striped">
         <thead>
             <tr>
-                <th scope="col"><b>Sl. No</b></th> <!-- Added Serial Number Column -->
-                <th scope="col"><b>Product name</b></th>
+                <th scope="col"><b>Sl. No</b></th> <!-- Serial Number -->
+                <th scope="col"><b>Product Name</b></th>
                 <th scope="col"><b>Brand</b></th>
                 <th scope="col"><b>Category</b></th>
                 <th scope="col"><b>Sale Price</b></th>
-                <th scope="col"><b>Offer Price</b></th>
-                <th scope="col"><b>Offer</b></th>
-                <th scope="col"><b>Quantity</b></th>
                 <th scope="col"><b>Action</b></th>
                 <th scope="col"><b>Edit</b></th>
             </tr>
         </thead>
         <tbody>
-            <% let userCount = 1; %> <% // Initialize serial number %>
-            <% products.forEach(products => { %> <!-- Assuming 'products' is the array of product data -->
+            <% let userCount = 1; %> 
+            <% products.forEach(product => { %> 
             <tr>
-                <td><%= userCount++ %></td> <!-- Displaying Serial Number -->
-                <td><%= products.productName %></td>
-                <td><%= products.brand ? products.brand.name : "N/A" %></td>
-                <td><%= (products.categoryId && products.categoryId.name) ? products.categoryId.name : "N/A" %></td>
-                <td><%= products.salePrice %></td>
-                <td><%= products.offerPrice %></td>
+                <td><%= userCount++ %></td> <!-- Serial Number -->
+                <td><%= product.productName %></td>
+                <td><%= product.brand ? product.brand.name : "N/A" %></td>
+                <td><%= (product.categoryId && product.categoryId.name) ? product.categoryId.name : "N/A" %></td>
+                <td><%= product.salePrice %></td>
                 <td>
-                    <button class="btn btn-info" style="width: 100px;">
-                        <a href="#" class="text-white">Add Offer</a>
-                    </button>
-                    <button class="btn btn-info" style="width: 100px;">
-                        <a href="#" class="text-white">Remove</a>
-                    </button>
-                </td>
-                <td><%= products.quantity %></td>
-                <td>
-                    <button class="btn btn-danger" style="width: 80px;">
-                        <a href="" class="text-white" style="text-decoration: none;">Block</a>
-                    </button>
-                    <button class="btn btn-success" style="width: 80px;">
-                        <a href="" class="text-white" style="text-decoration: none;">Unblock</a>
+                    <button class="btn btn-warning" style="width: 100px;">
+                        <a href="" class="text-white" style="text-decoration: none;">Listed</a>
                     </button>
                 </td>
                 <td>
-                    <button class="btn btn-info" style="width: 80px;">
-                        <a href="" class="text-white" style="text-decoration: none;">Edit</a>
+                    <button class="btn btn-info edit-btn" id="editbtn" style="width: 80px;" onclick="redirectToEdit('<%= product._id %>', event)">
+                        Edit
                     </button>
                 </td>
+                
+                
             </tr>
-            <% }) %> <!-- End of loop -->
+            <% }) %> 
         </tbody>
     </table>
-</div>
-</div>
-</div>
-
-<div class="container mt-3">
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <%- include("partials/footer") %>
+<script>
+ 
+ function redirectToEdit(productId, event) {
+    event.stopPropagation(); // Prevent bubbling
+    event.preventDefault(); // Prevent default behavior
+
+    let button = event.currentTarget; // Ensures the button itself is targeted
+    button.disabled = true;
+    button.innerHTML = "Loading...";
+
+    setTimeout(() => {
+        window.location.href = `/admin/editproducts/${productId}`;
+    }, 500);
+}
+
+
+
+</script>

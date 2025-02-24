@@ -1,0 +1,190 @@
+<%- include("partials/header") %>
+
+<head>
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
+</head>
+
+<style>
+   .error-message {
+       color: red;
+   }
+   .thumbnails-container {
+       display: flex;
+       overflow-x: auto;
+   }
+   .thumbnail {
+       margin-right: 10px;
+   }
+   .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+        background-color: white;
+        margin: 10% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 50%;
+        text-align: center;
+    }
+    .close {
+        float: right;
+        font-size: 24px;
+        cursor: pointer;
+    }
+</style>
+
+<section class="content-main">
+    <div class="row">
+        <div class="col-9">
+            <div class="content-header">
+                <h2 class="content-title">Edit Product</h2>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form id="productForm">
+                        <input type="hidden" name="productId" id="productId">
+                        <div class="mb-4">
+                            <label class="form-label">Product Name</label>
+                            <input type="text" name="productName" class="form-control border" id="productName" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Brand</label>
+                            <select class="form-select border" name="brand" id="brand"></select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Category</label>
+                            <select class="form-select border" name="categoryId" id="categoryId"></select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Full description</label>
+                            <textarea name="description" class="form-control border" id="description" rows="4" required></textarea>
+                        </div>
+
+                        <h4>Product Variants</h4>
+                        <div id="variantsContainer"></div>
+                        <button type="button" onclick="addVariant()">Add More Variants</button>
+
+                        <div class="card mb-2">
+                            <div class="card-header">
+                                <h4>Choose and Crop Images</h4>
+                            </div>
+                            <div class="border row">
+                                <div id="addedImagesContainer" class="thumbnails-container"></div>
+                            </div>
+                            <div class="row">
+                                <div class="card-body align-items-center">
+                                    <input class="form-control" type="file" name="images" id="inputImages" multiple accept="image/png, image/jpeg, image/jpg">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <button class="btn btn-md rounded font-sm hover-up" type="button" onclick="validateAndSubmit(event)">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    async function loadProductDetails(productId) {
+        let response = await fetch(`/admin/getproduct/${productId}`);
+        let product = await response.json();
+        
+        document.getElementById("productId").value = product._id;
+        document.getElementById("productName").value = product.name;
+        document.getElementById("description").value = product.description;
+        
+        let brandSelect = document.getElementById("brand");
+        let categorySelect = document.getElementById("categoryId");
+        brandSelect.value = product.brand;
+        categorySelect.value = product.categoryId;
+        
+        let variantsContainer = document.getElementById("variantsContainer");
+        product.variants.forEach(variant => {
+            let div = document.createElement("div");
+            div.innerHTML = `
+                <div class="mb-2">
+                    <label class="form-label">Size</label>
+                    <input type="text" name="size[]" class="form-control border" value="${variant.size}" required>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Regular Price</label>
+                    <input type="number" name="regularPrice[]" class="form-control border" value="${variant.regularPrice}" required>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Quantity</label>
+                    <input type="number" name="quantity[]" class="form-control border" value="${variant.quantity}" required>
+                </div>
+            `;
+            variantsContainer.appendChild(div);
+        });
+    }
+
+    async function validateAndSubmit(event) {
+        event.preventDefault();
+        
+        const form = document.getElementById("productForm");
+        const formData = new FormData(form);
+        
+        try {
+            let response = await fetch("/admin/editproduct", {
+                method: "POST",
+                body: formData
+            });
+            
+            let data = await response.json();
+            
+            if (data.success) {
+                Swal.fire({
+                    title: "Success!",
+                    text: "Product updated successfully!",
+                    icon: "success",
+                    confirmButtonText: "OK"
+                }).then(() => {
+                    window.location.href = "/admin/products";
+                });
+            } else {
+                Swal.fire({
+                    title: "Error!",
+                    text: "Error updating product: " + data.message,
+                    icon: "error",
+                    confirmButtonText: "OK"
+                });
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            Swal.fire({
+                title: "Error!",
+                text: "Something went wrong. Please try again.",
+                icon: "error",
+                confirmButtonText: "OK"
+            });
+        }
+    }
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get("id");
+    if (productId) {
+        loadProductDetails(productId);
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<%- include("partials/footer") %>
