@@ -5,8 +5,7 @@ const categorySchema=require("../../model/categoryModel");
 const categoryController={
     loadCategoryPage:async (req,res) => {
         try {
-            // const categories=await categorySchema.find()
-            // res.render("admin/category",{categories})
+           
             let page = parseInt(req.query.page) || 1; // Default to page 1
             let limit = 5; // Number of categories per page
             let skip = (page - 1) * limit;
@@ -18,8 +17,6 @@ const categoryController={
             if(searchQuery){
                 filter.name={$regex:new RegExp(searchQuery,"i")};
             }
-
-            
            
             const totalCategories = await categorySchema.countDocuments(filter); // Total count
             const totalPages = Math.ceil(totalCategories / limit);
@@ -35,19 +32,12 @@ const categoryController={
                 totalPages,
                 search:searchQuery,
             });
+
         } catch (error) {
             console.log(error)
             res.status(500).send("internal server error")
         }
     },
-    // loadEditCategory:async (req,res) => {
-    //     try {
-    //         res.render("admin/editcategory")
-    //     } catch (error) {
-    //         console.log(error)
-    //         res.status(500).send("internal server error")
-    //     }
-    // },
     editCategory:async (req,res) => {
         try {
          
@@ -63,7 +53,6 @@ const categoryController={
                 status: 'error',
             });
         }
-        // console.log(editedCategoryName+"  "+editedCategoryDesc)
 
         const existingCategory = await categorySchema.findOne({
             _id: { $ne: id }, // Exclude the current category being edited

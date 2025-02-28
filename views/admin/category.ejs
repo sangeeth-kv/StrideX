@@ -1,10 +1,10 @@
 <%- include("partials/header") %>
 <head>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css"/>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
-  <!-- Bootstrap Icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     /* UI Enhancement: Image thumbnail styling */
     .category-thumbnail {
@@ -60,7 +60,7 @@
                 <tr>
                   <td>
                     <% if (category.image) { %>
-                      <img src="<%= category.image %>" alt="Category Image" class="category-thumbnail category-image-popup" />
+                      <img src="<%= category.image %>" alt="Category Image" data-name="<%=category.name %>" class="category-thumbnail category-image-popup" />
                     <% } else { %>
                       <i class="bi bi-card-image" style="font-size: 1.5rem;"></i>
                     <% } %>
@@ -198,6 +198,42 @@
   
   <script>
     document.addEventListener("DOMContentLoaded", function() {
+
+
+
+      document.getElementById("addCategoryImage").addEventListener("change", function() {
+  const file = this.files[0];
+  const FILE_SIZE_LIMIT = 5 * 1024 * 1024; // 5MB in bytes
+  const imgPreview = document.getElementById("imgPreview");
+  if (file) {
+    if (file.size > FILE_SIZE_LIMIT) {
+      Toastify({
+        text: "File size exceeds 5MB. Please choose a smaller image.",
+        duration: 3000,
+        close: true,
+        gravity: "top",
+        position: "right",
+        backgroundColor: "#dc3545"
+      }).showToast();
+      // Clear the file input and preview if size is too large
+      this.value = "";
+      imgPreview.style.display = "none";
+      return;
+    }
+    // If file is valid, display preview
+    const reader = new FileReader();
+    reader.onload = function() {
+      imgPreview.setAttribute("src", reader.result);
+      imgPreview.style.display = "block";
+    };
+    reader.readAsDataURL(file);
+  } else {
+    imgPreview.style.display = "none";
+  }
+});
+
+
+      
       // Search functionality for categories
       const searchForm = document.getElementById("search-form");
       searchForm.addEventListener("submit", function(e) {
@@ -231,47 +267,36 @@
       });
       
       // Add Category Form Submission with image upload
-      document.getElementById("addCategoryForm").addEventListener("submit", async function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        try {
-          const response = await fetch("/admin/add-category", {
+    document.getElementById("addCategoryForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    try {
+        const response = await fetch("/admin/add-category", {
             method: "POST",
             body: formData
-          });
-          const data = await response.json();
-          if (data.success) {
-            Toastify({
-              text: "Category added successfully!",
-              duration: 3000,
-              close: true,
-              gravity: "top",
-              position: "right",
-              backgroundColor: "#28a745"
-            }).showToast();
+        });
+        const data = await response.json();
+
+        if (data.success) {
+            Swal.fire("Success", "Category added successfully!", "success");
             setTimeout(() => location.reload(), 1500);
-          } else {
-            Toastify({
-              text: data.message || "Something went wrong!",
-              duration: 3000,
-              close: true,
-              gravity: "top",
-              position: "right",
-              backgroundColor: "#dc3545"
-            }).showToast();
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          Toastify({
-            text: "An error occurred. Please try again.",
-            duration: 3000,
-            close: true,
-            gravity: "top",
-            position: "right",
-            backgroundColor: "#dc3545"
-          }).showToast();
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: data.message || "Something went wrong!",
+            });
         }
-      });
+    } catch (error) {
+        console.error("Error:", error);
+        Swal.fire({
+            icon: "error",
+            title: "File too large!",
+            text: "Please upload an image smaller than 5MB.",
+        });
+    }
+});
+
       
       // Edit Category Modal population
       document.querySelectorAll(".edit-category-btn").forEach(button => {
@@ -383,7 +408,7 @@ document.querySelectorAll(".category-image-popup").forEach(image => {
     image.addEventListener("click", function() {
       const imageUrl = this.getAttribute("src");
       Swal.fire({
-        title: "Category Image",
+        title: `${this.dataset.name}`,
         imageUrl: imageUrl,
         imageAlt: "Category Image",
         showCloseButton: true,
@@ -407,6 +432,7 @@ document.querySelectorAll(".category-image-popup").forEach(image => {
       reader.readAsDataURL(file);
     }
   });
+
 
 
     });

@@ -8,35 +8,6 @@ const adminController={
 login:async (req,res) => {
 res.render("admin/login")
 },
-
-// postLogin:async (req,res) => {
-//     const {email,password}=req.body
-//     console.log(email+" "+password)
-//     const admin=await adminModel.findOne({email})
-//     console.log(admin)
-// }
-// postLogin:async (req,res) => {
-//     try {
-//         const {email,password}=req.body
-//     console.log(email+" "+password)
-//     const admin=await adminModel.findOne({email})
-//     console.log(admin)
-
-//     if(!admin){
-//        return res.render("admin/login",{message:"Wrong email address",type:"error"})
-//     }
-//     const isMatch=await bcrypt.compare(password,admin.password)
-//     if(!isMatch){
-//         return res.render("admin/login",{message:"Password must match",type:"error"})
-//     }
-//     res.redirect("/admin/dashboard")
-
-//     } catch (error) {
-//         console.log(error)
-//     }
-// },
-
-
 postLogin: async (req, res) => {
     try {
         const { email, password } = req.body;

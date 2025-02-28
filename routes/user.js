@@ -1,7 +1,9 @@
 const express=require("express")
 const router=express.Router();
 const userController=require("../controller/user/userController");
+const userProductController=require("../controller/user/userProductController")
 const passport=require("passport");
+const productController = require("../controller/admin/productController");
 // const adminController = require("../controller/admin/adminController");
 require("../config/passport")
 
@@ -72,11 +74,12 @@ router.post("/forgot-password",userController.forgotPassword)
 router.get("/verify-otp",userController.loadVerify)
 router.get("/change-password",userController.loadChangePassword)
 router.post("/change-password",userController.changePassword)
+router.get("/logout",userController.logout)
 
 
-
-// router.get("/success",userController.loadHome)
-// router.get("/failure",userController.loadLogin)
+//for products 
+router.get("/view-product/:id",userProductController.getProductDetails)
+router.get("/shop",userProductController.loadShopPage)
 
 
 

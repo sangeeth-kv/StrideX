@@ -266,7 +266,7 @@
       const resetBtn = document.getElementById("resetBtn");
       resetBtn.addEventListener("click", function() {
         document.getElementById("searchInput").value = "";
-        window.location.href = "/admin/category";
+        window.location.href = "/admin/brands";
       });
 
 
@@ -406,7 +406,11 @@ document.querySelectorAll(".editBrandBtn").forEach(button => {
       //for list and unlisted
       document.querySelectorAll(".toggle-status-btn").forEach(button => {
       button.addEventListener("click", async function () {
+        console.log("here");
+        
       const brandId = this.dataset.id;
+      console.log(brandId);
+      
       const currentStatus = this.textContent.trim();
       const newStatus = currentStatus === "Listed" ? "unlisted" : "Listed";
 
@@ -421,8 +425,10 @@ document.querySelectorAll(".editBrandBtn").forEach(button => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
+          console.log("send");
+          
           const response = await fetch(`/admin/list-unlisted/${brandId}`, {
-            method: "POST",
+            method: "PATCH",
             headers: { "Content-Type": "application/json" }
           });
           const data = await response.json();

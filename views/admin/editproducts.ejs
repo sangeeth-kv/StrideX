@@ -3,8 +3,20 @@
 <head>
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
 </head>
+<script src="https://cdn.jsdelivr.net/npm/cropperjs"></script>
 
 <style>
+    .delete-btn {
+    background-color: red;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-left: 5px;
+    padding: 2px 5px;
+    font-size: 14px;
+    border-radius: 3px;
+}
+
    .error-message {
        color: red;
    }
@@ -53,104 +65,265 @@
             <div class="card mb-4">
                 <div class="card-body">
                     <form id="productForm">
-                        <input type="hidden" name="productId" id="productId">
+                        <input type="hidden" name="productId" id="productId" value="<%= product._id %>">
                         <div class="mb-4">
                             <label class="form-label">Product Name</label>
-                            <input type="text" name="productName" class="form-control border" id="productName" required>
+                            <input type="text"   value="<%=product.name %>" name="name" class="form-control border" id="productName" required>
                         </div>
 
                         <div class="mb-4">
                             <label class="form-label">Brand</label>
-                            <select class="form-select border" name="brand" id="brand"></select>
+                            <select class="form-select border" name="brand" id="brand">
+                                <% brands.forEach(brand => { %>
+                                    <option value="<%= brand._id %>" <%= brand._id.toString() === product.brand._id.toString() ? "selected" : "" %>>
+                                        <%= brand.name %>
+                                    </option>
+                                <% }); %>
+                            </select>
                         </div>
 
                         <div class="mb-4">
                             <label class="form-label">Category</label>
-                            <select class="form-select border" name="categoryId" id="categoryId"></select>
+                            <select class="form-select border" name="categoryId" id="categoryId">
+                                <% categories.forEach(category => { %>
+                                    <option value="<%= category._id %>" <%= category._id.toString() === product.categoryId._id.toString() ? "selected" : "" %>>
+                                        <%= category.name %>
+                                    </option>
+                                <% }); %>
+                            </select>
                         </div>
 
                         <div class="mb-4">
                             <label class="form-label">Full description</label>
-                            <textarea name="description" class="form-control border" id="description" rows="4" required></textarea>
+                            <textarea name="description" class="form-control border" id="description" rows="4" required><%- product.description %></textarea>
                         </div>
 
                         <h4>Product Variants</h4>
-                        <div id="variantsContainer"></div>
-                        <button type="button" onclick="addVariant()">Add More Variants</button>
+<div id="variantsContainer">
+    <% product.variants.forEach((variant, index) => { %>
+        <div class="variant">
+            <div class="mb-2">
+                <label class="form-label">Size</label>
+                <input type="text" name="size[]" class="form-control border" value="<%= variant.size %>">
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Regular Price</label>
+                <input type="number" name="regularPrice[]" class="form-control border" value="<%= variant.regularPrice %>" >
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Quantity</label>
+                <input type="number" name="quantity[]" class="form-control border" value="<%= variant.quantity %>" >
+            </div>
+        </div>
+    <% }); %>
+</div>
+<button type="button" onclick="addVariant()">Add More Variants</button>
 
-                        <div class="card mb-2">
-                            <div class="card-header">
-                                <h4>Choose and Crop Images</h4>
-                            </div>
-                            <div class="border row">
-                                <div id="addedImagesContainer" class="thumbnails-container"></div>
-                            </div>
-                            <div class="row">
-                                <div class="card-body align-items-center">
-                                    <input class="form-control" type="file" name="images" id="inputImages" multiple accept="image/png, image/jpeg, image/jpg">
-                                </div>
-                            </div>
-                        </div>
+<div class="card mb-2">
+    <div class="card-header">
+        <h4>Choose and Crop Images</h4>
+    </div>
+    <div class="border row">
+        <div id="addedImagesContainer" class="thumbnails-container">
+            <% product.images.forEach((image, index) => { %>
+                <div class="thumbnail" id="thumbnail-<%= index %>">
+                    <img src="<%= image %>" alt="Product Image" width="100">
+                    <button type="button" class="delete-btn" onclick="removeImage('<%= index %>')">X</button>
+                </div>
+            <% }); %>
+        </div>
+        
+    </div>
+    <div class="row">
+        <div class="card-body align-items-center">
+            <input class="form-control" type="file" name="images" id="inputImages" multiple accept="image/png, image/jpeg, image/jpg">
+        </div>
+    </div>
+</div>
+
 
                         <div>
-                            <button class="btn btn-md rounded font-sm hover-up" type="button" onclick="validateAndSubmit(event)">Save Changes</button>
+                            <button class="btn btn-md rounded font-sm hover-up" id="submitBtn"  type="button" >Save Changes</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+    <!-- Add a modal for cropping -->
+<div id="cropperModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeCropperModal()">&times;</span>
+        <h4>Crop Image</h4>
+        <div>
+            <img id="cropperImage" style="max-width: 100%;" />
+        </div>
+        <button type="button" onclick="cropImage()">Crop & Save</button>
+    </div>
+</div>
+
 </section>
 
 <script>
-    async function loadProductDetails(productId) {
-        let response = await fetch(`/admin/getproduct/${productId}`);
-        let product = await response.json();
+
+let cropper;
+let croppedImages = [];
+let imageQueue = []; 
+
+const inputImages = document.getElementById("inputImages");
+const cropperImage = document.getElementById("cropperImage");
+const cropperModal = document.getElementById("cropperModal");
+const addedImagesContainer = document.getElementById("addedImagesContainer");
+
+inputImages.addEventListener("change", function (event) {
+    imageQueue = Array.from(event.target.files);
+    if (imageQueue.length > 0) {
+        processNextImage(); 
+    }
+});
+
+function processNextImage() {
+    if (imageQueue.length === 0) return;
+
+    const file = imageQueue.shift(); 
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+        cropperImage.src = e.target.result;
+        openCropperModal();
+    };
+
+    reader.readAsDataURL(file);
+}
+
+function openCropperModal() {
+    cropperModal.style.display = "block";
+    cropper = new Cropper(cropperImage, {
+        aspectRatio: 1, // Adjust the aspect ratio as needed
+        viewMode: 2,
+    });
+}
+
+function closeCropperModal() {
+    cropperModal.style.display = "none";
+    if (cropper) {
+        cropper.destroy();
+    }
+}
+
+function cropImage() {
+    const canvas = cropper.getCroppedCanvas();
+    canvas.toBlob((blob) => {
+        const croppedImageFile = new File([blob], "cropped-image.jpg", { type: "image/jpeg" });
+
+        addCroppedImagePreview(URL.createObjectURL(blob));
+
+        closeCropperModal();
+
+        // Process the next image in the queue
+        processNextImage(); 
+    });
+}
+
+
+function addCroppedImagePreview(imageUrl) {
+    const container = document.getElementById("addedImagesContainer");
+
+    const div = document.createElement("div");
+    div.classList.add("thumbnail");
+
+    div.innerHTML = `
+        <img src="${imageUrl}" alt="Cropped Image" width="100">
+        <button type="button" class="delete-btn" onclick="removeImage(this)">X</button>
+    `;
+
+    container.appendChild(div);
+}
+
+
+function removeImage(index) {
+    const imageElement = document.getElementById(`thumbnail-${index}`);
+    if (imageElement) {
+        imageElement.remove(); // Remove image from preview
+    }
+
+    // Optionally: Store deleted image indexes to exclude them from the request
+    if (!window.deletedImages) {
+        window.deletedImages = [];
+    }
+    window.deletedImages.push(index);
+}
+
+function addVariant() {
+        let container = document.getElementById("variantsContainer");
+        let div = document.createElement("div");
+        div.classList.add("variant");
+
+        div.innerHTML = `
+            <div class="mb-2">
+                <label class="form-label">Size</label>
+                <input type="text" name="size[]" class="form-control border" >
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Regular Price</label>
+                <input type="number" name="regularPrice[]" class="form-control border" >
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Quantity</label>
+                <input type="number" name="quantity[]" class="form-control border" >
+            </div>
+        `;
+        container.appendChild(div);
         
-        document.getElementById("productId").value = product._id;
-        document.getElementById("productName").value = product.name;
-        document.getElementById("description").value = product.description;
-        
-        let brandSelect = document.getElementById("brand");
-        let categorySelect = document.getElementById("categoryId");
-        brandSelect.value = product.brand;
-        categorySelect.value = product.categoryId;
-        
-        let variantsContainer = document.getElementById("variantsContainer");
-        product.variants.forEach(variant => {
-            let div = document.createElement("div");
-            div.innerHTML = `
-                <div class="mb-2">
-                    <label class="form-label">Size</label>
-                    <input type="text" name="size[]" class="form-control border" value="${variant.size}" required>
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Regular Price</label>
-                    <input type="number" name="regularPrice[]" class="form-control border" value="${variant.regularPrice}" required>
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Quantity</label>
-                    <input type="number" name="quantity[]" class="form-control border" value="${variant.quantity}" required>
-                </div>
-            `;
-            variantsContainer.appendChild(div);
-        });
     }
 
     async function validateAndSubmit(event) {
         event.preventDefault();
+        console.log("jhsdjf")
+       
+        const productId = document.getElementById("productId").value;
+
+     
+
+console.log("Product ID:", productId);
+
+        
         
         const form = document.getElementById("productForm");
         const formData = new FormData(form);
+
+// for (const [key, value] of formData.entries()) {
+//     console.log(key, value);
+// }
+
+
+        const variants=[];
+        document.querySelectorAll("#variantsContainer .variant").forEach(variantDiv => {
+            const size = variantDiv.querySelector("input[name='size[]']").value;
+            const regularPrice = variantDiv.querySelector("input[name='regularPrice[]']").value;
+            const quantity = variantDiv.querySelector("input[name='quantity[]']").value;
+            
+            if (size && regularPrice && quantity) {
+            variants.push({
+                size: size,
+                regularPrice: parseFloat(regularPrice),
+                quantity: parseInt(quantity),
+            });
+        }
+        });
         
+        
+        formData.append("variants", JSON.stringify(variants)); 
+        
+
         try {
-            let response = await fetch("/admin/editproduct", {
-                method: "POST",
+            let response = await fetch(`/admin/editproducts/${productId}`, {
+                method: "PATCH",
                 body: formData
             });
             
             let data = await response.json();
-            
+            console.log("hetn")
             if (data.success) {
                 Swal.fire({
                     title: "Success!",
@@ -179,11 +352,11 @@
         }
     }
     
-    const urlParams = new URLSearchParams(window.location.search);
-    const productId = urlParams.get("id");
-    if (productId) {
-        loadProductDetails(productId);
-    }
+ 
+    
+
+    document.getElementById("submitBtn").addEventListener("click",validateAndSubmit)
+    
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

@@ -1,0 +1,218 @@
+<style>
+.zoom-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.zoom-container img {
+    transition: transform 0.3s ease-in-out;
+}
+
+.zoom-container:hover img {
+    transform: scale(1.9);
+    cursor: zoom-in;
+}
+
+.zoom-container span {
+    transition: all 0.3s ease-in-out;
+}
+
+
+</style>
+
+<%- include("partials/header") %>
+
+<main class="main">
+    <!-- Breadcrumb -->
+    <div class="bg-gray-100 py-4">
+        <div class="container mx-auto px-4">
+            <nav class="text-sm">
+                <a href="/user/home" class="text-gray-600 hover:text-gray-800">Home</a>
+                <span class="mx-2 text-gray-400">/</span>
+                <a href="#" class="text-gray-600 hover:text-gray-800"><%= product.category %></a>
+                <span class="mx-2 text-gray-400">/</span>
+                <span class="text-gray-800 font-semibold"><%= product.name %></span>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Product Section -->
+    <section class="py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Product Image Gallery -->
+                <div class="relative">
+                    <div class="zoom-container relative group">
+                        <img id="mainImage" src="<%= product.images[0] %>" alt="<%= product.name %>" class="w-full rounded-lg shadow-md">
+                        <!-- Stylish Zoom Icon -->
+                        <span class="absolute top-2 right-2 bg-white p-3 rounded-full shadow-md cursor-pointer transition-all duration-300 opacity-0 group-hover:opacity-100 group-hover:scale-110">
+                            <i class="fi-rs-search text-gray-700 text-xl"></i> <!-- Replace with FontAwesome or Lucide icon -->
+                        </span>
+                    </div>                
+                    <div class="flex space-x-2 mt-4">
+                        <% product.images.forEach(image => { %>
+                            <img onclick="document.getElementById('mainImage').src=this.src" src="<%= image %>" class="w-20 h-20 object-cover rounded-lg cursor-pointer border hover:border-orange-500">
+                        <% }) %>
+                    </div>
+                </div>
+
+                <!-- Product Info -->
+                <div>
+                    <h2 class="text-3xl font-semibold mb-3"><%= product.name %></h2>
+                    <p class="text-gray-500 text-sm mb-4">Brand: <a href="#" class="text-orange-500 font-medium"><%= product.brand.name %></a></p>
+                    
+                    
+                    <!-- Price -->
+                    <div class="flex items-center space-x-4 mb-4">
+                        <span id="currentPrice" class="text-2xl font-bold text-orange-500">₹<%= product.variants[0].regularPrice %></span>
+                        <% if (product.oldPrice) { %>
+                            <span id="oldPrice" class="text-gray-400 line-through">₹<%= product.variants[0].regularPrice %></span>
+                        <% } %>
+                    </div>
+
+                    <!-- Size Selection as Boxes -->
+                    <div class="mb-6">
+                        <label class="block text-gray-600 font-medium mb-2">Select Size:</label>
+                        <div id="productVariants" data-variants='<%= JSON.stringify(product.variants) %>'>
+                            <div class="flex flex-wrap gap-2">
+                                <% product.variants.forEach(variant => { %>
+                                    <button class="size-box px-4 py-2 border rounded-lg cursor-pointer hover:border-orange-500"
+                                        onclick="selectSize(this, '<%= variant.size %>', '<%= variant.regularPrice %>')"
+                                        data-size="<%= variant.size %>"
+                                        data-price="<%= variant.regularPrice %>">
+                                        <%= variant.size %>
+                                    </button>
+                                <% }) %>
+                            </div>
+                        </div>
+                        <input type="hidden" id="selectedSize" name="size">
+                    </div>
+                    
+
+                    <!-- Quantity Selector & Add to Cart -->
+                    <div class="flex items-center space-x-4 mb-6">
+                        <div class="flex items-center border px-3 py-2 rounded-lg">
+                            <button onclick="decreaseQty()" class="text-gray-600 hover:text-orange-500 px-2">−</button>
+                            <span id="quantity" class="mx-3">1</span>
+                            <button onclick="increaseQty()" class="text-gray-600 hover:text-orange-500 px-2">+</button>
+                        </div>
+                        <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg shadow-md">
+                            Add to Cart
+                        </button>
+                        <a href="#" class="text-gray-600 hover:text-red-500 text-xl">
+                            <i class="fi-rs-heart"></i>
+                        </a>
+                    </div>
+
+                    <!-- Stock & SKU -->
+                    <ul class="text-sm text-gray-500">
+                        <li>Availability: 
+                            <span id="availabilityStatus" class="<%= product.stock > 0 ? 'text-green-600' : 'text-red-500' %>">
+                                <%= product.stock > 0 ? "In Stock" : "Out of Stock" %>
+                            </span>
+                        </li>
+                    </ul>
+                    <h3 class="text-lg font-semibold mb-2">Product Description</h3>
+                    <p class="text-gray-600 mb-6"><%= product.description %></p>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<%- include("partials/footer") %>
+
+<!-- Quantity & Size Selection Script -->
+<script>
+
+
+
+    function selectSize(element, size, price) {
+        console.log("Size selected:", size, "Price:", price);  // Debugging log
+
+        document.querySelectorAll('.size-box').forEach(box => {
+            box.classList.remove('border-orange-500', 'bg-orange-100');
+        });
+        element.classList.add('border-orange-500', 'bg-orange-100');
+        document.getElementById('selectedSize').value = size;
+        
+        // Update price dynamically
+        document.getElementById('currentPrice').innerText = `₹${price}`;
+    }
+
+    function decreaseQty() {
+        let qty = document.getElementById('quantity');
+        if (parseInt(qty.innerText) > 1) {
+            qty.innerText = parseInt(qty.innerText) - 1;
+        }
+    }
+
+    function increaseQty() {
+        let qty = document.getElementById('quantity');
+        qty.innerText = parseInt(qty.innerText) + 1;
+    }
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+    // Get the product variants from the hidden data attribute
+    const productVariants = JSON.parse(document.getElementById('productVariants').getAttribute('data-variants'));
+
+    function selectSize(element, size, price) {
+        console.log("Size selected:", size, "Price:", price);  // Debugging log
+
+        // Remove previous selection styles
+        document.querySelectorAll('.size-box').forEach(box => {
+            box.classList.remove('border-orange-500', 'bg-orange-100');
+        });
+
+        // Highlight selected size
+        element.classList.add('border-orange-500', 'bg-orange-100');
+
+        // Update hidden input
+        document.getElementById('selectedSize').value = size;
+
+        // Update price dynamically
+        document.getElementById('currentPrice').innerText = `₹${price}`;
+
+        // Get the availability span
+        let availabilitySpan = document.getElementById('availabilityStatus');
+
+        // Find the selected variant
+        let selectedVariant = productVariants.find(variant => variant.size === size);
+
+        if (selectedVariant) {
+            if (selectedVariant.quantity > 0) {
+                availabilitySpan.innerText = "In Stock";
+                availabilitySpan.classList.remove('text-red-500');
+                availabilitySpan.classList.add('text-green-600');
+            } else {
+                availabilitySpan.innerText = "Out of Stock";
+                availabilitySpan.classList.remove('text-green-600');
+                availabilitySpan.classList.add('text-red-500');
+            }
+        }
+    }
+
+    // Attach event listeners to size buttons
+    document.querySelectorAll('.size-box').forEach(button => {
+        button.addEventListener('click', function () {
+            selectSize(this, this.getAttribute('data-size'), this.getAttribute('data-price'));
+        });
+    });
+    const mainImage = document.getElementById("mainImage");
+
+    mainImage.addEventListener("mousemove", function (e) {
+        const { left, top, width, height } = mainImage.getBoundingClientRect();
+        const x = (e.clientX - left) / width * 100;
+        const y = (e.clientY - top) / height * 100;
+
+        mainImage.style.transformOrigin = `${x}% ${y}%`;
+        mainImage.style.transform = "scale(1.5)";
+    });
+
+    mainImage.addEventListener("mouseleave", function () {
+        mainImage.style.transform = "scale(1)";
+    });
+});
+
+</script>

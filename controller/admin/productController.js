@@ -3,6 +3,7 @@ const productSchema=require("../../model/productModel")
 const categorySchema=require("../../model/categoryModel")
 const brandSchema=require("../../model/brandModel")
 const mongoose = require("mongoose");
+const { search } = require("../../routes/admin");
 
 
 
@@ -10,37 +11,35 @@ const productController={
 
 loadProductPage:async (req,res) => {
     try {
-        // Fetch products from database (assuming you're using Mongoose)
-        // const products= await productSchema.find().populate("categoryId","name").populate("brand","name"); 
-        // const products = await Product.find().populate("categoryId", "name");
-// console.log(JSON.stringify(products, null, 2));
 
-        // const products = await productSchema
-        // .find()
-        // .populate({ path: "categoryId", select: "name" }) // Explicitly defining population
-        // .populate({ path: "brand", select: "name" }); 
-        // console.log("Fetched Products:", JSON.stringify(products, null, 2))
-        
+        let page=parseInt(req.query.page)||1
+        let limit=5;
+        let skip=(page-1)*limit;
+        const searchQuery=req.query.search?req.query.search.trim():"";
+        console.log(searchQuery+"thie sseaec")
 
-        // Render the page and pass the products array
-        // res.render("admin/product", { products }); // Ensure "product" is the correct key
-        const products = await productSchema.find()
+        let filter={}
+        if(searchQuery){
+            filter.name={$regex:new RegExp(searchQuery,"i")};
+        }
+
+            const totalProducts= await productSchema.countDocuments(filter); // Total count
+            const totalPages = Math.ceil(totalProducts/ limit);
+
+            const products = await productSchema.find(filter)
                 .populate('categoryId', 'name')
                 .populate('brand', 'name logo')
-                .lean();  // Using lean() for better performance
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .lean();  
 
-            console.log("Fetched Products:", JSON.stringify(products, null, 2));
-
-            // Render the page with products
-            res.render("admin/product", { products });
+            
+            res.render("admin/product", { products , currentPage: page,totalPages,search:searchQuery});
         } catch (error) {
             console.error("Error in fetching product page: " + error);
             res.status(500).send("Internal Server Error");
         }
-        // } catch (error) {
-        //     console.error("error in fething in product page"+error);
-        //     res.status(500).send("Internal Server Error");
-        // }
     },
 loadAddProducts:async (req,res) => {
     try {
@@ -61,7 +60,10 @@ addproducts:async (req,res) => {
         if (!name || !description || !categoryId || !brand) {
             return res.status(400).json({ success: false, message: "All required fields must be filled!" });
         }
-        console.log(categoryId+"this is category iddddd")
+        const existingProduct=await productSchema.findOne( {name: { $regex: new RegExp(`^${name}$`, "i") }} )
+        if(existingProduct){
+            return res.status(409).json({message:"Product already exists"})
+        }
       
         console.log(req.files)
         console.log("erk ekre");
@@ -102,10 +104,7 @@ deleteProducts:async (req,res) => {
         res.status(500).send("Error in deleting products")
     }
 },fetchBrands:async (req,res) => {
-    // const brands= brandSchema.find({},"name")
     const brands = await brandSchema.find({}, "name").lean();
-    // const brands = await brandSchema.find({}, "name");
-
      res.status(200).json(brands);
 },fetchCategories:async (req,res) => {
     const categories= await categorySchema.find({},"name").lean();
@@ -113,20 +112,78 @@ deleteProducts:async (req,res) => {
 },
 loadEditProductPage:async (req,res) => {
     try {
-        console.log(req.params)
-        console.log("wrkingg");
-        
-        res.render("admin/editproducts")
+        console.log(req.params);
+        const id = req.params.id;
+
+        const product = await productSchema.findById(id).populate("categoryId").populate("brand");
+
+        if (!product) {
+            return res.status(404).send("Product not found");
+        }
+
+        const brands = await brandSchema.find(); // Fetch all brands
+        const categories = await categorySchema.find(); // Fetch all categories
+        res.render("admin/editproducts", { product, brands, categories });
     } catch (error) {
         res.status(500).send("server error")
         console.log(error)
     }
 },
-editProducts:async (req,res) => {
+updateProduct:async (req,res) => {
     try {
+       const id=req.body.productId
+        const {name, brand, categoryId, description, variants }=req.body
+
+        const existingProduct = await productSchema.findById(id);
+        const images = req.files && req.files.length > 0 
+         ? req.files.map(file => `/uploads/${file.filename}`) 
+        : existingProduct.images; // Retain old images if no new ones are uploaded
+
         
+        
+        if(!id){
+            res.status(400).json({success:false,message:"Product not found.."})
+        }
+        console.log("hereree");
+        const updatedProduct = await productSchema.findByIdAndUpdate(
+            id,
+            {
+                name,
+                brand,
+                images,
+                categoryId,
+                description,
+                variants: JSON.parse(variants),
+            },
+            { new: true } // Returns the updated product
+        );
+        
+        if (!updatedProduct) {
+            return res.status(404).json({ success: false, message: "Product not found." });
+        }
+       
+        return res.status(200).json({ success: true, message: "Product updated successfully!", product: updatedProduct });
     } catch (error) {
         res.status(500).send("server error")
+    }
+},productStatus:async (req,res) => {
+    try {
+            const id=req.params.id
+            console.log(id)
+            
+            const product=await productSchema.findById(id)
+            if(!product){
+                return res.status(409).json({message:"No such product found",success:false})
+            }
+            product.isActive=!product.isActive
+
+            await product.save()
+            console.log("worked");
+            
+            return res.status(200).json({message:"Product updated",success:true})
+    } catch (error) {
+        res.status(500).send("server error")
+        console.log(error)
     }
 }
 }

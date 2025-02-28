@@ -4,12 +4,15 @@ const adminController = require("../controller/admin/adminController");
 const productController = require("../controller/admin/productController");
 const categoryController = require("../controller/admin/categoryController");
 const brandController = require("../controller/admin/brandController");
+const userController=require("../controller/admin/userController")
 const upload = require("../config/multer");
 
 //for login page adminController
 router.get("/login", adminController.login);
 router.post("/login", adminController.postLogin);
 router.get("/dashboard", adminController.loadDashboard);
+
+
 
 //for products productController
 router.get("/products", productController.loadProductPage);
@@ -22,6 +25,10 @@ router.get("/addproducts", productController.loadAddProducts);
 router.get("/fetchbrands", productController.fetchBrands);
 router.get("/fetchcategories", productController.fetchCategories);
 router.get("/editproducts/:id",productController.loadEditProductPage)
+router.patch("/editproducts/:id",upload.array("images",4),productController.updateProduct)
+router.patch("/product/status/:id",productController.productStatus)
+
+
 
 //for categorys CategoryController
 
@@ -37,6 +44,12 @@ router.post("/toggle-category-status/:id",categoryController.listUnlistCategory)
 router.get("/brands", brandController.loadBrandPage);
 router.post("/add-brands",upload.single("image"),brandController.addBrands)
 router.put("/edit-brands/:id",upload.single("image"),brandController.editBrands)
-router.post("/list-unlist/:id",brandController.listUnlistBrand)
+router.patch("/list-unlisted/:id",brandController.listUnlistBrand)
+
+
+//for users
+
+router.get("/users",userController.loadUserPage)
+router.patch("/users/status/:id",userController.UserStatus)
 
 module.exports = router;

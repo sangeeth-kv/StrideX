@@ -1,34 +1,82 @@
-<header class="header-area header-style-3 header-height-2">
-    <div class="header-bottom header-bottom-bg-color sticky-bar">
-        <div class="container">
-            <div class="header-wrap header-space-between position-relative main-nav d-flex align-items-center justify-content-between">
-                <div class="logo">
-                    <a href="/">
-                        <img src="/user/imgs/logos/cyclonelogo.png" alt="logo" class="logo-img">
+<!DOCTYPE html>
+<html lang="zxx">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Male_Fashion Template">
+    <meta name="keywords" content="Male_Fashion, unica, creative, html">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Male-Fashion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body class="font-['Nunito_Sans']">
+    <!-- Header -->
+    <header class="sticky top-0 bg-white shadow-md z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between py-4">
+                <!-- Logo -->
+                <div class="w-1/4">
+                    <a href="/user/home">
+                        <img src="/admin-assets/imgs/logos/logo-transparent-png.png" alt="Logo" class="h-11">
                     </a>
                 </div>
-                <div class="header-nav">
-                    <div class="main-menu main-menu-padding-1 main-menu-lh-2">
-                        <nav>
-                            <ul class="d-flex justify-content-end">
-                                <li><a href="/">Home</a></li>
-                                <li><a href="/about">About</a></li>
-                                <li><a href="/shop">Shop</a></li>
-                                <li><a href="/order">Order</a></li>
-                                <li><a href="/contact">Contact</a></li>
-                                <li><a href="/profile">Profile</a></li>
-                            </ul>
-                        </nav>
-                    </div>
+
+                <!-- Navigation -->
+                <nav class="hidden md:flex w-2/4 justify-center">
+                    <ul class="flex space-x-8">
+                        <li><a href="/user/home" class="text-gray-700 hover:text-orange-500 font-semibold">Home</a></li>
+                        <li><a href="/user/shop" class="text-gray-700 hover:text-orange-500 font-semibold">Shop</a></li>
+                    </ul>
+                </nav>
+
+                <!-- User Actions -->
+                <div class="w-1/4 flex items-center justify-end space-x-6">
+                    <% if(user) { %>
+                        <div class="relative">
+                            <!-- Username Button -->
+                            <button id="user-button" class="text-gray-700 hover:text-orange-500 font-semibold">
+                                <%= user.name %>
+                            </button>
+                        
+                            <!-- Dropdown Menu -->
+                            <div id="user-dropdown" class="absolute right-0 hidden bg-white shadow-lg rounded-md mt-2 min-w-[160px]">
+                                <a href="/user/Profile" class="block px-4 py-3 hover:bg-gray-100">Profile</a>
+                                <a href="/user/logout" class="block px-4 py-3 hover:bg-gray-100">Logout</a>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <a href="/user/signup" class="text-gray-700 hover:text-orange-500 font-semibold">Sign Up</a>
+                        <a href="/user/login" class="text-gray-700 hover:text-orange-500 font-semibold">Log in</a>
+                    <% } %>
+                    
+                    <a href="/wishlist" class="text-gray-700 hover:text-orange-500">
+                        <i class="fas fa-heart text-lg"></i>
+                    </a>
+                    <a href="/cart" class="text-gray-700 hover:text-orange-500 relative">
+                        <i class="fas fa-shopping-cart text-lg"></i>
+                        <span class="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-2 rounded-full">0</span>
+                    </a>
                 </div>
             </div>
         </div>
-    </div>
-</header>
+    </header>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+    const userButton = document.getElementById("user-button");
+    const dropdownMenu = document.getElementById("user-dropdown");
 
-<style>
-    .logo img {
-        width: 200px; /* Adjust width as needed */
-        height: auto; /* Maintain aspect ratio */
-    }
-</style>
+    userButton.addEventListener("click", function (event) {
+        event.stopPropagation(); // Prevent event from bubbling
+        dropdownMenu.classList.toggle("hidden"); // Toggle visibility
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", function (event) {
+        if (!userButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+            dropdownMenu.classList.add("hidden");
+        }
+    });
+});
+    </script>

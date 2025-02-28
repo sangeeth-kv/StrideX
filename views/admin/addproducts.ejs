@@ -147,6 +147,28 @@
 
 <script>
 
+function addVariant() {
+        let container = document.getElementById("variantsContainer");
+        let div = document.createElement("div");
+        div.classList.add("variant");
+
+        div.innerHTML = `
+            <div class="mb-2">
+                <label class="form-label">Size</label>
+                <input type="text" name="size[]" class="form-control border" required>
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Regular Price</label>
+                <input type="number" name="regularPrice[]" class="form-control border" required>
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Quantity</label>
+                <input type="number" name="quantity[]" class="form-control border" required>
+            </div>
+        `;
+        container.appendChild(div);
+        
+    }
 document.addEventListener("DOMContentLoaded",function(){
 
 
@@ -180,12 +202,12 @@ document.addEventListener("DOMContentLoaded",function(){
                 }
                 cropper = new Cropper(cropperImage, {
                     aspectRatio: 1, 
-                    viewMode: 1,
+                    viewMode: 0,
                     autoCropArea: 1,
                     movable: false,
                     zoomable: false,
-                    rotatable: false,
-                    scalable: false
+                    rotatable: true,
+                    scalable: true,
                 });
             };
             reader.readAsDataURL(file);
@@ -268,27 +290,7 @@ document.addEventListener("DOMContentLoaded",function(){
 
     fetchBrandsAndCategories();
 
-    function addVariant() {
-        let container = document.getElementById("variantsContainer");
-        let div = document.createElement("div");
-        div.classList.add("variant");
-
-        div.innerHTML = `
-            <div class="mb-2">
-                <label class="form-label">Size</label>
-                <input type="text" name="size[]" class="form-control border" required>
-            </div>
-            <div class="mb-2">
-                <label class="form-label">Regular Price</label>
-                <input type="number" name="regularPrice[]" class="form-control border" required>
-            </div>
-            <div class="mb-2">
-                <label class="form-label">Quantity</label>
-                <input type="number" name="quantity[]" class="form-control border" required>
-            </div>
-        `;
-        container.appendChild(div);
-    }
+   
 
     async function validateAndSubmit(event) {
     event.preventDefault();
@@ -349,6 +351,7 @@ document.addEventListener("DOMContentLoaded",function(){
         });
     }
 }
+
 
 document.getElementById("publishButton").addEventListener("click", validateAndSubmit);
 

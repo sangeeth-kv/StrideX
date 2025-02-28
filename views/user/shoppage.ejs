@@ -1,0 +1,367 @@
+<%- include("partials/header") %>
+<style>
+.custom-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.custom-select {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #46698f;
+  border-radius: 8px;
+  background-color: #fff;
+  font-size: 14px;
+  color: #333;
+  appearance: none; /* Removes default browser styling */
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: bold;
+}
+
+.custom-select:hover {
+  background-color: #f0f8ff;
+  border-color: #324d6b;
+}
+
+.custom-dropdown::after {
+  content: "▼";
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  color: #46698f;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.product-card {
+  width: calc(33.333% - 20px);
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.product-card img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 5px;
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover img {
+  transform: scale(1.05);
+}
+
+.add-to-cart-btn {
+  background-color: #46698f;
+  color: #fff;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.add-to-cart-btn:hover {
+  background-color: #324d6b;
+}
+
+  .main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .shop-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .search-form {
+    display: flex;
+    align-items: center;
+    background-color: #f1f1f1;
+    border-radius: 25px;
+    overflow: hidden;
+    max-width: 250px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .search-input {
+    flex: 1;
+    padding: 8px 10px;
+    font-size: 14px;
+    border: none;
+    outline: none;
+    background-color: transparent;
+  }
+
+  .search-button {
+    padding: 8px 15px;
+    background-color: #1e918b;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 15px;
+    margin-right: 5px;
+    transition: background-color 0.3s, transform 0.2s;
+  }
+
+  .search-button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+  }
+
+  .product-list-container {
+    display: flex;
+    gap: 20px;
+  }
+
+  .sidebar {
+    width: 250px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+  }
+
+  .filter-section {
+    margin-bottom: 20px;
+  }
+
+  .filter-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: #333;
+  }
+
+  .filter-item {
+    margin: 5px 0;
+  }
+
+  .filter-item a {
+    text-decoration: none;
+    color: #333;
+  }
+
+  .filter-item a:hover {
+    color: #007bff;
+  }
+
+  .product-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    width: calc(100% - 270px);
+  }
+
+  .product-card {
+    width: calc(33.333% - 20px);
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    position: relative;
+  }
+
+  .product-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+  }
+
+  .wishlist-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background-color: rgba(237, 247, 247, 0.8);
+    color: #fff;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .add-to-cart-btn {
+    background-color: #46698f;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .pagination {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+  gap: 10px;
+}
+
+.page-btn {
+  padding: 10px 15px;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  color: #333;
+  text-decoration: none;
+  font-weight: bold;
+  border-radius: 5px;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.page-btn:hover {
+  background-color: #46698f;
+  color: white;
+  transform: scale(1.05);
+}
+
+.page-btn.active {
+  background-color: #1e918b;
+  color: white;
+  border: 1px solid #1e918b;
+}
+
+
+  .price-filter {
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    margin-top: 20px;
+  }
+
+  .price-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .price-button {
+    padding: 12px 20px;
+    background-color: #f1f1f1;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    text-align: center;
+    font-size: 14px;
+  }
+
+  .price-button:hover {
+    background-color: #007bff;
+    color: white;
+    transform: scale(1.05);
+  }
+
+  .price-button:active {
+    transform: scale(0.95);
+  }
+</style>
+
+<div class="main-container">
+  <section class="shop-page container">
+    <!-- Topbar with search -->
+    <div class="shop-topbar">
+      <div class="search-bar">
+        <form action="" method="GET" class="search-form">
+          <input type="text" name="query" placeholder="Search items..." class="search-input" value="<%= searchQuery || '' %>" />
+          <button type="submit" class="search-button">Search</button>
+      </form>      
+      </div>
+    </div>
+
+    <div class="product-list-container">
+      <!-- Sidebar for filters -->
+      <aside class="sidebar"><form id="filter-form" action="/user/shop" method="GET">
+        <div class="filter-section">
+          <div class="filter-title">Categories</div>
+          <% categories.forEach(category => { %>
+            <div class="filter-item">
+              <input type="checkbox" name="category" value="<%= category.name %>" 
+                <% if (categoryFilter && categoryFilter.includes(category.name)) { %> checked <% } %> />
+              <label><%= category.name %></label>
+            </div>
+          <% }) %>
+        </div>
+      
+        <div class="filter-section">
+          <div class="filter-title">Brands</div>
+          <% brands.forEach(brand => { %>
+            <div class="filter-item">
+                <input type="checkbox" name="brand" value="<%= brand.name %>"
+                <% if (brandFilter && brandFilter.includes(brand.name)) { %> checked <% } %> />              
+              <label><%= brand.name %></label>
+            </div>
+          <% }) %>
+        </div>
+      
+        <div class="filter-section">
+          <div class="filter-title">Sort By</div>
+          <select name="sort" class="custom-select" id="sort-select">
+              <option value="low-high" <%= sort === 'low-high' ? 'selected' : '' %>>Price Low to High</option>
+              <option value="high-low" <%= sort === 'high-low' ? 'selected' : '' %>>Price High to Low</option>
+              <option value="a-z" <%= sort === 'a-z' ? 'selected' : '' %>>A - Z</option>
+              <option value="z-a" <%= sort === 'z-a' ? 'selected' : '' %>>Z - A</option>
+          </select>
+      </div>
+      
+      
+        <button type="submit" class="search-button" style="width: 100%; margin-top: 10px;">Apply Filters</button>
+      </form>      
+      </aside>
+
+      <!-- Product grid -->
+      <main class="product-grid">
+        <% product.forEach(product => { %>
+          <div class="product-card">
+            <span class="wishlist-btn" onclick="">❤️</span>
+            <a href="/user/view-product/<%= product._id %>">
+              <img src="<%= product.images[0] %>" alt="<%= product.name %>" />
+              <h4><%= product.name %></h4>
+              <p>Brand: <%= product.brand.name %></p>
+              <p>₹<span class="text-brand"><%= product.variants[0].regularPrice%></span></p>
+            </a>
+            <button class="add-to-cart-btn" onclick="addToCart('<%= product._id %>')">Add to Cart</button>
+          </div>
+        <% }) %>
+      </main>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <div class="pagination">
+        <% if (currentPage > 1) { %>
+            <a href="?page=<%= currentPage - 1 %>" class="page-btn">Previous</a>
+        <% } %>
+    
+        <% for (let i = 1; i <= totalPages; i++) { %>
+            <a href="?page=<%= i %>" class="page-btn <%= currentPage === i ? 'active' : '' %>"><%= i %></a>
+        <% } %>
+    
+        <% if (currentPage < totalPages) { %>
+            <a href="?page=<%= currentPage + 1 %>" class="page-btn">Next</a>
+        <% } %>
+    </div>
+    
+    </div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+<%- include("partials/footer") %>

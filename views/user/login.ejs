@@ -6,16 +6,17 @@
     <title>StrideX User Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="flex items-center justify-center h-screen bg-gray-900" style="background-color: #6f8e80;">
+<body class="flex items-center justify-center h-screen bg-gray-900" style="background-color: #020202dc;">
     <div class="flex w-4/5 max-w-5xl bg-gray-800 rounded-lg shadow-lg overflow-hidden">
         <!-- Left Section (Logo) -->
-        <div class="w-1/2 flex items-center justify-center p-10 bg-gray-700" style="background-color: #8FB0A1;">
-            <img src="/admin-assets/imgs/logos/Stridex.png" alt="StrideX Logo" style="width: 900px;" class="w-3/4">
+        <div class="w-1/2 flex items-center justify-center p-10 bg-gray-700" style="background-color: #ced1cd;">
+            <img src="/admin-assets/imgs/logos/logo-transparent-png.png" alt="StrideX Logo" style="width: 700px;  height: 400px;" class="w-3/4">
         </div>
+        <div class="border-l border-gray-500"></div>
         
         <!-- Right Section (Login Form) -->
-        <div class="w-1/2 p-10 flex flex-col justify-center text-white" style="background-color: #8FB0A1;">
-            <h2 class="text-3xl font-bold mb-6 text-center" style="color: rgb(251, 223, 223);">StrideX User Login</h2>
+        <div class="w-1/2 p-10 flex flex-col justify-center text-white" style="background-color: #e3e4e3;">
+            <h2 class="text-2xl font-bold mb-6 text-center" style="color: rgb(21, 21, 21);">Welcome,Please Login to Continue</h2>
             <form action="/user/login" method="POST" id="signinForm">
                 <div class="mb-4">
                     <input type="email" id="emailField"  name="email" value="<%= typeof email !== 'undefined' ? email: '' %>" 
@@ -37,10 +38,7 @@
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5 mr-2" 
                     alt="Google Logo"> Login with Google
             </button>
-            <button class="w-full flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-md">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" class="w-5 h-5 mr-2" 
-                    alt="Facebook Logo"> Login with Facebook
-            </button>
+           
 
             <!-- Sign Up Button -->
             <p class="text-center mt-4 text-white">Don't have an account? <a href="/user/signup" class="text-blue-500 font-semibold">Sign Up Here</a></p>
@@ -67,31 +65,20 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <% if (messages && messages.error && messages.error.length > 0) { %>
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                Swal.fire({
-                    icon: "error",
-                    title: "<%= messages.error[0] %>",
-                    showConfirmButton: true
-                });
-            });
-        </script>
-    <% } %>
-    
-    <% if (messages && messages.success && messages.success.length > 0) { %>
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                Swal.fire({
-                    icon: "success",
-                    title: "<%= messages.success[0] %>",
-                    showConfirmButton: true
-                });
-            });
-        </script>
-    <% } %>
-
     <script>
+
+    // Check if there's a message from the server
+    let message = "<%= messages %>";
+    
+    if (message) {
+        Swal.fire({
+            icon: "error",  // Type of alert (error, success, warning, info)
+            title: "Access Denied",
+            text: message,  // Display the message
+            confirmButtonColor: "#d33"
+        });
+    }
+
      document.addEventListener("DOMContentLoaded", function () {
     const forgotPasswordModal = document.getElementById("forgotPasswordModal");
     const forgotPasswordLink = document.getElementById("forgotPasswordLink");
@@ -133,6 +120,7 @@
         });
 
         const data = await response.json();
+
         console.log(data);
 
         if (data.status === "success") {
@@ -152,11 +140,6 @@
         }
     } catch (error) {
         console.error("Error logging in:", error);
-        Swal.fire({
-            icon: "error",
-            title: "Something went wrong!",
-            text: "Please try again later."
-        });
     }
 });
 
