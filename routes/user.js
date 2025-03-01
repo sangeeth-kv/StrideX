@@ -27,6 +27,14 @@ router.get("/auth/google", passport.authenticate("google", { scope: ["email", "p
 router.get( "/auth/google/callback",
     passport.authenticate("google", { failureRedirect: "/user/login" }),
     (req, res) => {
+        if (req.user) {
+            req.session.user = {
+                id: req.user._id,
+                name: req.user.fullname,  // Store user's name
+                email: req.user.email,    // Store email
+                googleId: req.user.googleId
+            };
+        }
         console.log("hei googglke")
         res.redirect("/user/home"); // Redirect to home after successful login
     }

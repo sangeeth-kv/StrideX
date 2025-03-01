@@ -5,275 +5,410 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StrideX User Signup</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .bg-gradient {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d3748 100%);
+            background-size: cover;
+            background-attachment: fixed;
+        }
+        
+        .form-input:focus {
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+            transition: all 0.2s ease;
+        }
+        
+        .hover-scale {
+            transition: transform 0.2s ease;
+        }
+        
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+        
+        .pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+    </style>
 </head>
-<body class="flex items-center justify-center h-screen bg-gray-900" style="background-color: #020202dc;">
-    <div class="flex w-4/5 max-w-5xl bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-        <!-- Left Section (Logo) -->
-        <div class="w-1/2 flex items-center justify-center p-10 bg-gray-700" style="background-color: #ced1cd;">
-            <img src="/admin-assets/imgs/logos/logo-transparent-png.png" alt="StrideX Logo" style="width: 900px;" class="w-3/4">
+<body class="min-h-screen bg-gradient pattern text-white-100 flex items-center justify-center" style="background-image: url('/user-assets/img/banner/bannererrrr.webp');">
+    <div class="w-full max-w-4xl flex flex-col md:flex-row h-auto rounded-xl shadow-lg overflow-hidden">
+        <!-- Left Section (Image) -->
+        <div class="w-full md:w-1/2 relative h-96 md:h-auto">
+            <div class="absolute inset-0 bg-cover bg-center" 
+                style="background-image: url('/user-assets/Q135_Q134_Vertical_compressed.webp');">
+            </div>
+            <div class="absolute inset-0 bg-black bg-opacity-30"></div>
+            <div class="relative z-10 flex flex-col items-center justify-center h-full p-6">
+                <h1 class="text-2xl md:text-3xl font-bold text-white">StrideX</h1>
+                <p class="text-white text-sm text-center">Join our community of style enthusiasts</p>
+            </div>
         </div>
-        
+    
         <!-- Right Section (Signup Form) -->
-        <div class="w-1/2 p-10 flex flex-col justify-center text-white" style="background-color: #e3e4e3;">
-            <h2 class="text-3xl font-bold mb-6 text-center" style="color: rgb(32, 31, 31);">Please Signup to continue</h2>
-            <form action="/user/signup" method="POST" id="signupForm">
-                <div class="mb-4">
-                    <input type="text" name="fullname" placeholder="Full Name" value="<%= typeof fullname !== 'undefined' ? fullname : '' %>" class="w-full px-4 py-3 rounded-md bg-gray-600 text-white placeholder-gray-400">
+        <div class="w-full md:w-1/2 flex items-center justify-center bg-gray-900 p-6 md:p-8">
+            <div class="max-w-sm w-full">
+                <h2 class="text-xl md:text-2xl font-bold text-white text-center">Create Account</h2>
+                <p class="text-gray-400 text-sm text-center mb-4">Fill in your details to get started</p>
+    
+                <form action="/user/signup" method="POST" id="signupForm" class="space-y-3">
+                    <input type="text" id="fullname" name="fullname" placeholder="Full Name" 
+                        value="<%= typeof fullname !== 'undefined' ? fullname : '' %>" 
+                        class="w-full px-3 py-2 rounded bg-gray-800 text-white placeholder-gray-500 border border-gray-700 focus:ring-primary-500">
                     <p id="fullnameError" class="text-red-500 text-sm mt-1 hidden"></p>
-                </div>
-                <div class="mb-4">
-                    <input type="email" name="email" placeholder="Email"  value="<%= typeof email !== 'undefined' ? email: '' %>" class="w-full px-4 py-3 rounded-md bg-gray-600 text-white placeholder-gray-400">
+    
+                    <input type="email" id="email" name="email" placeholder="Email Address" 
+                        value="<%= typeof email !== 'undefined' ? email: '' %>" 
+                        class="w-full px-3 py-2 rounded bg-gray-800 text-white placeholder-gray-500 border border-gray-700 focus:ring-primary-500">
                     <p id="emailError" class="text-red-500 text-sm mt-1 hidden"></p>
-
-                </div>
-                <div class="mb-4">
-                    <input type="text" name="phoneNumber" placeholder="Phone Number" value="<%= typeof phoneNumber !== 'undefined' ? phoneNumber : '' %>" class="w-full px-4 py-3 rounded-md bg-gray-600 text-white placeholder-gray-400">
+    
+                    <input type="text" id="phoneNumber" name="phoneNumber" placeholder="Phone Number" 
+                        value="<%= typeof phoneNumber !== 'undefined' ? phoneNumber : '' %>" 
+                        class="w-full px-3 py-2 rounded bg-gray-800 text-white placeholder-gray-500 border border-gray-700 focus:ring-primary-500">
                     <p id="phoneNumberError" class="text-red-500 text-sm mt-1 hidden"></p>
-
-                </div>
-                <div class="mb-4">
-                    <input type="password" name="password" placeholder="Password" class="w-full px-4 py-3 rounded-md bg-gray-600 text-white placeholder-gray-400">
+    
+                    <input type="password" id="password" name="password" placeholder="Password" 
+                        class="w-full px-3 py-2 rounded bg-gray-800 text-white placeholder-gray-500 border border-gray-700 focus:ring-primary-500">
                     <p id="passwordError" class="text-red-500 text-sm mt-1 hidden"></p>
-
-                </div>
-                <div class="mb-4">
-                    <input type="password" name="confirmPassword" placeholder="Confirm Password" class="w-full px-4 py-3 rounded-md bg-gray-600 text-white placeholder-gray-400">
+    
+                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" 
+                        class="w-full px-3 py-2 rounded bg-gray-800 text-white placeholder-gray-500 border border-gray-700 focus:ring-primary-500">
                     <p id="confirmPasswordError" class="text-red-500 text-sm mt-1 hidden"></p>
-
+    
+                    <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 rounded-lg shadow-md transition-all">
+                        Sign Up Now
+                    </button>
+                </form>
+    
+                <div class="my-4 flex items-center">
+                    <div class="flex-grow h-px bg-gray-700"></div>
+                    <span class="px-2 text-xs text-gray-400">Already registered?</span>
+                    <div class="flex-grow h-px bg-gray-700"></div>
                 </div>
-                <!-- <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-md" onclick="window.location.href='/user/otp-page'">Sign Up Now</button> -->
-                <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-md">Sign Up Now</button>
-
-            </form>
-            <hr class="my-6 border-gray-600">
-            <p class="text-center mb-4">Already have an account?</p>
-            <a href="/user/login" class="w-full flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-md">
-                Login Here
-            </a>
+    
+                <a href="/user/login" class="w-full block text-center bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 rounded-lg">
+                    Login Here
+                </a>
+            </div>
         </div>
     </div>
-    <!-- for modalllll -->
- <!-- OTP Modal -->
-<div id="otpModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-96">
-        <h2 class="text-xl font-bold text-center mb-4">Enter OTP</h2>
-        <p class="text-center text-gray-600 mb-4">OTP has been sent to your email</p>
-        
-        <input type="text" id="otpInput" class="w-full px-4 py-2 border rounded-md mb-2" placeholder="Enter OTP">
-        
-        <p class="text-center text-sm text-red-600 mb-2">Expires in <span id="timer">60</span>s</p>
-
-        <button id="verifyOtpBtn"  class="w-full bg-green-500 text-white font-bold py-2 rounded-md mb-2">Verify OTP</button>
-
-        <button id="resendOtpBtn" class="w-full bg-blue-500 text-white font-bold py-2 rounded-md hidden">Resend OTP</button>
-        
-        <button onclick="closeModal()" class="w-full bg-gray-400 text-white font-bold py-2 rounded-md mt-2">Cancel</button>
+    
+    
+    
+    <!-- OTP Modal -->
+    <div id="otpModal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-900 p-8 rounded-xl shadow-2xl w-full max-w-md border border-gray-800 transform transition-all duration-300">
+            <div class="text-center mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-primary-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <h2 class="text-2xl font-bold text-white mb-2">Verify Your Email</h2>
+                <p class="text-gray-400">We've sent a verification code to your email</p>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <label for="otpInput" class="block text-sm font-medium text-gray-400 mb-2">Enter OTP Code</label>
+                    <input type="text" id="otpInput" placeholder="Enter 6-digit code" 
+                        class="form-input w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-center text-xl tracking-widest">
+                </div>
+                
+                <div class="text-center">
+                    <p class="text-sm text-gray-400">Code expires in <span id="timer" class="font-bold text-primary-400">60</span> seconds</p>
+                </div>
+                
+                <button id="verifyOtpBtn" 
+                    class="hover-scale w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200">
+                    Verify OTP
+                </button>
+                
+                <button id="resendOtpBtn" 
+                    class="hover-scale w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 hidden">
+                    Resend OTP
+                </button>
+                
+                <button onclick="closeModal()" 
+                    class="hover-scale w-full bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200">
+                    Cancel
+                </button>
+            </div>
+        </div>
     </div>
-</div>
 
-</body>
     <!-- SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <!-- SweetAlert2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <script>
+        document.getElementById("signupForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
 
-<script>
-    document.getElementById("signupForm").addEventListener("submit", async function (event) {
-        event.preventDefault();
+            const fullname = document.querySelector('input[name="fullname"]').value.trim();
+            const email = document.querySelector('input[name="email"]').value.trim();
+            const phoneNumber = document.querySelector('input[name="phoneNumber"]').value.trim();
+            const password = document.querySelector('input[name="password"]').value.trim();
+            const confirmPassword = document.querySelector('input[name="confirmPassword"]').value.trim();
 
-        const fullname = document.querySelector('input[name="fullname"]').value.trim();
-        const email = document.querySelector('input[name="email"]').value.trim();
-        const phoneNumber = document.querySelector('input[name="phoneNumber"]').value.trim();
-        const password = document.querySelector('input[name="password"]').value.trim();
-        const confirmPassword = document.querySelector('input[name="confirmPassword"]').value.trim();
-
-        const fullnameError = document.getElementById("fullnameError");
-        const emailError = document.getElementById("emailError");
-        const phoneError = document.getElementById("phoneNumberError");
-        const passwordError = document.getElementById("passwordError");
-        const confirmPasswordError = document.getElementById("confirmPasswordError");
+            const fullnameError = document.getElementById("fullnameError");
+            const emailError = document.getElementById("emailError");
+            const phoneError = document.getElementById("phoneNumberError");
+            const passwordError = document.getElementById("passwordError");
+            const confirmPasswordError = document.getElementById("confirmPasswordError");
+            
+            fullnameError.textContent = "";
+            emailError.textContent = "";
+            phoneError.textContent = "";
+            passwordError.textContent = "";
+            confirmPasswordError.textContent = "";
         
-        fullnameError.textContent = "";
-        emailError.textContent = "";
-        phoneError.textContent = "";
-        passwordError.textContent = "";
-        confirmPasswordError.textContent = "";
-    
-        fullnameError.classList.add("hidden");
-        emailError.classList.add("hidden");
-        phoneError.classList.add("hidden");
-        passwordError.classList.add("hidden");
-        confirmPasswordError.classList.add("hidden");
+            fullnameError.classList.add("hidden");
+            emailError.classList.add("hidden");
+            phoneError.classList.add("hidden");
+            passwordError.classList.add("hidden");
+            confirmPasswordError.classList.add("hidden");
 
+            let isValid = true;
+            const fullNameRegex= /^[A-Za-z\s]+$/;
+            
+            // Full Name Validation
+            if (!fullname) {
+                fullnameError.textContent = "Full Name is required!";
+                fullnameError.classList.remove("hidden");
+                isValid = false;
+            } else if(!fullNameRegex.test(fullname)) {
+                fullnameError.textContent = "Please enter a valid Name!";
+                fullnameError.classList.remove("hidden");
+                isValid = false;
+            }
 
-        let isValid = true;
+            // Email Validation (Regex for valid email)
+            const emailPattern = /^[a-zA-Z0-9][a-zA-Z0-9._-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!email) {
+                emailError.textContent = "Email is required!";
+                emailError.classList.remove("hidden");
+                isValid = false;
+            } else if (!emailPattern.test(email)) {
+                emailError.textContent = "Please enter a valid email!";
+                emailError.classList.remove("hidden");
+                isValid = false;
+            }
 
-    // Full Name Validation
-    if (!fullname) {
-        fullnameError.textContent = "Full Name is required!";
-        fullnameError.classList.remove("hidden");
-        isValid = false;
-    }
+            // Phone Number Validation (10 digits)
+            const phonePattern = /^[0-9]{10}$/;
+            if (!phoneNumber) {
+                phoneError.textContent = "Phone Number is required!";
+                phoneError.classList.remove("hidden");
+                isValid = false;
+            } else if (!phonePattern.test(phoneNumber)) {
+                phoneError.textContent = "Please enter a valid phone number!";
+                phoneError.classList.remove("hidden");
+                isValid = false;
+            }
 
-    // Email Validation (Regex for valid email)
-    const emailPattern = /^[a-zA-Z0-9][a-zA-Z0-9._-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!email) {
-        emailError.textContent = "Email is required!";
-        emailError.classList.remove("hidden");
-        isValid = false;
-    } else if (!emailPattern.test(email)) {
-        emailError.textContent = "Please enter a valid email!";
-        emailError.classList.remove("hidden");
-        isValid = false;
-    }
+            // Password Validation (8+ characters, includes letters, numbers, and special characters)
+            const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+            if (!password) {
+                passwordError.textContent = "Password is required!";
+                passwordError.classList.remove("hidden");
+                isValid = false;
+            } else if (!passwordPattern.test(password)) {
+                passwordError.textContent = "Password must be at least 8 characters and include letters, numbers, and special characters!";
+                passwordError.classList.remove("hidden");
+                isValid = false;
+            }
 
-    // Phone Number Validation (10 digits)
-    const phonePattern = /^[0-9]{10}$/;
-    if (!phoneNumber) {
-        phoneError.textContent = "Phone Number is required!";
-        phoneError.classList.remove("hidden");
-        isValid = false;
-    } else if (!phonePattern.test(phoneNumber)) {
-        phoneError.textContent = "Please enter a valid phone number!";
-        phoneError.classList.remove("hidden");
-        isValid = false;
-    }
+            // Confirm Password Validation
+            if (!confirmPassword) {
+                confirmPasswordError.textContent = "Confirm Password is required!";
+                confirmPasswordError.classList.remove("hidden");
+                isValid = false;
+            } else if (password !== confirmPassword) {
+                confirmPasswordError.textContent = "Passwords do not match!";
+                confirmPasswordError.classList.remove("hidden");
+                isValid = false;
+            }
 
-    // Password Validation (8+ characters, includes letters, numbers, and special characters)
-    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    if (!password) {
-        passwordError.textContent = "Password is required!";
-        passwordError.classList.remove("hidden");
-        isValid = false;
-    } else if (!passwordPattern.test(password)) {
-        passwordError.textContent = "Password must be at least 8 characters and include letters, numbers, and special characters!";
-        passwordError.classList.remove("hidden");
-        isValid = false;
-    }
+            // Stop submission if validation fails
+            if (!isValid) {
+                return;
+            }
 
-    // Confirm Password Validation
-    if (!confirmPassword) {
-        confirmPasswordError.textContent = "Confirm Password is required!";
-        confirmPasswordError.classList.remove("hidden");
-        isValid = false;
-    } else if (password !== confirmPassword) {
-        confirmPasswordError.textContent = "Passwords do not match!";
-        confirmPasswordError.classList.remove("hidden");
-        isValid = false;
-    }
+            try {
+                const response = await fetch("/user/signup", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ fullname, email, phoneNumber, password, confirmPassword })
+                });
 
-    // Stop submission if validation fails
-    if (!isValid) {
-        return;
-    }
-
-        try {
-            const response = await fetch("/user/signup", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ fullname, email, phoneNumber, password, confirmPassword })
-            });
-
-            const data = await response.json();
-            console.log("this is data"+data)
-            if (data.status === "success") {
-                Swal.fire({ icon: "success", title: data.message });
-        
-                localStorage.setItem("userEmail", email);
-              
-
-                // Show OTP modal
-                document.getElementById("otpModal").classList.remove("hidden");
+                const data = await response.json();
+                console.log("this is data"+data)
+                if (data.status === "success") {
+                    Swal.fire({ 
+                        icon: "success", 
+                        title: "Registration Successful!",
+                        text: data.message,
+                        confirmButtonColor: '#16a34a'
+                    });
+            
+                    localStorage.setItem("userEmail", email);
                 
-                // Start OTP timer
-                startOtpTimer();
-            } else {
-                Swal.fire({ icon: "error", title: data.message });
+                    // Show OTP modal
+                    document.getElementById("otpModal").classList.remove("hidden");
+                    document.getElementById("otpModal").classList.add("flex");
+                    document.getElementById("otpInput").focus();
+                    
+                    // Start OTP timer
+                    startOtpTimer();
+                } else {
+                    Swal.fire({ 
+                        icon: "error", 
+                        title: "Registration Failed",
+                        text: data.message,
+                        confirmButtonColor: '#16a34a'
+                    });
+                }
+            } catch (error) {
+                Swal.fire({ 
+                    icon: "error", 
+                    title: "Something went wrong!",
+                    confirmButtonColor: '#16a34a'
+                });
             }
-        } catch (error) {
-            Swal.fire({ icon: "error", title: "Something went wrong!" });
-        }
-    });
+        });
 
-    // Function to start OTP countdown
-    function startOtpTimer() {
-        let timer = 60;
-        const timerElement = document.getElementById("timer");
-        const resendBtn = document.getElementById("resendOtpBtn");
+        // Function to start OTP countdown
+        function startOtpTimer() {
+            let timer = 60;
+            const timerElement = document.getElementById("timer");
+            const resendBtn = document.getElementById("resendOtpBtn");
 
-        timerElement.innerText = timer;
-        resendBtn.classList.add("hidden"); // Hide resend button initially
-
-        const countdown = setInterval(() => {
-            timer--;
             timerElement.innerText = timer;
+            resendBtn.classList.add("hidden"); // Hide resend button initially
 
-            if (timer <= 0) {
-                clearInterval(countdown);
-                resendBtn.classList.remove("hidden"); // Show resend button
+            const countdown = setInterval(() => {
+                timer--;
+                timerElement.innerText = timer;
+
+                if (timer <= 0) {
+                    clearInterval(countdown);
+                    resendBtn.classList.remove("hidden"); // Show resend button
+                }
+            }, 1000);
+        }
+
+        // Function to close modal
+        function closeModal() {
+            document.getElementById("otpModal").classList.add("hidden");
+            document.getElementById("otpModal").classList.remove("flex");
+        }
+
+        // Close modal when clicking outside
+        document.getElementById("otpModal").addEventListener("click", function(event) {
+            if (event.target === this) {
+                closeModal();
             }
-        }, 1000);
-    }
+        });
 
-    // Function to close modal
-    function closeModal() {
-        document.getElementById("otpModal").classList.add("hidden");
-    }
-
-    // Verify OTP function
-    document.getElementById("verifyOtpBtn").addEventListener("click", async function () {
-        const otp = document.getElementById("otpInput").value.trim();
-        // const otpToken = localStorage.getItem("otpToken");
-        
-        // console.log("this is  otp tokeneenn"+otpToken)
-        if (!otp) {
-            Swal.fire({ icon: "error", title: "Please enter OTP!" });
-            return;
-        }
-
-        try {
-            const response = await fetch("/user/verify-otp", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ otp })
-            });
-
-            const data = await response.json();
-            Swal.fire({ icon: data.status === "success" ? "success" : "error", title: data.message });
-
-            if (data.status === "success") {
-                window.location.href = "/user/login";
+        // Verify OTP function
+        document.getElementById("verifyOtpBtn").addEventListener("click", async function () {
+            const otp = document.getElementById("otpInput").value.trim();
+            
+            if (!otp) {
+                Swal.fire({ 
+                    icon: "error", 
+                    title: "Please enter OTP!",
+                    confirmButtonColor: '#16a34a'
+                });
+                return;
             }
-        } catch (error) {
-            Swal.fire({ icon: "error", title: "OTP verification failed!" });
-        }
-    });
 
-    // Resend OTP function
-    document.getElementById("resendOtpBtn").addEventListener("click", async function () {
-        const email = localStorage.getItem("userEmail");
+            try {
+                const response = await fetch("/user/verify-otp", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ otp })
+                });
 
-        try {
-            const response = await fetch("/user/resend-otp", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email })
-            });
+                const data = await response.json();
+                Swal.fire({ 
+                    icon: data.status === "success" ? "success" : "error", 
+                    title: data.status === "success" ? "Verification Successful" : "Verification Failed",
+                    text: data.message,
+                    confirmButtonColor: '#16a34a'
+                });
 
-            const data = await response.json();
-            Swal.fire({ icon: "success", title: "New OTP sent!" });
+                if (data.status === "success") {
+                    window.location.href = "/user/login";
+                }
+            } catch (error) {
+                Swal.fire({ 
+                    icon: "error", 
+                    title: "OTP verification failed!",
+                    confirmButtonColor: '#16a34a'
+                });
+            }
+        });
 
-            // Update OTP token
-            // localStorage.setItem("otpToken", data.otpToken);
+        // Resend OTP function
+        document.getElementById("resendOtpBtn").addEventListener("click", async function () {
+            const email = localStorage.getItem("userEmail");
 
-            // Restart OTP timer
-            startOtpTimer();
-        } catch (error) {
-            Swal.fire({ icon: "error", title: "Failed to resend OTP!" });
-        }
-    });
-    
-    
-</script>
+            try {
+                const response = await fetch("/user/resend-otp", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await response.json();
+                Swal.fire({ 
+                    icon: "success", 
+                    title: "New OTP Sent!",
+                    text: "Please check your email for the new verification code.",
+                    confirmButtonColor: '#16a34a'
+                });
+
+                // Restart OTP timer
+                startOtpTimer();
+            } catch (error) {
+                Swal.fire({ 
+                    icon: "error", 
+                    title: "Failed to resend OTP!",
+                    confirmButtonColor: '#16a34a'
+                });
+            }
+        });
+    </script>
+</body>
 </html>

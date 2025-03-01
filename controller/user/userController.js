@@ -34,6 +34,7 @@ const userController={
             
             const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
             const phoneRegex = /^[6-9]\d{9}$/; // Validates a 10-digit Indian phone number starting with 6-9
+            const nameRegex= /^[A-Za-z\s]+$/;
            
     
             // Validation
@@ -61,6 +62,14 @@ const userController={
                     data: { fullname, phoneNumber }
                 });   
             }
+
+            if(!nameRegex.test(fullname)){
+                return res.status(400).json({
+                    message:'Please enter a valid name',
+                    status:'error'
+                })
+            }
+            
             if(!phoneRegex.test(phoneNumber)){
                 return res.status(400).json({
                     message:'please enter a valid phone number',
@@ -288,7 +297,6 @@ const userController={
          const user=await userSchema.findOne({email})
          console.log(user)
          if(!user){
-            
             return res.status(400).json({
                 message: 'No registered account,need to sign up first!',
                 status: 'error',
@@ -331,22 +339,15 @@ const userController={
      },
     loadHome:async (req,res) => {
         try {
-            console.log("working");
-            const user=req.session.user
+            console.log("working")
             
-            const id=req.session.user.id
-           const isblocked=await userSchema.findById(id)
-           console.log(isblocked);
-           
-           if(isblocked.isActive==false){
-            return res.render("user/login",{messages:"User blocked"})
-           }
+            
             
             const products = await productSchema.find({ isActive: true }).sort({ createdAt: -1 });
             const categories=await categorySchema.find({ isListed: true })
             console.log(products);
             
-            res.render("user/home",{products,categories,user})
+            res.render("user/home",{products,categories})
         } catch (error) {
             console.log(error);
         }
@@ -368,8 +369,7 @@ const userController={
             console.log(error)
             res.status(500)
         }
-    }
- 
+    },
     
 }
 

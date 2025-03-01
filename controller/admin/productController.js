@@ -71,7 +71,11 @@ addproducts:async (req,res) => {
 
         const images = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
         console.log("image doneeeee")
-        const parsedVariants = variants ? JSON.parse(variants) : [];
+        // const parsedVariants = variants ? JSON.parse(variants) : [];
+        const parsedVariants = variants ? JSON.parse(variants).map(variant => ({
+            ...variant,
+            salePrice: variant.regularPrice - (variant.regularPrice * (variant.offer / 100))
+        })) : [];
         console.log("parsed done")
 
           const newProduct = new productSchema({
@@ -79,9 +83,7 @@ addproducts:async (req,res) => {
             description,
             categoryId,
             brand,
-            // offer: offer || 0,
             images,
-            stock: stock || 0,
             variants: parsedVariants
         });
         console.log("wrk here")
@@ -129,44 +131,45 @@ loadEditProductPage:async (req,res) => {
         console.log(error)
     }
 },
-updateProduct:async (req,res) => {
+updateProduct: async (req, res) => {
     try {
-       const id=req.body.productId
-        const {name, brand, categoryId, description, variants }=req.body
+        const { productId, name, brand, categoryId, description, variants } = req.body;
+        const deletedImages = JSON.parse(req.body.deletedImages || "[]");
+        console.log(deletedImages+"thti")
 
-        const existingProduct = await productSchema.findById(id);
-        const images = req.files && req.files.length > 0 
-         ? req.files.map(file => `/uploads/${file.filename}`) 
-        : existingProduct.images; // Retain old images if no new ones are uploaded
-
-        
-        
-        if(!id){
-            res.status(400).json({success:false,message:"Product not found.."})
-        }
-        console.log("hereree");
-        const updatedProduct = await productSchema.findByIdAndUpdate(
-            id,
-            {
-                name,
-                brand,
-                images,
-                categoryId,
-                description,
-                variants: JSON.parse(variants),
-            },
-            { new: true } // Returns the updated product
-        );
-        
-        if (!updatedProduct) {
+        // Find the existing product
+        const existingProduct = await productSchema.findById(productId);
+        if (!existingProduct) {
             return res.status(404).json({ success: false, message: "Product not found." });
         }
-       
-        return res.status(200).json({ success: true, message: "Product updated successfully!", product: updatedProduct });
+
+        // Remove deleted images from the product
+        existingProduct.images = existingProduct.images.filter((image) => !deletedImages.includes(image));
+
+        // Append new uploaded images, if any
+        if (req.files && req.files.length > 0) {
+            const newImages = req.files.map((file) => `/uploads/${file.filename}`);
+            existingProduct.images.push(...newImages);
+        }
+
+        // Update other product details
+        existingProduct.name = name;
+        existingProduct.brand = brand;
+        existingProduct.categoryId = categoryId;
+        existingProduct.description = description;
+        existingProduct.variants = JSON.parse(variants);
+
+        // Save the updated product
+        await existingProduct.save(); // <-- Save after removing images
+
+        return res.status(200).json({ success: true, message: "Product updated successfully!", product: existingProduct });
+
     } catch (error) {
-        res.status(500).send("server error")
+        console.error("Update Product Error:", error);
+        return res.status(500).json({ success: false, message: "Server error. Please try again later." });
     }
-},productStatus:async (req,res) => {
+}
+,productStatus:async (req,res) => {
     try {
             const id=req.params.id
             console.log(id)

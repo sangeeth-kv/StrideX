@@ -5,59 +5,147 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StrideX User Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .bg-gradient {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d3748 100%);
+        }
+        
+        .form-input:focus {
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+            transition: all 0.2s ease;
+        }
+        
+        .hover-scale {
+            transition: transform 0.2s ease;
+        }
+        
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+    </style>
 </head>
-<body class="flex items-center justify-center h-screen bg-gray-900" style="background-color: #020202dc;">
-    <div class="flex w-4/5 max-w-5xl bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+<body class="min-h-screen bg-gradient text-gray-100 flex items-center justify-center p-4 md:p-6">
+    <div class="w-full max-w-5xl flex flex-col md:flex-row rounded-2xl shadow-2xl overflow-hidden bg-white bg-opacity-10 backdrop-blur-sm">
         <!-- Left Section (Logo) -->
-        <div class="w-1/2 flex items-center justify-center p-10 bg-gray-700" style="background-color: #ced1cd;">
-            <img src="/admin-assets/imgs/logos/logo-transparent-png.png" alt="StrideX Logo" style="width: 700px;  height: 400px;" class="w-3/4">
+        <div class="w-full md:w-1/2 relative overflow-hidden">
+            <div class="absolute inset-0 bg-black bg-opacity-30 z-10"></div>
+            <div class="absolute inset-0 bg-cover bg-center" 
+                style="background-image: url('/user-assets/img/banner/3\ shoe\ baner.webp');">
+            </div>
+            <div class="relative z-20 h-full flex flex-col items-center justify-center p-8 md:p-12">
+                <!-- <img src="/admin-assets/imgs/logos/logo-transparent-png.png" alt="StrideX Logo" class="w-3/4 max-w-xs animate-pulse-slow"> -->
+                <div class="mt-8 text-center">
+                    <h1 class="text-3xl md:text-4xl font-bold text-white mb-3">StrideX</h1>
+                    <p class="text-gray-200 text-lg">Step into style, stride with confidence</p>
+                </div>
+            </div>
         </div>
-        <div class="border-l border-gray-500"></div>
         
         <!-- Right Section (Login Form) -->
-        <div class="w-1/2 p-10 flex flex-col justify-center text-white" style="background-color: #e3e4e3;">
-            <h2 class="text-2xl font-bold mb-6 text-center" style="color: rgb(21, 21, 21);">Welcome,Please Login to Continue</h2>
-            <form action="/user/login" method="POST" id="signinForm">
-                <div class="mb-4">
-                    <input type="email" id="emailField"  name="email" value="<%= typeof email !== 'undefined' ? email: '' %>" 
-                        placeholder="Email" class="w-full px-4 py-3 rounded-md bg-gray-600 text-white placeholder-gray-400">
-                </div>
-                <div class="mb-4">
-                    <input type="password" id="passwordField" name="password" placeholder="Password" 
-                        class="w-full px-4 py-3 rounded-md bg-gray-600 text-white placeholder-gray-400">
-                    <div class="text-right mt-2">
-                        <a href="#" id="forgotPasswordLink" class="text-blue-400 hover:text-blue-300 text-sm">Forgot Password?</a>
+        <div class="w-full md:w-1/2 p-6 md:p-10 flex flex-col justify-center bg-gray-900">
+            <div class="max-w-md mx-auto w-full">
+                <h2 class="text-2xl md:text-3xl font-bold mb-2 text-white">Welcome Back</h2>
+                <p class="text-gray-400 mb-8">Please login to continue your journey</p>
+                
+                <form action="/user/login" method="POST" id="signinForm" class="space-y-6">
+                    <div>
+                        <label for="emailField" class="block text-sm font-medium text-gray-400 mb-1">Email Address</label>
+                        <input type="email" id="emailField" name="email" value="<%= typeof email !== 'undefined' ? email: '' %>" 
+                            placeholder="Enter your email" 
+                            class="form-input w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200">
                     </div>
+                    
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label for="passwordField" class="block text-sm font-medium text-gray-400">Password</label>
+                            <a href="#" id="forgotPasswordLink" class="text-sm text-primary-400 hover:text-primary-300 transition-colors">Forgot Password?</a>
+                        </div>
+                        <input type="password" id="passwordField" name="password" placeholder="Enter your password" 
+                            class="form-input w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200">
+                    </div>
+                    
+                    <button type="submit" id="loginButton" 
+                        class="hover-scale w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center">
+                        <span>Login Now</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </form>
+                
+                <div class="my-8 flex items-center">
+                    <div class="flex-grow h-px bg-gray-700"></div>
+                    <span class="px-4 text-sm text-gray-400">or continue with</span>
+                    <div class="flex-grow h-px bg-gray-700"></div>
                 </div>
-                <button type="submit" id="loginButton" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-md">Login Now</button>
-            </form>
-            <hr class="my-6 border-gray-600">
-            <p class="text-center mb-4">Login with Others</p>
-            <button onclick="window.location.href='/user/auth/google'"
-                class="w-full flex items-center justify-center bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-md mb-3">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5 mr-2" 
-                    alt="Google Logo"> Login with Google
-            </button>
-           
-
-            <!-- Sign Up Button -->
-            <p class="text-center mt-4 text-white">Don't have an account? <a href="/user/signup" class="text-blue-500 font-semibold">Sign Up Here</a></p>
+                
+                <button onclick="window.location.href='/user/auth/google'"
+                    class="hover-scale w-full flex items-center justify-center bg-white text-gray-800 font-medium py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 mb-6">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5 mr-3" alt="Google Logo"> 
+                    <span>Login with Google</span>
+                </button>
+                
+                <p class="text-center text-gray-400">
+                    Don't have an account? 
+                    <a href="/user/signup" class="text-primary-400 hover:text-primary-300 font-medium transition-colors">
+                        Sign Up Here
+                    </a>
+                </p>
+            </div>
         </div>
     </div>
 
     <!-- Forgot Password Modal -->
-    <div id="forgotPasswordModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex justify-center items-center">
-        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 class="text-xl font-semibold text-center mb-4">Reset Password</h2>
-            <p class="text-sm text-gray-600 mb-4 text-center">Enter your email to receive a OTP</p>
-            <input type="email" id="forgotEmail" placeholder="Enter your email"
-                class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-            <button id="sendResetEmail" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 mt-4 rounded-md">
-                Send OTP
-            </button>
-            <button id="closeModal" class="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 mt-2 rounded-md">
-                Cancel
-            </button>
+    <div id="forgotPasswordModal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex justify-center items-center z-50 p-4">
+        <div class="bg-gray-900 p-6 rounded-xl shadow-2xl w-full max-w-md border border-gray-800 transform transition-all duration-300">
+            <h2 class="text-2xl font-bold text-white mb-2">Reset Password</h2>
+            <p class="text-gray-400 mb-6">Enter your email to receive a OTP</p>
+            
+            <div class="space-y-4">
+                <input type="email" id="forgotEmail" placeholder="Enter your email"
+                    class="form-input w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200">
+                
+                <button id="sendResetEmail" 
+                    class="hover-scale w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200">
+                    Send OTP
+                </button>
+                
+                <button id="closeModal" 
+                    class="hover-scale w-full bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200">
+                    Cancel
+                </button>
+            </div>
         </div>
     </div>
 
@@ -66,130 +154,126 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const forgotPasswordModal = document.getElementById("forgotPasswordModal");
+        const forgotPasswordLink = document.getElementById("forgotPasswordLink");
+        const closeModalBtn = document.getElementById("closeModal");
+        const sendResetEmailBtn = document.getElementById("sendResetEmail");
+        const loginButton = document.getElementById("loginButton");
 
-    // Check if there's a message from the server
-    let message = "<%= messages %>";
-    
-    if (message) {
-        Swal.fire({
-            icon: "error",  // Type of alert (error, success, warning, info)
-            title: "Access Denied",
-            text: message,  // Display the message
-            confirmButtonColor: "#d33"
-        });
-    }
-
-     document.addEventListener("DOMContentLoaded", function () {
-    const forgotPasswordModal = document.getElementById("forgotPasswordModal");
-    const forgotPasswordLink = document.getElementById("forgotPasswordLink");
-    const closeModalBtn = document.getElementById("closeModal");
-    const sendResetEmailBtn = document.getElementById("sendResetEmail");
-    const loginButton=document.getElementById("loginButton");
-
-    // Show Modal When Clicking "Forgot Password?"
-    forgotPasswordLink.addEventListener("click", function (event) {
-        event.preventDefault();
-        forgotPasswordModal.classList.remove("hidden");
-    });
-
-    // Hide Modal When Clicking "Cancel"
-    closeModalBtn.addEventListener("click", function () {
-        forgotPasswordModal.classList.add("hidden");
-    });
-
-    loginButton.addEventListener("click", async function (event) {
-    event.preventDefault(); // Prevent form submission
-
-    const email = document.getElementById("emailField").value;
-    const password = document.getElementById("passwordField").value;
-
-    if (!email || !password) {
-        Swal.fire({
-            icon: "error",
-            title: "Missing Fields!",
-            text: "Please enter both email and password."
-        });
-        return;
-    }
-
-    try {
-        const response = await fetch("/user/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
+        // Show Modal When Clicking "Forgot Password?"
+        forgotPasswordLink.addEventListener("click", function (event) {
+            event.preventDefault();
+            forgotPasswordModal.classList.remove("hidden");
+            forgotPasswordModal.classList.add("flex");
+            document.getElementById("forgotEmail").focus();
         });
 
-        const data = await response.json();
+        // Hide Modal When Clicking "Cancel"
+        closeModalBtn.addEventListener("click", function () {
+            forgotPasswordModal.classList.add("hidden");
+            forgotPasswordModal.classList.remove("flex");
+        });
 
-        console.log(data);
+        // Close modal when clicking outside
+        forgotPasswordModal.addEventListener("click", function (event) {
+            if (event.target === forgotPasswordModal) {
+                forgotPasswordModal.classList.add("hidden");
+                forgotPasswordModal.classList.remove("flex");
+            }
+        });
 
-        if (data.status === "success") {
-            Swal.fire({
-                icon: "success",
-                title: "Login successful!",
-                text: data.message
-            }).then(() => {
-                window.location.href = data.redirectUrl;
-            });
-        } else {
-            Swal.fire({
-                icon: "error",
-                title: "Login failed!",
-                text: data.message
-            });
-        }
-    } catch (error) {
-        console.error("Error logging in:", error);
-    }
-});
+        loginButton.addEventListener("click", async function (event) {
+            event.preventDefault(); // Prevent form submission
 
+            const email = document.getElementById("emailField").value;
+            const password = document.getElementById("passwordField").value;
 
-    // Handle "Send OTP" Button Click
-    sendResetEmailBtn.addEventListener("click", async function () {
-        const email = document.getElementById("forgotEmail").value;
-        localStorage.setItem("userEmail", email);
-
-        if (!email) {
-            Swal.fire({ icon: "error", title: "Please enter your email!" });
-            return;
-        }
-
-        try {
-            const response = await fetch("/user/forgot-password", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email })
-            });
-
-            const data = await response.json();
-
-            if (data.status === "success") {
-                Swal.fire({
-                    icon: "success",
-                    title: "OTP sent successfully!",
-                    text: "Please check your email for the OTP."
-                }).then(() => {
-                    window.location.href = data.redirectUrl; // Redirect only on success
-                });
-            } else {
+            if (!email || !password) {
                 Swal.fire({
                     icon: "error",
-                    title: data.message || "Failed to send OTP!",
-                    text: "Please check your email and try again."
+                    title: "Missing Fields!",
+                    text: "Please enter both email and password."
                 });
+                return;
             }
 
-        } catch (error) {
-            console.error("Error sending OTP:", error);
-            Swal.fire({
-                icon: "error",
-                title: "Something went wrong!",
-                text: "Please try again later."
-            });
-        }
-    });
-});
+            try {
+                const response = await fetch("/user/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password })
+                });
 
+                const data = await response.json();
+
+                console.log(data);
+
+                if (data.status === "success") {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Login successful!",
+                        text: data.message
+                    }).then(() => {
+                        window.location.href = data.redirectUrl;
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Login failed!",
+                        text: data.message
+                    });
+                }
+            } catch (error) {
+                console.error("Error logging in:", error);
+            }
+        });
+
+        // Handle "Send OTP" Button Click
+        sendResetEmailBtn.addEventListener("click", async function () {
+            const email = document.getElementById("forgotEmail").value;
+            localStorage.setItem("userEmail", email);
+
+            if (!email) {
+                Swal.fire({ icon: "error", title: "Please enter your email!" });
+                return;
+            }
+
+            try {
+                const response = await fetch("/user/forgot-password", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await response.json();
+
+                if (data.status === "success") {
+                    Swal.fire({
+                        icon: "success",
+                        title: "OTP sent successfully!",
+                        text: "Please check your email for the OTP."
+                    }).then(() => {
+                        window.location.href = data.redirectUrl; // Redirect only on success
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: data.message || "Failed to send OTP!",
+                        text: "Please check your email and try again."
+                    });
+                }
+
+            } catch (error) {
+                console.error("Error sending OTP:", error);
+                Swal.fire({
+                    icon: "error",
+                    title: "Something went wrong!",
+                    text: "Please try again later."
+                });
+            }
+        });
+    });
     </script>
 </body>
 </html>

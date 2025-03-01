@@ -34,7 +34,10 @@ app.set("view engine","ejs")
 
 
 
-
+app.use((req, res, next) => {
+    res.locals.user = req.session.user || null; // Assign session user globally
+    next();
+});
 
 app.use(express.static("public"))
 

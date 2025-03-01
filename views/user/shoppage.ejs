@@ -1,5 +1,14 @@
 <%- include("partials/header") %>
 <style>
+
+.no-products {
+  display: flex;
+  justify-content: center; /* Centers horizontally */
+  align-items: center; /* Centers vertically */
+  height: 200px; /* Adjust height as needed */
+  width: 100%;
+  text-align: center;
+}
 .custom-dropdown {
   position: relative;
   width: 100%;
@@ -327,20 +336,28 @@
       </aside>
 
       <!-- Product grid -->
-      <main class="product-grid">
-        <% product.forEach(product => { %>
-          <div class="product-card">
-            <span class="wishlist-btn" onclick="">❤️</span>
-            <a href="/user/view-product/<%= product._id %>">
-              <img src="<%= product.images[0] %>" alt="<%= product.name %>" />
-              <h4><%= product.name %></h4>
-              <p>Brand: <%= product.brand.name %></p>
-              <p>₹<span class="text-brand"><%= product.variants[0].regularPrice%></span></p>
-            </a>
-            <button class="add-to-cart-btn" onclick="addToCart('<%= product._id %>')">Add to Cart</button>
-          </div>
-        <% }) %>
-      </main>
+     <!-- Product grid -->
+<main class="product-grid">
+  <% if (product.length > 0) { %>
+    <% product.forEach(product => { %>
+      <div class="product-card">
+        <span class="wishlist-btn" onclick="">❤️</span>
+        <a href="/user/view-product/<%= product._id %>">
+          <img src="<%= product.images[0] %>" alt="<%= product.name %>" />
+          <h4><%= product.name %></h4>
+          <p>Brand: <%= product.brand.name %></p>
+          <p>₹<span class="text-brand"><%= product.variants[0].regularPrice%></span></p>
+        </a>
+        <button class="add-to-cart-btn" onclick="addToCart('<%= product._id %>')">Add to Cart</button>
+      </div>
+    <% }) %>
+  <% } else { %>
+    <div class="no-products">
+      <h3 style="text-align: center; color: #e87878; width: 100%;">No products available</h3>
+    </div>
+  <% } %>
+</main>
+
     </div>
 
     <!-- Pagination -->

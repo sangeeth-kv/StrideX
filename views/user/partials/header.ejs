@@ -24,59 +24,50 @@
                 </div>
 
                 <!-- Navigation -->
-                <nav class="hidden md:flex w-2/4 justify-center">
-                    <ul class="flex space-x-8">
-                        <li><a href="/user/home" class="text-gray-700 hover:text-orange-500 font-semibold">Home</a></li>
-                        <li><a href="/user/shop" class="text-gray-700 hover:text-orange-500 font-semibold">Shop</a></li>
-                    </ul>
-                </nav>
-
-                <!-- User Actions -->
-                <div class="w-1/4 flex items-center justify-end space-x-6">
-                    <% if(user) { %>
+                <div class="flex items-center space-x-6">
+                    <% if (user) { %>
                         <div class="relative">
-                            <!-- Username Button -->
-                            <button id="user-button" class="text-gray-700 hover:text-orange-500 font-semibold">
+                            <button id="user-button" class="sign-in-link focus:outline-none">
                                 <%= user.name %>
                             </button>
-                        
-                            <!-- Dropdown Menu -->
-                            <div id="user-dropdown" class="absolute right-0 hidden bg-white shadow-lg rounded-md mt-2 min-w-[160px]">
-                                <a href="/user/Profile" class="block px-4 py-3 hover:bg-gray-100">Profile</a>
-                                <a href="/user/logout" class="block px-4 py-3 hover:bg-gray-100">Logout</a>
+                            <div id="user-dropdown" class="absolute right-0 mt-2 w-40 bg-white shadow-md rounded-md hidden">
+                                <a href="/userProfile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profile</a>
+                                <a href="/user/logout" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Logout</a>
                             </div>
                         </div>
                     <% } else { %>
-                        <a href="/user/signup" class="text-gray-700 hover:text-orange-500 font-semibold">Sign Up</a>
-                        <a href="/user/login" class="text-gray-700 hover:text-orange-500 font-semibold">Log in</a>
+                        <a href="/user/signup" class="sign-in-link">Sign Up</a>
+                        <a href="/user/login" class="sign-in-link">Log in</a>
+                        <a href="/user/wishlist"><img src="img/icon/heart.png" alt=""></a>
+                        <a href="/user/cart" class="relative">
+                            <img src="img/icon/cart.png" alt="">
+                            <span class="absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1 rounded-full">0</span>
+                        </a>
                     <% } %>
-                    
-                    <a href="/wishlist" class="text-gray-700 hover:text-orange-500">
-                        <i class="fas fa-heart text-lg"></i>
-                    </a>
-                    <a href="/cart" class="text-gray-700 hover:text-orange-500 relative">
-                        <i class="fas fa-shopping-cart text-lg"></i>
-                        <span class="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-2 rounded-full">0</span>
-                    </a>
                 </div>
             </div>
         </div>
     </header>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-    const userButton = document.getElementById("user-button");
-    const dropdownMenu = document.getElementById("user-dropdown");
+            const userButton = document.getElementById("user-button");
+            const dropdownMenu = document.getElementById("user-dropdown");
 
-    userButton.addEventListener("click", function (event) {
-        event.stopPropagation(); // Prevent event from bubbling
-        dropdownMenu.classList.toggle("hidden"); // Toggle visibility
-    });
+            if (userButton) {
+                userButton.addEventListener("click", function (event) {
+                    event.stopPropagation(); // Prevent event from bubbling
+                    dropdownMenu.classList.toggle("hidden"); // Toggle visibility
+                });
 
-    // Close dropdown when clicking outside
-    document.addEventListener("click", function (event) {
-        if (!userButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
-            dropdownMenu.classList.add("hidden");
-        }
-    });
-});
+                // Close dropdown when clicking outside
+                document.addEventListener("click", function (event) {
+                    if (!userButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                        dropdownMenu.classList.add("hidden");
+                    }
+                });
+            }
+        });
     </script>
+</body>
+</html>
