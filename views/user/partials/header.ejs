@@ -10,6 +10,18 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+  header {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Ensures even spacing */
+    padding: 10px 20px;
+}
+
+
+
+    </style>
 </head>
 <body class="font-['Nunito_Sans']">
     <!-- Header -->
@@ -22,6 +34,14 @@
                         <img src="/admin-assets/imgs/logos/logo-transparent-png.png" alt="Logo" class="h-11">
                     </a>
                 </div>
+                <div class="col-lg-6 col-md-6 flex justify-center">
+                    <nav class="header__menu mobile-menu">
+                        <ul class="flex space-x-6">
+                            <li class="active"><a href="/user/home">Home</a></li>
+                            <li><a href="/user/shop">Shop</a></li>
+                        </ul>
+                    </nav>
+                </div>
 
                 <!-- Navigation -->
                 <div class="flex items-center space-x-6">
@@ -31,7 +51,7 @@
                                 <%= user.name %>
                             </button>
                             <div id="user-dropdown" class="absolute right-0 mt-2 w-40 bg-white shadow-md rounded-md hidden">
-                                <a href="/userProfile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profile</a>
+                                <a href="/user/view-Profile/<%=user.id%>" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profile</a>
                                 <a href="/user/logout" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Logout</a>
                             </div>
                         </div>

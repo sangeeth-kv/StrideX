@@ -1,384 +1,188 @@
 <%- include("partials/header") %>
-<style>
 
-.no-products {
-  display: flex;
-  justify-content: center; /* Centers horizontally */
-  align-items: center; /* Centers vertically */
-  height: 200px; /* Adjust height as needed */
-  width: 100%;
-  text-align: center;
-}
-.custom-dropdown {
-  position: relative;
-  width: 100%;
-}
-
-.custom-select {
-  width: 100%;
-  padding: 12px;
-  border: 2px solid #46698f;
-  border-radius: 8px;
-  background-color: #fff;
-  font-size: 14px;
-  color: #333;
-  appearance: none; /* Removes default browser styling */
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: bold;
-}
-
-.custom-select:hover {
-  background-color: #f0f8ff;
-  border-color: #324d6b;
-}
-
-.custom-dropdown::after {
-  content: "▼";
-  position: absolute;
-  top: 50%;
-  right: 15px;
-  transform: translateY(-50%);
-  color: #46698f;
-  font-size: 14px;
-  pointer-events: none;
-}
-
-.product-card {
-  width: calc(33.333% - 20px);
-  border: 1px solid #ddd;
-  padding: 15px;
-  border-radius: 8px;
-  text-align: center;
-  position: relative;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.product-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.product-card img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 5px;
-  transition: transform 0.3s ease;
-}
-
-.product-card:hover img {
-  transform: scale(1.05);
-}
-
-.add-to-cart-btn {
-  background-color: #46698f;
-  color: #fff;
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  width: 100%;
-  margin-top: 10px;
-  transition: background-color 0.3s ease;
-}
-
-.add-to-cart-btn:hover {
-  background-color: #324d6b;
-}
-
-  .main-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
-  .shop-topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-
-  .search-form {
-    display: flex;
-    align-items: center;
-    background-color: #f1f1f1;
-    border-radius: 25px;
-    overflow: hidden;
-    max-width: 250px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  }
-
-  .search-input {
-    flex: 1;
-    padding: 8px 10px;
-    font-size: 14px;
-    border: none;
-    outline: none;
-    background-color: transparent;
-  }
-
-  .search-button {
-    padding: 8px 15px;
-    background-color: #1e918b;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
-    border-radius: 15px;
-    margin-right: 5px;
-    transition: background-color 0.3s, transform 0.2s;
-  }
-
-  .search-button:hover {
-    background-color: #0056b3;
-    transform: scale(1.05);
-  }
-
-  .product-list-container {
-    display: flex;
-    gap: 20px;
-  }
-
-  .sidebar {
-    width: 250px;
-    padding: 20px;
-    border: 1px solid #ddd;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-  }
-
-  .filter-section {
-    margin-bottom: 20px;
-  }
-
-  .filter-title {
-    font-weight: bold;
-    margin-bottom: 10px;
-    font-size: 16px;
-    color: #333;
-  }
-
-  .filter-item {
-    margin: 5px 0;
-  }
-
-  .filter-item a {
-    text-decoration: none;
-    color: #333;
-  }
-
-  .filter-item a:hover {
-    color: #007bff;
-  }
-
-  .product-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    width: calc(100% - 270px);
-  }
-
-  .product-card {
-    width: calc(33.333% - 20px);
-    border: 1px solid #ddd;
-    padding: 15px;
-    border-radius: 8px;
-    text-align: center;
-    position: relative;
-  }
-
-  .product-card img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 5px;
-  }
-
-  .wishlist-btn {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background-color: rgba(237, 247, 247, 0.8);
-    color: #fff;
-    padding: 8px;
-    border-radius: 50%;
-    cursor: pointer;
-  }
-
-  .add-to-cart-btn {
-    background-color: #46698f;
-    color: #fff;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 10px;
-  }
-
-  .pagination {
-  display: flex;
-  justify-content: center;
-  margin: 20px 0;
-  gap: 10px;
-}
-
-.page-btn {
-  padding: 10px 15px;
-  background-color: #f0f0f0;
-  border: 1px solid #ddd;
-  color: #333;
-  text-decoration: none;
-  font-weight: bold;
-  border-radius: 5px;
-  transition: background-color 0.3s, transform 0.2s;
-}
-
-.page-btn:hover {
-  background-color: #46698f;
-  color: white;
-  transform: scale(1.05);
-}
-
-.page-btn.active {
-  background-color: #1e918b;
-  color: white;
-  border: 1px solid #1e918b;
-}
-
-
-  .price-filter {
-    padding: 10px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    margin-top: 20px;
-  }
-
-  .price-options {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .price-button {
-    padding: 12px 20px;
-    background-color: #f1f1f1;
-    color: #333;
-    border: 1px solid #ddd;
-    border-radius: 30px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-    text-align: center;
-    font-size: 14px;
-  }
-
-  .price-button:hover {
-    background-color: #007bff;
-    color: white;
-    transform: scale(1.05);
-  }
-
-  .price-button:active {
-    transform: scale(0.95);
-  }
-</style>
-
-<div class="main-container">
-  <section class="shop-page container">
-    <!-- Topbar with search -->
-    <div class="shop-topbar">
-      <div class="search-bar">
-        <form action="" method="GET" class="search-form">
-          <input type="text" name="query" placeholder="Search items..." class="search-input" value="<%= searchQuery || '' %>" />
-          <button type="submit" class="search-button">Search</button>
-      </form>      
-      </div>
+<div class="bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Page Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">Shop Collection</h1>
+      <p class="mt-2 text-sm text-gray-600">Discover our latest products and exclusive offers</p>
     </div>
 
-    <div class="product-list-container">
-      <!-- Sidebar for filters -->
-      <aside class="sidebar"><form id="filter-form" action="/user/shop" method="GET">
-        <div class="filter-section">
-          <div class="filter-title">Categories</div>
-          <% categories.forEach(category => { %>
-            <div class="filter-item">
-              <input type="checkbox" name="category" value="<%= category.name %>" 
-                <% if (categoryFilter && categoryFilter.includes(category.name)) { %> checked <% } %> />
-              <label><%= category.name %></label>
-            </div>
-          <% }) %>
+    <!-- Search Bar -->
+    <div class="flex justify-between items-center mb-8">
+      <form action="" method="GET" class="relative flex-1 max-w-sm">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+          </svg>
         </div>
-      
-        <div class="filter-section">
-          <div class="filter-title">Brands</div>
-          <% brands.forEach(brand => { %>
-            <div class="filter-item">
-                <input type="checkbox" name="brand" value="<%= brand.name %>"
-                <% if (brandFilter && brandFilter.includes(brand.name)) { %> checked <% } %> />              
-              <label><%= brand.name %></label>
+        <input type="text" name="query" placeholder="Search products..." value="<%= searchQuery || '' %>" class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-full bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out" />
+        <button type="submit" class="absolute inset-y-0 right-0 flex items-center px-4 text-indigo-600 hover:text-indigo-800 font-medium text-sm transition duration-150 ease-in-out">
+          Search
+        </button>
+      </form>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+      <!-- Sidebar Filters -->
+      <div class="w-full lg:w-64 flex-shrink-0">
+        <form id="filter-form" action="/user/shop" method="GET" class="sticky top-6">
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <!-- Categories Filter -->
+            <div class="p-6 border-b border-gray-200">
+              <h3 class="text-lg font-medium text-gray-900 mb-4">Categories</h3>
+              <div class="space-y-3">
+                <% categories.forEach(category => { %>
+                  <div class="flex items-center">
+                    <input id="category-<%= category.name %>" name="category" value="<%= category.name %>" type="checkbox" <% if (categoryFilter && categoryFilter.includes(category.name)) { %> checked <% } %> class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer" />
+                    <label for="category-<%= category.name %>" class="ml-3 text-sm text-gray-700 cursor-pointer hover:text-indigo-600 transition"><%= category.name %></label>
+                  </div>
+                <% }) %>
+              </div>
             </div>
-          <% }) %>
-        </div>
-      
-        <div class="filter-section">
-          <div class="filter-title">Sort By</div>
-          <select name="sort" class="custom-select" id="sort-select">
-              <option value="low-high" <%= sort === 'low-high' ? 'selected' : '' %>>Price Low to High</option>
-              <option value="high-low" <%= sort === 'high-low' ? 'selected' : '' %>>Price High to Low</option>
-              <option value="a-z" <%= sort === 'a-z' ? 'selected' : '' %>>A - Z</option>
-              <option value="z-a" <%= sort === 'z-a' ? 'selected' : '' %>>Z - A</option>
-          </select>
+
+            <!-- Brands Filter -->
+            <div class="p-6 border-b border-gray-200">
+              <h3 class="text-lg font-medium text-gray-900 mb-4">Brands</h3>
+              <div class="space-y-3">
+                <% brands.forEach(brand => { %>
+                  <div class="flex items-center">
+                    <input id="brand-<%= brand.name %>" name="brand" value="<%= brand.name %>" type="checkbox" <% if (brandFilter && brandFilter.includes(brand.name)) { %> checked <% } %> class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer" />
+                    <label for="brand-<%= brand.name %>" class="ml-3 text-sm text-gray-700 cursor-pointer hover:text-indigo-600 transition"><%= brand.name %></label>
+                  </div>
+                <% }) %>
+              </div>
+            </div>
+
+            <!-- Sort By -->
+            <div class="p-6">
+              <h3 class="text-lg font-medium text-gray-900 mb-4">Sort By</h3>
+              <div class="relative">
+                <select name="sort" id="sort-select" class="block w-full pl-3 pr-10 py-3 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg appearance-none bg-white cursor-pointer">
+                  <option value="low-high" <%= sort === 'low-high' ? 'selected' : '' %>>Price: Low to High</option>
+                  <option value="high-low" <%= sort === 'high-low' ? 'selected' : '' %>>Price: High to Low</option>
+                  <option value="a-z" <%= sort === 'a-z' ? 'selected' : '' %>>Name: A to Z</option>
+                  <option value="z-a" <%= sort === 'z-a' ? 'selected' : '' %>>Name: Z to A</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                  <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Apply Filters Button -->
+            <div class="px-6 pb-6">
+              <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                Apply Filters
+              </button>
+            </div>
+          </div>
+        </form>
       </div>
-      
-      
-        <button type="submit" class="search-button" style="width: 100%; margin-top: 10px;">Apply Filters</button>
-      </form>      
-      </aside>
 
-      <!-- Product grid -->
-     <!-- Product grid -->
-<main class="product-grid">
-  <% if (product.length > 0) { %>
-    <% product.forEach(product => { %>
-      <div class="product-card">
-        <span class="wishlist-btn" onclick="">❤️</span>
-        <a href="/user/view-product/<%= product._id %>">
-          <img src="<%= product.images[0] %>" alt="<%= product.name %>" />
-          <h4><%= product.name %></h4>
-          <p>Brand: <%= product.brand.name %></p>
-          <p>₹<span class="text-brand"><%= product.variants[0].regularPrice%></span></p>
-        </a>
-        <button class="add-to-cart-btn" onclick="addToCart('<%= product._id %>')">Add to Cart</button>
+      <!-- Product Grid -->
+      <div class="flex-1">
+        <% if (product.length > 0) { %>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <% product.forEach(product => { %>
+              <div class="group relative bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                <!-- Wishlist Button -->
+                <button class="absolute top-3 right-3 z-10 p-2 rounded-full bg-white bg-opacity-80 shadow-sm hover:bg-opacity-100 transition-all duration-200 transform hover:scale-110" onclick="">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 hover:text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                </button>
+
+                <!-- Product Image -->
+                <a href="/user/view-product/<%= product._id %>" class="block overflow-hidden">
+                  <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-100">
+                    <img src="<%= product.images[0] %>" alt="<%= product.name %>" class="w-full h-64 object-cover object-center transform transition-transform duration-500 group-hover:scale-105" />
+                  </div>
+                </a>
+
+                <!-- Product Info -->
+                <div class="p-5">
+                  <a href="/user/view-product/<%= product._id %>" class="block">
+                    <h3 class="text-lg font-medium text-gray-900 mb-1 hover:text-indigo-600 transition"><%= product.name %></h3>
+                    <p class="text-sm text-gray-500 mb-2">Brand: <%= product.brand.name %></p>
+                    <p class="text-xl font-bold text-indigo-600 mb-4">₹<%= product.variants[0].regularPrice %></p>
+                  </a>
+                  
+                  <button onclick="addToCart('<%= product._id %>')" class="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    Add to Cart
+                  </button>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <div class="flex items-center justify-center h-64 bg-white rounded-2xl shadow-sm border border-gray-200">
+            <div class="text-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <h3 class="mt-2 text-lg font-medium text-gray-900">No products available</h3>
+              <p class="mt-1 text-sm text-gray-500">Try changing your search or filter criteria</p>
+            </div>
+          </div>
+        <% } %>
+
+        <!-- Pagination -->
+        <% if (product.length > 0) { %>
+          <div class="mt-10 flex justify-center">
+            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+              <% if (currentPage > 1) { %>
+                <a href="?page=<%= currentPage - 1 %>" class="relative inline-flex items-center px-4 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                  <span class="sr-only">Previous</span>
+                  <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
+                </a>
+              <% } %>
+              
+              <% for (let i = 1; i <= totalPages; i++) { %>
+                <a href="?page=<%= i %>" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium <%= currentPage === i ? 'text-indigo-600 bg-indigo-50 z-10 border-indigo-500' : 'text-gray-700 hover:bg-gray-50' %> transition">
+                  <%= i %>
+                </a>
+              <% } %>
+              
+              <% if (currentPage < totalPages) { %>
+                <a href="?page=<%= currentPage + 1 %>" class="relative inline-flex items-center px-4 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                  <span class="sr-only">Next</span>
+                  <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                  </svg>
+                </a>
+              <% } %>
+            </nav>
+          </div>
+        <% } %>
       </div>
-    <% }) %>
-  <% } else { %>
-    <div class="no-products">
-      <h3 style="text-align: center; color: #e87878; width: 100%;">No products available</h3>
     </div>
-  <% } %>
-</main>
-
-    </div>
-
-    <!-- Pagination -->
-    <div class="pagination">
-      <div class="pagination">
-        <% if (currentPage > 1) { %>
-            <a href="?page=<%= currentPage - 1 %>" class="page-btn">Previous</a>
-        <% } %>
-    
-        <% for (let i = 1; i <= totalPages; i++) { %>
-            <a href="?page=<%= i %>" class="page-btn <%= currentPage === i ? 'active' : '' %>"><%= i %></a>
-        <% } %>
-    
-        <% if (currentPage < totalPages) { %>
-            <a href="?page=<%= currentPage + 1 %>" class="page-btn">Next</a>
-        <% } %>
-    </div>
-    
-    </div>
-  </section>
+  </div>
 </div>
 
+
+<script>
+  async function addToCart(productId) {
+    try {
+      const response = await fetch(`/user/add-to-cart`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId })
+      });
+      const result = await response.json();
+      alert(result.message);
+    } catch (error) {
+      alert('Error adding product to cart. Please try again.');
+    }
+  }
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+
 <%- include("partials/footer") %>

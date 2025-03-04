@@ -9,23 +9,115 @@
     <!-- Toastify CSS & JS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            light: '#A3C1B5',
+                            DEFAULT: '#8FB0A1',
+                            dark: '#6f8e80'
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .otp-input {
+            letter-spacing: 0.5em;
+            font-weight: 600;
+        }
+        
+        .bg-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239CB0A3' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+    </style>
 </head>
-<body class="flex items-center justify-center h-screen bg-gray-900" style="background-color: #6f8e80;">
-    <div class="flex w-4/5 max-w-5xl bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-        <!-- Left Section (Logo) -->
-        <div class="w-1/2 flex items-center justify-center p-10 bg-gray-700" style="background-color: #8FB0A1;">
-            <img src="/admin/imgs/logos/logo-png.png" alt="StrideX Logo" class="w-3/4">
+<body class="flex items-center justify-center min-h-screen bg-gradient-to-br from-brand-dark via-brand to-brand-light bg-pattern">
+    <div class="w-11/12 max-w-5xl mx-auto">
+        <!-- Card Container with shadow and glass effect -->
+        <div class="flex flex-col md:flex-row bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl shadow-2xl overflow-hidden border border-white border-opacity-20">
+            <!-- Left Section (Logo) -->
+            <div class="w-full md:w-1/2 flex items-center justify-center p-10 bg-gradient-to-br from-brand-light to-brand relative overflow-hidden">
+                <!-- Decorative circles -->
+                <div class="absolute top-0 left-0 w-40 h-40 bg-white bg-opacity-10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+                <div class="absolute bottom-0 right-0 w-60 h-60 bg-white bg-opacity-10 rounded-full translate-x-1/4 translate-y-1/4"></div>
+                
+                <div class="relative z-10 flex flex-col items-center">
+                    <img src="/admin/imgs/logos/logo-png.png" alt="StrideX Logo" class="w-4/5 max-w-xs drop-shadow-lg animate-pulse-slow">
+                    <h1 class="mt-6 text-2xl font-bold text-white text-center drop-shadow-md">Secure Authentication</h1>
+                    <p class="mt-2 text-white text-opacity-80 text-center max-w-xs">We've sent a verification code to your email address</p>
+                </div>
+            </div>
+            
+            <!-- Right Section (OTP Verification) -->
+            <div class="w-full md:w-1/2 p-10 flex flex-col justify-center text-white">
+                <div class="max-w-md mx-auto w-full">
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl font-bold mb-2 text-white drop-shadow-md">Verify Your Identity</h2>
+                        <p class="text-white text-opacity-80">Enter the 6-digit code sent to your email</p>
+                    </div>
+                    
+                    <form id="otpForm" onsubmit="verifyOTP(event)" class="space-y-6">
+                        <div class="relative">
+                            <input 
+                                type="text" 
+                                name="otp" 
+                                id="otp-input" 
+                                class="otp-input w-full px-4 py-4 rounded-xl bg-white bg-opacity-10 text-white text-center placeholder-white placeholder-opacity-50 border border-white border-opacity-20 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-40 focus:border-transparent transition-all duration-300" 
+                                maxlength="6" 
+                                placeholder="• • • • • •"
+                            >
+                            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-focus:opacity-10 pointer-events-none"></div>
+                        </div>
+                        
+                        <button 
+                            type="submit" 
+                            id="verifyOtpBtn" 
+                            class="w-full mt-4 bg-white text-brand-dark font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-1 transition-all duration-300" 
+                            disabled
+                        >
+                            Verify OTP
+                        </button>
+                        
+                        <div class="text-center space-y-4">
+                            <p id="timer-text" class="text-white text-opacity-80">Resend OTP in 60s</p>
+                            
+                            <button 
+                                type="button" 
+                                id="resendOtpBtn" 
+                                class="w-full bg-transparent border border-white border-opacity-30 text-white font-medium py-3 rounded-xl hover:bg-white hover:bg-opacity-10 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300" 
+                                disabled
+                            >
+                                Resend Code
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="mt-8 text-center">
+                        <p class="text-white text-opacity-70 text-sm">
+                            Having trouble? <a href="#" class="underline hover:text-white transition-colors">Contact Support</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
         
-        <!-- Right Section (OTP Verification) -->
-        <div class="w-1/2 p-10 flex flex-col justify-center text-white" style="background-color: #8FB0A1;">
-            <h2 class="text-3xl font-bold mb-6 text-center" style="color: rgb(251, 223, 223);">Verify Your OTP</h2>
-            <form id="otpForm" onsubmit="verifyOTP(event)">
-                <input type="text" name="otp" id="otp-input" class="w-full px-4 py-3 rounded-md bg-gray-600 text-white text-center placeholder-gray-400" maxlength="6" placeholder="Enter OTP">
-                <button type="submit" id="verifyOtpBtn" class="w-full mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-md" disabled>Verify OTP</button>
-                <p id="timer-text" class="mt-3 text-center text-gray-300">Resend OTP in 60s</p>
-                <button type="button" id="resendOtpBtn" class="w-full mt-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-md" disabled>Resend OTP</button>
-            </form>
+        <div class="mt-4 text-center text-white text-opacity-70 text-sm">
+            &copy; 2023 StrideX. All rights reserved.
         </div>
     </div>
 
@@ -69,49 +161,48 @@
         }
 
         async function verifyOTP(event) {
-    event.preventDefault();
-    const otp = document.getElementById("otp-input").value;
-    const email = localStorage.getItem("userEmail");
+            event.preventDefault();
+            const otp = document.getElementById("otp-input").value;
+            const email = localStorage.getItem("userEmail");
 
-    if (!email || !otp) {
-        showToast("Email or OTP is missing!", "error");
-        return;
-    }
+            if (!email || !otp) {
+                showToast("Email or OTP is missing!", "error");
+                return;
+            }
 
-    try {
-        const response = await fetch("/user/verify-otp", {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            body: JSON.stringify({ email, otp })
-        });
+            try {
+                const response = await fetch("/user/verify-otp", {
+                    method: "POST",
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    },
+                    body: JSON.stringify({ email, otp })
+                });
 
-        const result = await response.json();
+                const result = await response.json();
 
-        if (result.status === "success") {
-            showToast("OTP Verified Successfully!");
+                if (result.status === "success") {
+                    showToast("OTP Verified Successfully!");
 
-            // localStorage.removeItem("userEmail"); // Clean up
+                    // localStorage.removeItem("userEmail"); // Clean up
 
-            // Delay redirect to allow the toast message to be seen
-            setTimeout(() => {
-                if (result.redirectUrl) {
-                    window.location.href = result.redirectUrl;
+                    // Delay redirect to allow the toast message to be seen
+                    setTimeout(() => {
+                        if (result.redirectUrl) {
+                            window.location.href = result.redirectUrl;
+                        } else {
+                            showToast("Redirection URL missing in response.", "error");
+                        }
+                    }, 2000); // 2-second delay
                 } else {
-                    showToast("Redirection URL missing in response.", "error");
+                    showToast(result.message || "Verification failed", "error");
                 }
-            }, 2000); // 2-second delay
-        } else {
-            showToast(result.message || "Verification failed", "error");
+            } catch (error) {
+                console.error("Error verifying OTP:", error);
+                showToast("Something went wrong. Please try again.", "error");
+            }
         }
-    } catch (error) {
-        console.error("Error verifying OTP:", error);
-        showToast("Something went wrong. Please try again.", "error");
-    }
-}
-
 
         async function resendOTP() {
             const email = localStorage.getItem("userEmail");

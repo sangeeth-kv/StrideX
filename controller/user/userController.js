@@ -111,11 +111,13 @@ const userController={
            }
 
             const otp = generateOTP();
+            const expiresAt = Date.now() + 60 * 1000; // Set expiration time (1 minute)
+            req.session.otpData = { otp, expiresAt };
             console.log(otp)
             await sendOTPByEmail(email,otp)
             
             const hashedPassword=await bcrypt.hash(password,saltRounds)
-            req.session.otp=otp
+        
             req.session.email=email
             req.session.password=password
             req.session.fullname=fullname
@@ -141,18 +143,29 @@ const userController={
         try {
             console.log("verfiyuy");
             
-            const otp=req.session.otp
-            console.log("this is req,bodyy"+req.body)
+            const otpData = req.session.otpData;
+            console.log(otpData);
+            
+          
             const email=req.session.email
             const userOtp=req.body.otp
             console.log("this is user enter otp : "+userOtp)
-            console.log("session otp : "+otp)
+          
 
             if(!email){
                 return res.status(401).json({ status: "error", message: "No user email found"})
             }
 
-            if(otp!=userOtp){
+            if (!otpData) {
+                return res.status(400).json({ message: "No OTP found. Please request a new one." });
+            }
+
+            if (Date.now() > otpData.expiresAt) {
+                req.session.otpData = null; // Clear expired OTP
+                return res.status(400).json({ message: "OTP expired. Please request a new one." });
+            }
+
+            if(otpData.otp!=userOtp){
                 return res.status(400).json({ status: "error", message: "Invalid OTP entered" })
             }
 
@@ -173,6 +186,8 @@ const userController={
                         phoneNumber: req.session.phoneNumber,
                         password: req.session.password,
                      });
+
+                     req.session.otpData=null //////////////////////////here it is null.......
                      
             newUser.save();
 
@@ -184,9 +199,10 @@ const userController={
     },
     resendOTP:async (req,res) => {
         try {
-            const newOtp= generateOTP();
-            req.session.otp = newOtp;
-            console.log("new otp is here : "+newOtp)
+            const otp= generateOTP();
+            const expiresAt = Date.now() + 60 * 1000; // Set expiration time (1 minute)
+            req.session.otpData = { otp, expiresAt };
+            console.log(otp)
             res.status(200).json({ message: "New OTP sent successfully." });
 
         } catch (error) {
@@ -322,6 +338,7 @@ const userController={
             name: user.fullname,
             email: user.email
          }
+         
          return res.status(201).json({
             message: "Signin successful! Redirecting to home page..",
             status: "success",

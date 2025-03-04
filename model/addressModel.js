@@ -12,6 +12,7 @@ const addressSchema = new mongoose.Schema({
   place: { type: String, required: true },
   city: { type: String, required: true },
   type: { type: String, required: true },
+  isDeleted: { type: Boolean, default: false},
 });
 
 module.exports = mongoose.model("Address", addressSchema);

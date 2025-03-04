@@ -2,8 +2,11 @@ const express=require("express")
 const router=express.Router();
 const userController=require("../controller/user/userController");
 const userProductController=require("../controller/user/userProductController")
+const userProfileController=require("../controller/user/userProfileController")
 const passport=require("passport");
-const productController = require("../controller/admin/productController");
+// const productController = require("../controller/admin/productController");
+const userAddressController=require("../controller/user/userAddressController");
+const cartController = require("../controller/user/cartController");
 // const adminController = require("../controller/admin/adminController");
 require("../config/passport")
 
@@ -91,8 +94,28 @@ router.get("/shop",userProductController.loadShopPage)
 
 
 
+//for user profile
+router.get("/view-profile/:id",userProfileController.loadProfilePage)
+router.get("/change-email-otp/:id",userProfileController.loadEmailOtpPage)
+router.post("/email-verify-otp",userProfileController.verifyEmailOtp)
+router.get("/change-email",userProfileController.loadChangeEmailPage)
+router.post("/change-email",userProfileController.changeEmail)
+router.post("/email-resend-otp",userProfileController.resendOtpforEmail)
+router.post("/verify-current-password",userProfileController.checkCurrentPassword)
+router.get("/change-user-password-otp",userProfileController.changeUserpasswordOtpPage)
+router.post("/password-verify-otp",userProfileController.verifyOtpChangePassword)
+router.get("/change-user-password",userProfileController.changeUserPasswordPage)
+router.post("/update-new-password",userProfileController.verifyNewPassword)
+//address
+router.get("/add-address/:id",userAddressController.loadAddAddressPage)
+router.post("/verify-add-address",userAddressController.verifyAddAddress)
+router.get("/edit-address/:id",userAddressController.loadEditAddressPage)
+router.post("/edit-address/:id",userAddressController.verifyEditAddress)
+router.delete("/delete-address/:id",userAddressController.deleteUserAddress)
 
 
+//add to cart
+router.post("/add-to-cart",cartController.addToCart)
 
 
 module.exports=router;

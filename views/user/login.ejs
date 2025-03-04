@@ -152,6 +152,35 @@
     <!-- SweetAlert2 CSS & JS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/notiflix@3.2.5/dist/notiflix-aio-3.2.5.min.js"></script>
+   
+
+    <script>
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const errorMessage = urlParams.get("error");
+    
+        if (errorMessage) {
+            // Show Toastify notification at the top of the page
+            Notiflix.Notify.failure(errorMessage, {
+            width: '320px',  // Smaller width
+            position: 'right-top',  // Position at top-right
+            fontSize: '16px',
+            borderRadius: '8px',
+            timeout: 3000,  // Auto close in 3 sec
+            useIcon: true,  // Show an icon
+            cssAnimationStyle: 'zoom',  // Smooth animation
+        });
+    
+            // ✅ Remove the error message from the URL after displaying it
+            setTimeout(() => {
+                const newUrl = window.location.origin + window.location.pathname;
+                window.history.replaceState({}, document.title, newUrl);
+            }, 1000); // Removes the error from the URL after 1 second
+        }
+    </script>
+    
+    
 
     <script>
     document.addEventListener("DOMContentLoaded", function () {

@@ -55,7 +55,8 @@
                      <form id="productForm">
                          <div class="mb-4">
                              <label class="form-label">Product Name</label>
-                             <input type="text" name="name" class="form-control border" required>
+                             <input type="text" id="productName" name="name" class="form-control border" required>
+                             <p id="productNameError" class="text-red-500 text-sm mt-1 hidden" style="color: red;"></p>
                          </div>
                          <div class="mb-4">
                              <label class="form-label">Brand</label>
@@ -75,18 +76,22 @@
                                  <div class="mb-2">
                                      <label class="form-label">Size</label>
                                      <input type="text" name="size[]" class="form-control border" required>
+                                     <p id="sizeError" class="text-red-500 text-sm mt-1 hidden" style="color: red;"></p>
                                  </div>
                                  <div class="mb-2">
                                      <label class="form-label">Regular Price</label>
                                      <input type="number" name="regularPrice[]" class="form-control border" required>
+                                     <p id="regularPriceError" class="text-red-500 text-sm mt-1 hidden" style="color: red;"></p>
                                  </div>
                                  <div class="mb-2">
                                      <label class="form-label">Offer (%)</label>
                                      <input type="number" name="offer[]" class="form-control border" min="0" max="100">
+                                     <p id="offerError" class="text-red-500 text-sm mt-1 hidden"  style="color: red;"></p>
                                  </div>
                                  <div class="mb-2">
                                      <label class="form-label">Quantity</label>
                                      <input type="number" name="quantity[]" class="form-control border" required>
+                                     <p id="quantityError" class="text-red-500 text-sm mt-1 hidden " style="color: red;"></p>
                                  </div>
                              </div>
                          </div>
@@ -139,18 +144,22 @@ function addVariant() {
             <div class="mb-2">
                 <label class="form-label">Size</label>
                 <input type="text" name="size[]" class="form-control border" required>
+                <p id="sizeError" class="text-red-500 text-sm mt-1 hidden"></p>
             </div>
             <div class="mb-2">
                 <label class="form-label">Regular Price</label>
                 <input type="number" name="regularPrice[]" class="form-control border" required>
+                <p id="regularPriceError" class="text-red-500 text-sm mt-1 hidden"></p>
             </div>
             <div class="mb-2">
                 <label class="form-label">Offer (%)</label>
                 <input type="number" name="offer[]" class="form-control border" min="0" max="100">
+                <p id="offerError" class="text-red-500 text-sm mt-1 hidden"></p>
             </div>
             <div class="mb-2">
                 <label class="form-label">Quantity</label>
                 <input type="number" name="quantity[]" class="form-control border" required>
+                <p id="quantityError" class="text-red-500 text-sm mt-1 hidden"></p>
             </div>
         `;
         container.appendChild(div);
@@ -374,6 +383,77 @@ function addVariant() {
             const regularPrice = variantDiv.querySelector("input[name='regularPrice[]']").value;
             const quantity = variantDiv.querySelector("input[name='quantity[]']").value;
             const offer = variantDiv.querySelector("input[name='offer[]']").value;
+            const productName=document.getElementById("productName").value
+
+
+
+            sizeError.textContent = "";
+            regularPriceError.textContent = "";
+            quantityError.textContent = "";
+            offerError.textContent = "";
+            productName.textContent = "";
+
+            sizeError.classList.add("hidden");
+            regularPriceError.classList.add("hidden");
+            quantityError.classList.add("hidden");
+            offerError.classList.add("hidden");
+            productNameError.classList.add("hidden");
+            let isValid = true;
+
+            if(!productName.trim()){
+                productNameError.textContent="Product name required"
+                productNameError.classList.remove("hidden");
+                isValid=false;
+            }
+
+            
+            sizeRegex=/^(?!value$)(?:[1-9]\d?|\d)(?:\.\d{1,2})?$/
+
+            if(!size.trim()){
+                sizeError.textContent = "size required!";
+                sizeError.classList.remove("hidden");
+                isValid = false;
+            }else if(!sizeRegex.test(size)){
+                sizeError.textContent = "Enter a valid size!";
+                sizeError.classList.remove("hidden");
+                isValid = false;
+            }
+
+
+            regularPriceRegex=/^(?!value$)(?!-)(?:\d{1,7})(?:\.\d{1,2})?$/
+            if(!regularPrice.trim()){
+                regularPriceError.textContent = "Regular price required!";
+                regularPriceError.classList.remove("hidden");
+                isValid = false;
+            }else if(!regularPriceRegex.test(regularPrice)){
+                regularPriceError.textContent = "Enter valid price";
+                regularPriceError.classList.remove("hidden");
+                isValid = false;
+            }
+
+
+            quantityRegex=/^(?!0)\d{1,7}$/
+            if(!quantity.trim()){
+                    quantityError.textContent = "Quantity required!";
+                    quantityError.classList.remove("hidden");
+                isValid = false;
+            }else if(!quantityRegex.test(quantity)){
+                quantityError.textContent = "Enter a valid quality!";
+                    quantityError.classList.remove("hidden");
+                isValid = false;
+            }
+
+            offerRegex=/^(100|[1-9][0-9]?)$/
+            if(!offer.trim()){
+                offerError.textContent = "offer required!";
+                offerError.classList.remove("hidden");
+                isValid = false;
+            }else if(!offerRegex.test(offer)){
+                offerError.textContent = "Enter valid offer";
+                offerError.classList.remove("hidden");
+                isValid = false;
+            }
+
 
             if (size && regularPrice && quantity && offer) {
                 variants.push({
