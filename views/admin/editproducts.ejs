@@ -483,6 +483,10 @@ function addVariant() {
                 <label class="form-label">Quantity</label>
                 <input type="number" name="quantity[]" class="form-control border" >
             </div>
+            <div class="mb-2">
+                <label class="form-label">Offer</label>
+                <input type="number" name="offer[]" class="form-control border">
+            </div>
         `;
         container.appendChild(div);
         
@@ -511,12 +515,14 @@ console.log("Product ID:", productId);
             const size = variantDiv.querySelector("input[name='size[]']").value;
             const regularPrice = variantDiv.querySelector("input[name='regularPrice[]']").value;
             const quantity = variantDiv.querySelector("input[name='quantity[]']").value;
+            const offer=variantDiv.querySelector("input[name='offer[]']").value
             
             if (size && regularPrice && quantity) {
             variants.push({
                 size: size,
                 regularPrice: parseFloat(regularPrice),
                 quantity: parseInt(quantity),
+                offer:parseInt(offer)
             });
         }
         });

@@ -73,6 +73,7 @@
                     <!-- Size Selection -->
                     <div class="space-y-4">
                         <label class="block text-sm font-medium text-gray-700">Select Size</label>
+                        <p id="addtocartError" class="text-red-500 text-sm mt-1 hidden"></p>
                         <div id="productVariants" data-variants='<%= JSON.stringify(product.variants) %>'
                              class="grid grid-cols-4 sm:grid-cols-6 gap-3">
                             <% product.variants.forEach(variant => { %>
@@ -107,10 +108,10 @@
                                 </button>
                             </div>
 
-                            <button class="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200">
+                            
+                            <button id="addToCart" class="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200">
                                 Add to Cart
                             </button>
-
                             <button class="p-3 border-2 border-gray-200 rounded-lg text-gray-600 hover:text-red-500 hover:border-red-500 transition-all duration-200">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -118,13 +119,13 @@
                             </button>
                         </div>
                     </div>
-
+                   
                     <!-- Stock Status -->
                     <div class="flex items-center space-x-2 text-sm">
                         <span class="text-gray-600">Availability:</span>
                         <span id="availabilityStatus" 
                               class="font-medium <%= product.stock > 0 ? 'text-green-600' : 'text-red-500' %>">
-                            <%= product.stock > 0 ? "In Stock" : "Out of Stock" %>
+                            <%= product.stock > 0 ? "In Stock" : "Select a size" %>
                         </span>
                     </div>
 
@@ -176,16 +177,51 @@
     }
 
     function decreaseQty() {
-        let qty = document.getElementById('quantity');
-        if (parseInt(qty.innerText) > 1) {
-            qty.innerText = parseInt(qty.innerText) - 1;
-        }
+    let qty = document.getElementById('quantity');
+    let selectedSize = document.getElementById('selectedSize').value;
+    let productId = "<%= product._id %>";
+
+    if (parseInt(qty.innerText) > 1) {
+        qty.innerText = parseInt(qty.innerText) - 1;
+        // updateCartQuantity(productId, selectedSize, parseInt(qty.innerText));
+    }
     }
 
     function increaseQty() {
-        let qty = document.getElementById('quantity');
-        qty.innerText = parseInt(qty.innerText) + 1;
+    let qty = document.getElementById('quantity');
+    let selectedSize = document.getElementById('selectedSize').value;
+    let productId = "<%= product._id %>";
+
+    qty.innerText = parseInt(qty.innerText) + 1;
+    // updateCartQuantity(productId, selectedSize, parseInt(qty.innerText));
     }
+
+
+    function updateCartQuantity(productId, selectedSize, quantity) {
+    fetch("/user/update-cart-quantity", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            productId: productId,
+            size: selectedSize,
+            // quantity: quantity
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log("Cart updated successfully!");
+        } else {
+            console.error("Failed to update cart:", data.message);
+        }
+    })
+    .catch(error => {
+        console.error("Error updating cart:", error);
+    });
+    }
+
 
     document.addEventListener("DOMContentLoaded", function () {
         const productVariants = JSON.parse(document.getElementById('productVariants').getAttribute('data-variants'));
@@ -243,7 +279,59 @@
             isZoomed = false;
             mainImage.style.transform = "scale(1)";
         });
-    });
+
+
+
+
+        const addToCartButton = document.querySelector("#addToCart");
+    
+        addToCartButton.addEventListener("click", async function () {
+    const selectedSize = document.getElementById("selectedSize").value;
+    const productId = "<%= product._id %>"; // Ensure this is correctly populated in EJS
+
+    const addtocartError = document.getElementById("addtocartError");
+    addtocartError.textContent = "";
+    addtocartError.classList.add("hidden");
+
+    if (!selectedSize) {
+        addtocartError.textContent = "Please select a size before adding to cart!";
+        addtocartError.classList.remove("hidden");
+        return;
+    }
+
+    console.log("Product ID:", productId, "Selected Size:", selectedSize);
+
+    try {
+        const response = await fetch("/user/add-to-cart", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                productId: productId,
+                size: selectedSize
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            alert("Product added to cart successfully!");
+        } else {
+            alert(result.message || "Failed to add product to cart.");
+        }
+    } catch (error) {
+        console.error("Error adding to cart:", error);
+        alert("Something went wrong. Please try again.");
+    }
+});
+
+
+
+});
+
+
+    
 </script>
 
 <%- include("partials/footer") %>

@@ -55,6 +55,7 @@ addproducts:async (req,res) => {
     try {
         // const {name,description,categoryId,brand,offer,stock,variants}=req.body
         const { name, description, categoryId, brand, stock, variants } = req.body;
+        console.log(variants)
         console.log("ad produc is working "+ name,description)
 
         if (!name || !description || !categoryId || !brand) {
@@ -135,6 +136,7 @@ updateProduct: async (req, res) => {
     try {
         const { productId, name, brand, categoryId, description, variants } = req.body;
         const deletedImages = JSON.parse(req.body.deletedImages || "[]");
+        console.log(variants)
         console.log(deletedImages+"thti")
 
         // Find the existing product

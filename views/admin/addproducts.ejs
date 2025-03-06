@@ -1,45 +1,66 @@
 <%- include("partials/header") %>
 
-
 <head>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
- </head>
+    <script src="https://unpkg.com/cropperjs@1.5.12/dist/cropper.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/cropperjs@1.5.12/dist/cropper.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>   -->
+</head>
+
  
  <style>
-    .error-message {
-        color: red;
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    animation: fadeIn 0.4s ease-out;
+}
+
+.modal-content {
+    background-color: #ffffff;
+    margin: 5% auto;
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 800px; /* Increased max-width */
+    max-height: 80vh; /* Limit height to viewport */
+    overflow-y: auto; /* Allow scrolling if content is too long */
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    position: relative;
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+#cropperImage {
+    max-width: 100%;
+    max-height: 60vh; /* Limit image height */
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+    border-radius: 12px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+        padding: 20px;
     }
-    .thumbnails-container {
-        display: flex;
-        overflow-x: auto;
+    
+    #cropperImage {
+        max-height: 50vh;
     }
-    .thumbnail {
-        margin-right: 10px;
-    }
-    .modal {
-         display: none;
-         position: fixed;
-         z-index: 1;
-         left: 0;
-         top: 0;
-         width: 100%;
-         height: 100%;
-         overflow: auto;
-         background-color: rgba(0, 0, 0, 0.4);
-     }
-     .modal-content {
-         background-color: white;
-         margin: 10% auto;
-         padding: 20px;
-         border: 1px solid #888;
-         width: 50%;
-         text-align: center;
-     }
-     .close {
-         float: right;
-         font-size: 24px;
-         cursor: pointer;
-     }
+}
  </style>
  
  <section class="content-main">
@@ -120,22 +141,28 @@
  </section>
  
  <!-- Cropper Modal -->
- <div id="cropperModal" class="modal">
-     <div class="modal-content">
-         <span class="close">&times;</span>
-         <h4>Crop Your Image</h4>
-         <div>
-             <img id="cropperImage" style="max-width: 100%; display: block;">
-         </div>
-         <button id="cropAndSave">Crop & Save</button>
-     </div>
- </div>
- 
- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
- <script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>
+ <!-- Cropper Modal -->
+<div id="cropperModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4>Crop Your Image</h4>
+            <span class="close">&times;</span>
+        </div>
+        <div>
+            <img id="cropperImage" style="max-width: 100%; display: block;">
+        </div>
+        <button id="cropAndSave">Crop & Save</button>
+    </div>
+</div>
+
 
 <script>
 
+function openCropperModal() {
+    cropperModal.style.display = "block";
+    cropperModal.classList.add("show");
+    document.body.classList.add("modal-open");
+}
 function addVariant() {
         let container = document.getElementById("variantsContainer");
         let div = document.createElement("div");
@@ -165,9 +192,18 @@ function addVariant() {
         container.appendChild(div);
     }
     document.addEventListener("DOMContentLoaded", function() {
+    // Detailed library check
+    console.log("Cropper object:", Cropper);
+    console.log("Cropper keys:", Object.keys(Cropper));
+
+    // Alternative constructor approach
+    const CropperConstructor = Cropper.default || Cropper;
+    
+    console.log("Constructor type:", typeof CropperConstructor);
+
     let cropper;
-    let selectedFiles = []; // Stores selected files
-    let croppedImages = []; // Stores cropped images as blobs
+    let selectedFiles = []; 
+    let croppedImages = []; 
     const inputImages = document.getElementById("inputImages");
     const cropperModal = document.getElementById("cropperModal");
     const cropperImage = document.getElementById("cropperImage");
@@ -176,68 +212,110 @@ function addVariant() {
 
     let currentFileIndex = 0;
 
+    // Fallback constructor initialization
+    function initializeCropper(image, options) {
+        try {
+            // Try multiple initialization methods
+            if (typeof Cropper === 'function') {
+                return new Cropper(image, options);
+            } else if (typeof CropperConstructor === 'function') {
+                return new CropperConstructor(image, options);
+            } else if (Cropper && Cropper.prototype && Cropper.prototype.constructor) {
+                return Cropper.prototype.constructor(image, options);
+            } else {
+                throw new Error('Cannot find valid Cropper constructor');
+            }
+        } catch (error) {
+            console.error('Cropper initialization error:', error);
+            alert('Failed to initialize image cropper. Please check browser console.');
+            return null;
+        }
+    }
+
     // When selecting new files
     inputImages.addEventListener("change", function(event) {
-        // Clear previous selections and results
-        selectedFiles = Array.from(event.target.files);
-        croppedImages = []; // Reset cropped images array
-        currentFileIndex = 0;
-        
-        // Clear existing thumbnails
-        document.getElementById("addedImagesContainer").innerHTML = "";
-        
-        if (selectedFiles.length > 0) {
-            openCropperForNextImage();
+        try {
+            console.log(`Files selected: ${event.target.files.length}`);
+            
+            selectedFiles = Array.from(event.target.files);
+            croppedImages = [];
+            currentFileIndex = 0;
+            
+            document.getElementById("addedImagesContainer").innerHTML = "";
+            
+            if (selectedFiles.length > 0) {
+                openCropperForNextImage();
+            }
+        } catch (error) {
+            console.error(`File selection error: ${error.message}`);
         }
     });
 
     function openCropperForNextImage() {
-        if (currentFileIndex < selectedFiles.length) {
-            const file = selectedFiles[currentFileIndex];
-            const reader = new FileReader();
+        try {
+            console.log(`Attempting to open cropper for image index: ${currentFileIndex}`);
             
-            reader.onload = function(e) {
-                cropperImage.src = e.target.result;
-                cropperModal.style.display = "block";
-
-                // Destroy previous cropper instance if it exists
-                if (cropper) {
-                    cropper.destroy();
-                }
+            if (currentFileIndex < selectedFiles.length) {
+                const file = selectedFiles[currentFileIndex];
+                const reader = new FileReader();
                 
-                // Initialize new cropper for current image
-                cropper = new Cropper(cropperImage, {
-                    aspectRatio: 1,
-                    viewMode: 0,
-                    autoCropArea: 1,
-                    movable: false,
-                    zoomable: false,
-                    rotatable: true,
-                    scalable: true,
-                });
-            };
-            
-            reader.readAsDataURL(file);
-        } else {
-            // All images processed, close modal
-            cropperModal.style.display = "none";
-            updateFileInput();
-            
-            // Show success message if any images were processed
-            if (croppedImages.length > 0) {
-                Swal.fire({
-                    title: 'Success!',
-                    text: `${croppedImages.length} images have been cropped and added.`,
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                });
+                reader.onload = function(e) {
+                    try {
+                        console.log("File read successfully");
+                        
+                        // Ensure image is fully loaded before initializing Cropper
+                        cropperImage.onload = function() {
+                            try {
+                                // Destroy previous cropper instance if it exists
+                                if (cropper) {
+                                    cropper.destroy();
+                                }
+                                
+                                console.log(`Image dimensions: ${cropperImage.naturalWidth} x ${cropperImage.naturalHeight}`);
+                                
+                                // Use fallback constructor method
+                                cropper = initializeCropper(cropperImage, {
+                                    aspectRatio: 1,
+                                    viewMode: 1,
+                                    autoCropArea: 1,
+                                    movable: false,
+                                    zoomable: false,
+                                    rotatable: true,
+                                    scalable: true,
+                                    ready: function() {
+                                        console.log("Cropper initialized successfully");
+                                        cropperModal.style.display = "block";
+                                    }
+                                });
+                            } catch (cropperError) {
+                                console.error(`Cropper initialization error: ${cropperError.message}`);
+                            }
+                        };
+                        
+                        // Set image source
+                        cropperImage.src = e.target.result;
+                    } catch (readError) {
+                        console.error(`Image processing error: ${readError.message}`);
+                    }
+                };
+                
+                reader.onerror = function(error) {
+                    console.error(`File reading error: ${error.message}`);
+                };
+                
+                reader.readAsDataURL(file);
+            } else {
+                console.log("All images processed");
+                cropperModal.style.display = "none";
+                updateFileInput();
             }
+        } catch (error) {
+            console.error(`General cropper error: ${error.message}`);
         }
     }
-
     cropAndSaveBtn.addEventListener("click", function() {
         if (!cropper) return;
-        
+        console.log("heii")
         cropper.getCroppedCanvas().toBlob((blob) => {
             // Create a truly unique filename with timestamp and random string
             const fileExtension = selectedFiles[currentFileIndex].name.split('.').pop();
@@ -504,6 +582,7 @@ function addVariant() {
     }
 
     document.getElementById("publishButton").addEventListener("click", validateAndSubmit);
+    
 });
 
 
@@ -513,9 +592,8 @@ function addVariant() {
     //for cropper 
     
 </script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>
+
 
 <%- include("partials/footer") %>
 

@@ -116,6 +116,8 @@ router.delete("/delete-address/:id",userAddressController.deleteUserAddress)
 
 //add to cart
 router.post("/add-to-cart",cartController.addToCart)
+router.post("/update-cart-quantity",cartController.updateCartQuantity)
+router.get("/cart",cartController.loadCartPage)
 
 
 module.exports=router;

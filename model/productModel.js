@@ -44,12 +44,6 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-// Middleware to update salePrice before saving
-productSchema.pre("save", function (next) {
-  this.variants.forEach((variant) => {
-    variant.salePrice = variant.regularPrice - (variant.regularPrice * (variant.offer / 100));
-  });
-  next();
-});
+
 
 module.exports = mongoose.model("Product", productSchema);
