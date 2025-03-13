@@ -44,9 +44,14 @@ const cartController={
 
             if (existingItem) {
                 //if adding another item exceeds available stock**
-                if (existingItem.quantity + 1 > variant.quantity) {
-                    return res.status(400).json({ message: "Not enough stock available" });
+                if(existingItem.quantity > 5){
+                    return res.status(400).json({message:"You can add upto 6 items"})
+                }else{
+                    if (existingItem.quantity + 1 > variant.quantity) {
+                        return res.status(400).json({ message: "Not enough stock available" });
+                    }
                 }
+                
 
                 existingItem.quantity += 1;
             } else {
@@ -61,7 +66,7 @@ const cartController={
 
             await cart.save();
 
-            return res.status(200).json({ message: "Product added to cart successfully" });
+            return res.status(200).json({ success:true, message: "Product added to cart successfully" });
 
             
         } catch (error) {
@@ -135,7 +140,7 @@ const cartController={
 
             
             if (!cart || cart.items.length === 0) {
-                return res.render("user/usercart", { data: [], grandTotal: 0, user: req.user });
+                return res.render("user/usercart", { data: [], grandTotal: 0, actualTotal: 0, user, shippingCharge: 0 ,finalTotal:0 });
             }
             let actualTotal = 0;
             let grandTotal = 0;
@@ -199,11 +204,43 @@ const cartController={
 
             let shippingCharge = grandTotal >= 1000 ? 0 : 50;
             let finalTotal = grandTotal + shippingCharge;
+            console.log(actualTotal)
     
             console.log(cartData)
             res.render("user/usercart", { data: cartData, grandTotal,shippingCharge, finalTotal, actualTotal, user });
         } catch (error) {
             console.log(error)
+        }
+    },deleteItem:async (req,res) => {
+        try {
+            const productId=req.params.id
+            console.log(productId)
+            const userId=req.session.user?.id
+console.log("here 1")
+            if (!userId) {
+                return res.status(401).json({ message: "User not authenticated" });
+            }
+            console.log("here 2")
+            let cart = await cartSchema.findOne({ userId });
+            console.log("here 3")
+            if (!cart) {
+                return res.status(404).json({ message: "Cart not found" });
+            }
+            console.log("here 5")
+            const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
+            console.log("here 6")
+            if (itemIndex === -1) {
+                return res.status(400).json({ message: "Product not found in cart" });
+            }
+            console.log("here 7")
+            cart.items.splice(itemIndex, 1);
+            console.log("here 8")
+            await cart.save();
+            console.log("here 9")
+            return res.status(200).json({ message: "Product removed from cart successfully",success:true });
+        } catch (error) {
+            console.log(error)
+            return res.status(500).json({ message: "Internal server error" });
         }
     }
 }

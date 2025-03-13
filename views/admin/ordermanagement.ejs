@@ -1,0 +1,128 @@
+<%- include("partials/header") %>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-6">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">Order Details</h2>
+
+            <!-- Order Summary -->
+            <div class="grid grid-cols-2 gap-6 border-b pb-4 mb-4">
+                <div>
+                    <p class="text-gray-700"><strong>Order ID:</strong> <%= orders.orderId %></p>
+                    <p class="text-gray-700">
+                        <strong>Status:</strong> 
+                        <span id="order-status"><%= orders.status %></span>
+                    </p>                    
+                    <p class="text-gray-700"><strong>Payment Method:</strong> <%= orders.paymentMethod %></p>
+                    <p class="text-gray-700"><strong>Order Date:</strong> <%= new Date(orders.orderDate).toLocaleDateString() %></p>
+                    <p class="text-gray-700"><strong>Final Amount:</strong> ₹<%= orders.total %></p>
+                </div>
+                <div>
+                    <p class="text-gray-700"><strong>Customer ID:</strong> <%= orders.userId %></p>
+                    <p class="text-gray-700"><strong>Transaction ID:</strong> <%= orders.transactionId ? orders.transactionId : "N/A" %></p>
+                </div>
+            </div>
+
+            <!-- Shipping Address -->
+            <h3 class="text-xl font-bold mt-6 text-gray-800">Shipping Address</h3>
+            <div class="bg-gray-50 p-4 rounded-md border mt-2">
+                <% if (orders.address) { %>
+                    <p class="text-gray-700"><strong>Place:</strong> <%= orders.address.place %></p>
+                    <p class="text-gray-700"><strong>City:</strong> <%= orders.address.city %></p>
+                    <p class="text-gray-700"><strong>State:</strong> <%= orders.address.state %></p>
+                    <p class="text-gray-700"><strong>Pin Code:</strong> <%= orders.address.pinCode %></p>
+                <% } else { %>
+                    <p class="text-red-500">Address not found.</p>
+                <% } %>
+            </div>
+
+            <!-- Ordered Products -->
+            <h3 class="text-xl font-bold mt-6 text-gray-800">Ordered Products</h3>
+            <div class="overflow-x-auto mt-4">
+                <table class="w-full border-collapse border border-gray-300 text-left">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="border border-gray-300 px-4 py-2">Product</th>
+                            <th class="border border-gray-300 px-4 py-2">Size</th>
+                            <th class="border border-gray-300 px-4 py-2">Quantity</th>
+                            <th class="border border-gray-300 px-4 py-2">Price</th>
+                            <th class="border border-gray-300 px-4 py-2">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (orders.items && orders.items.length > 0) { %>
+                            <% orders.items.forEach(item => { %>
+                                <% let matchedVariant = item.productId.variants.find(it => it.size === item.size); %>
+                                <tr class="bg-white hover:bg-gray-100">
+                                    <td class="border border-gray-300 px-4 py-2">
+                                        <%= item.productId ? item.productId.name : "Product Not Found" %>
+                                    </td>
+                                    <td class="border border-gray-300 px-4 py-2"><%= item.size %></td>
+                                    <td class="border border-gray-300 px-4 py-2"><%= item.quantity %></td>
+                                    <td class="border border-gray-300 px-4 py-2">₹<%= matchedVariant.regularPrice%></td>
+                                    <td class="border border-gray-300 px-4 py-2">₹<%= orders.total%></td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="5" class="text-red-500 text-center py-4">No items in this order</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Change Order Status -->
+            <h3 class="text-xl font-bold mt-6 text-gray-800">Change Order Status</h3>
+            <form id="statusForm" class="mt-4">
+                <input type="hidden" name="orderId" id="orderId" value="<%= orders.orderId %>">
+                <input type="hidden" name="userId" id="userId" value="<%= orders.userId %>">
+                <label for="status" class="block text-sm font-medium text-gray-700">Select Status:</label>
+                <select name="status" id="status" class="mt-1 p-2 border rounded-md w-full">
+                    <option value="pending" <% if(orders.status === "pending") { %> selected <% } %>>Pending</option>
+                    <option value="processing" <% if(orders.status === "processing") { %> selected <% } %>>Processing</option>
+                    <option value="shipped" <% if(orders.status === "shipped") { %> selected <% } %>>Shipped</option>
+                    <option value="delivered" <% if(orders.status === "delivered") { %> selected <% } %>>Delivered</option>
+                    <option value="cancelled" <% if(orders.status === "cancelled") { %> selected <% } %>>Cancelled</option>
+                    <option value="returned" <% if(orders.status === "returned") { %> selected <% } %>>Returned</option>
+                </select>
+                <button type="submit" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                    Update Status
+                </button>
+            </form>
+
+            <a href="/admin/orderList" class="block mt-6 text-blue-600 hover:underline">Back to Order List</a>
+        </div>
+    </div>
+</body>
+<%- include("partials/footer") %>
+<script>
+        document.getElementById("statusForm").addEventListener("submit", async function(event) {
+            event.preventDefault(); // Prevent form from reloading the page
+
+            const orderId = document.getElementById("orderId").value;
+            const userId = document.getElementById("userId").value;
+            const status = document.getElementById("status").value;
+
+            try {
+                const response = await fetch("/admin/change-order-Status", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ orderId, userId, status })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert("Order status updated successfully!");
+                    document.getElementById("order-status").textContent = status; // Update status in UI
+                } else {
+                    alert(result.message || "Failed to update order status.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("An error occurred while updating the order status.");
+            }
+        });
+</script>

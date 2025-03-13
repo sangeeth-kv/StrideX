@@ -1,0 +1,57 @@
+<%- include("partials/header") %>
+<body class="bg-gray-100">
+
+    <div class="container mx-auto p-6">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold mb-4">All Orders</h2>
+
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse border border-gray-300">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="border border-gray-300 px-4 py-2">Order ID</th>
+                            <th class="border border-gray-300 px-4 py-2">Customer</th>
+                            <th class="border border-gray-300 px-4 py-2">Total</th>
+                            <th class="border border-gray-300 px-4 py-2">Status</th>
+                            <th class="border border-gray-300 px-4 py-2">Order Date</th>
+                            <th class="border border-gray-300 px-4 py-2">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (orders && orders.length > 0) { %>
+                            <% orders.forEach(order => { %>
+                                <tr class="bg-white">
+                                    <td class="border border-gray-300 px-4 py-2"><%= order.orderId %></td>
+                                    <td class="border border-gray-300 px-4 py-2"><%= order.userId ? order.userId.fullname : "Guest" %></td>
+                                    <td class="border border-gray-300 px-4 py-2">₹<%= order.total.toLocaleString() %></td>
+                                    <td class="border border-gray-300 px-4 py-2">
+                                        <select class="status-dropdown bg-white border px-2 py-1 rounded" data-order-id="<%= order._id %>">
+                                            <option value="pending" <%= order.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                                            <option value="processing" <%= order.status === 'processing' ? 'selected' : '' %>>Processing</option>
+                                            <option value="shipped" <%= order.status === 'shipped' ? 'selected' : '' %>>Shipped</option>
+                                            <option value="delivered" <%= order.status === 'delivered' ? 'selected' : '' %>>Delivered</option>
+                                            <option value="cancelled" <%= order.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                        </select>
+                                    </td>                                    
+                                    <td class="border border-gray-300 px-4 py-2"><%= new Date(order.orderDate).toLocaleDateString() %></td>
+                                    <td class="border border-gray-300 px-4 py-2">
+                                        <a href="/admin/order-details/<%= order._id %>" class="text-blue-600 hover:underline">View</a>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="6" class="text-center text-red-500 py-4">No orders found.</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <a href="/admin/dashboard" class="block mt-6 text-blue-600 hover:underline">Back to Dashboard</a>
+        </div>
+    </div>
+
+</body>
+</html>
+<%- include("partials/footer") %>

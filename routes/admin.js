@@ -5,7 +5,9 @@ const productController = require("../controller/admin/productController");
 const categoryController = require("../controller/admin/categoryController");
 const brandController = require("../controller/admin/brandController");
 const userController=require("../controller/admin/userController")
+const orderController=require("../controller/admin/orderController")
 const upload = require("../config/multer");
+
 
 //for login page adminController
 router.get("/login", adminController.login);
@@ -51,5 +53,11 @@ router.patch("/list-unlisted/:id",brandController.listUnlistBrand)
 
 router.get("/users",userController.loadUserPage)
 router.patch("/users/status/:id",userController.UserStatus)
+
+
+//for orders
+router.get("/orderList",orderController.loadOrderPage)
+router.get("/order-details/:id",orderController.loadOrderDetailsPage)
+router.post("/change-order-Status",orderController.changeOrderStatus)
 
 module.exports = router;

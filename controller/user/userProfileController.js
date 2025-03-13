@@ -1,5 +1,6 @@
 const addressSchema=require("../../model/addressModel")
 const userSchema=require("../../model/userModel")
+const orderSchema=require("../../model/orderModel")
 const crypto = require("crypto");
 const {sendOTPByEmail}=require("../../controller/user/otpverification")
 const saltRounds=10;
@@ -10,19 +11,18 @@ const generateOTP=()=>crypto.randomInt(100000, 999999).toString();
 const userProfileController={
     loadProfilePage:async (req,res) => {
         try {
-            const id=req.params.id;
-            console.log(id+"here id");
-            
-            req.session.userId=id
-            console.log(req.session.userId+"session hhere");
+            const userId=req.session.user?.id
+        
+           
             
 
-            const user=await userSchema.findById(id)
+            const user=await userSchema.findById(userId)
             if(!user){
                 return res.redirect("/user/login?error=User not found");
             }
-            const addresses = await addressSchema.find({ userId: id, isDeleted: false });
-            res.render("user/userprofile",{user,addresses})
+            const addresses = await addressSchema.find({ userId, isDeleted: false });
+            const orders=await orderSchema.find({userId})
+            res.render("user/userprofile",{user,addresses,orders})
         } catch (error) {
             console.log(error)
         }

@@ -7,6 +7,10 @@ const passport=require("passport");
 // const productController = require("../controller/admin/productController");
 const userAddressController=require("../controller/user/userAddressController");
 const cartController = require("../controller/user/cartController");
+const wishlistController=require("../controller/user/wishlistController")
+const checkOutController=require("../controller/user/checkOutController")
+const orderController=require("../controller/user/orderController")
+const InvoiceController=require("../controller/user/invoiceController")
 // const adminController = require("../controller/admin/adminController");
 require("../config/passport")
 
@@ -43,30 +47,6 @@ router.get( "/auth/google/callback",
     }
 );
 
-// router.get(
-//     "/auth/google/callback",
-//     passport.authenticate("google", { 
-//         failureRedirect: "/user/login", 
-//         failureFlash: true  // Store failure messages in req.flash("error")
-//     }),
-//     (req, res) => {
-//         if (!req.user) {
-//             req.flash("error", "Authentication failed. Please try again.");
-//             console.log("🚨 Flash Error Set: Authentication failed");
-//             return res.redirect("/user/login");
-//         }
-
-//         if (req.authInfo && req.authInfo.message) {
-//             req.flash("error", "You have already signed up with this email.");
-//             console.log("🚨 Flash Error Set: You have already signed up with this email.");
-//             return res.redirect("/user/login");
-//         }
-
-//         req.flash("success", "Login successful!");
-//         console.log("✅ Flash Success Set: Login successful!");
-//         res.redirect("/user/home");
-//     }
-// );
 
 
 
@@ -107,7 +87,7 @@ router.post("/password-verify-otp",userProfileController.verifyOtpChangePassword
 router.get("/change-user-password",userProfileController.changeUserPasswordPage)
 router.post("/update-new-password",userProfileController.verifyNewPassword)
 //address
-router.get("/add-address/:id",userAddressController.loadAddAddressPage)
+router.get("/add-address",userAddressController.loadAddAddressPage)
 router.post("/verify-add-address",userAddressController.verifyAddAddress)
 router.get("/edit-address/:id",userAddressController.loadEditAddressPage)
 router.post("/edit-address/:id",userAddressController.verifyEditAddress)
@@ -118,6 +98,29 @@ router.delete("/delete-address/:id",userAddressController.deleteUserAddress)
 router.post("/add-to-cart",cartController.addToCart)
 router.post("/update-cart-quantity",cartController.updateCartQuantity)
 router.get("/cart",cartController.loadCartPage)
+router.post("/delete-item/:id",cartController.deleteItem)
 
+
+//wishlist 
+router.get("/wishlist",wishlistController.loadWishlistPage)
+router.post("/add-to-wishlist",wishlistController.addToWishlist)
+router.post("/remove-from-wishlist",wishlistController.removeFromWishlist)
+
+
+//checkout page
+router.get("/checkout",checkOutController.loadCheckoutPage)
+router.get("/add-order-address/:id",checkOutController.loadOrderAddress)
+
+//cod payment
+router.post("/cash-on-delivery",orderController.verifyCOD)
+router.get("/orderDetails",orderController.loadOrderDetailsPage)
+
+
+//invoice
+router.get("/downloadInvoice/:id",InvoiceController.downloadInvoice)
+
+
+//return
+router.post("/return-request-Order",orderController.returnOrderReq)
 
 module.exports=router;

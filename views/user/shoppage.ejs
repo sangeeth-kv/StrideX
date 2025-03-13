@@ -1,5 +1,9 @@
 <%- include("partials/header") %>
-
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</head>
 <div class="bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen py-8">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Page Header -->
@@ -89,11 +93,22 @@
             <% product.forEach(product => { %>
               <div class="group relative bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                 <!-- Wishlist Button -->
-                <button class="absolute top-3 right-3 z-10 p-2 rounded-full bg-white bg-opacity-80 shadow-sm hover:bg-opacity-100 transition-all duration-200 transform hover:scale-110" onclick="">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 hover:text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
-                </button>
+                <button class="wishlist-btn absolute top-3 right-3 z-10 p-2 rounded-full bg-white bg-opacity-80 shadow-sm hover:bg-opacity-100 transition-all duration-200 transform hover:scale-110"
+  data-product-id="<%= product._id %>">
+  <% if (wishlist && wishlist.includes(product.id)) { %>
+    <!-- If in wishlist, show filled heart -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5A5.5 5.5 0 0112 3a5.5 5.5 0 0110 5.5c0 3.78-3.4 6.86-8.55 11.18L12 21z" />
+    </svg>
+  <% } else { %>
+    <!-- If not in wishlist, show outlined heart -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 hover:text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+    </svg>
+  <% } %>
+</button>
+
+
 
                 <!-- Product Image -->
                 <a href="/user/view-product/<%= product._id %>" class="block overflow-hidden">
@@ -185,6 +200,48 @@
 
 <script>
 
+
+//for wishlistst
+document.querySelectorAll(".wishlist-btn").forEach(button => {
+    button.addEventListener("click", async function () {
+        const productId = this.getAttribute("data-product-id");
+        const heartIcon = this.querySelector("svg");
+        const isWishlisted = heartIcon.classList.contains("text-red-500");
+        const url = isWishlisted ? '/user/remove-from-wishlist' : '/user/add-to-wishlist';
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId })
+            });
+
+            const result = await response.json();
+            console.log(result)
+
+            if (result.success) {
+                if (isWishlisted) {
+                    // Change to unliked heart
+                    heartIcon.classList.remove("text-red-500");
+                    heartIcon.classList.add("text-gray-400");
+                  
+                    
+                } else {
+                    // Change to liked heart
+                    heartIcon.classList.remove("text-gray-400");
+                    heartIcon.classList.add("text-red-500");
+                }
+            } else {
+                console.error("Failed to update wishlist");
+            }
+        } catch (error) {
+            console.error("Error updating wishlist", error);
+        }
+    });
+});
+
+
+  //for add to cart
 document.querySelectorAll(".size-select").forEach(select => {
     select.addEventListener("change", function () {
       const productId = this.id.split("-")[1];
@@ -225,14 +282,30 @@ document.querySelectorAll(".size-select").forEach(select => {
         body: JSON.stringify({ productId, size: selectedSize })
       });
       const result = await response.json();
-      alert(result.message);
+      if(result.success){
+        Toastify({
+          text: result.message,
+          duration: 3000,
+          gravity: "bottom", // Position at the bottom
+          position: "center", // Center align
+          backgroundColor: "4CAF50", // green color for removal
+          stopOnFocus: true,
+        }).showToast();
+      }else{
+        Toastify({
+          text: result.message,
+          duration: 3000,
+          gravity: "bottom", // Position at the bottom
+          position: "center", // Center align
+          backgroundColor: "#FF9800", // Red color for removal
+          stopOnFocus: true,
+        }).showToast();
+      }
     } catch (error) {
       alert('Error adding product to cart. Please try again.');
     }
   }
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
 
 <%- include("partials/footer") %>

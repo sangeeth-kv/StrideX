@@ -15,7 +15,7 @@ const userAddressController={
         }
     },verifyAddAddress:async (req,res) => {
         try {
-            const id=req.session.userId
+            const id=req.session.user?.id
             console.log(req.body)
             console.log('idd is here'+id);
             const {name,mobile_number,country,state,district,city,place,pinCode,address,type}=req.body
@@ -63,7 +63,7 @@ const userAddressController={
     },
     verifyEditAddress:async (req,res) => {
         try {
-            const id=req.session.userId
+            const id=req.session.user?.id
             const addressId=req.params.id
             if(!id){
                 return res.status(401).json({message:"Session out,need to login again"})

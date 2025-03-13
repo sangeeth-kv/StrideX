@@ -1,6 +1,7 @@
 const productSchema=require("../../model/productModel")
 const categorySchema=require("../../model/categoryModel")
 const brandSchema=require("../../model/brandModel")
+const wishlistSchema=require("../../model/wishlistmodel")
 
 
 const userProductController={
@@ -85,7 +86,13 @@ const userProductController={
             // 📊 Get Total Pages for Pagination
             const totalProducts = await productSchema.countDocuments(filter); // Use same `filter` for accurate count
             const totalPages = Math.ceil(totalProducts / limit);
-    
+
+            let wishlistItems = [];
+if (req.session.user?.id) {
+    const wishlist = await wishlistSchema.findOne({ userId: req.session.user.id }).populate("items.productId");
+    wishlistItems = wishlist ? wishlist.items.map(item => item.productId._id.toString()) : [];
+}
+console.log("wishslist:  ",wishlistItems)
             res.render("user/shoppage", {
                 product,
                 categories,
@@ -96,6 +103,7 @@ const userProductController={
                 searchQuery,
                 currentPage: page,
                 totalPages,
+                wishlist:wishlistItems
             });
     
         } catch (error) {

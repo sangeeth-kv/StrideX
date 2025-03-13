@@ -1,0 +1,273 @@
+<%- include("partials/header") %>
+<head>
+  <!-- Other head elements -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Or better yet, a compiled version -->
+  <!-- Toastify CSS -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+  />
+  <!-- Toastify JS -->
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</head>
+<main class="bg-gray-50 min-h-screen">
+  <!-- Breadcrumb -->
+  <div class="bg-white shadow-sm">
+    <div class="container mx-auto py-4 px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center text-sm text-gray-500">
+        <a href="/" class="hover:text-indigo-600 transition" rel="nofollow"
+          >Home</a
+        >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4 mx-2"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 5l7 7-7 7"
+          />
+        </svg>
+        <span>Shop</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4 mx-2"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 5l7 7-7 7"
+          />
+        </svg>
+        <span class="font-medium text-gray-900">My Wishlist</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wishlist Section -->
+  <section class="py-12">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-3xl font-bold text-gray-900 mb-8 text-center">
+        My Wishlist
+      </h1>
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <% if (wishlist && wishlist.items.length > 0) { %>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gray-100">
+              <tr>
+                <th
+                  class="px-6 py-4 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Product
+                </th>
+                <th
+                  class="px-6 py-4 text-left text-sm font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Price
+                </th>
+                <th
+                  class="px-6 py-4 text-center text-sm font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              <% wishlist.items.forEach(item => { %>
+              <tr class="hover:bg-gray-50 transition duration-150">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div
+                      class="flex-shrink-0 h-20 w-20 bg-gray-100 rounded-md overflow-hidden"
+                    >
+                      <img
+                        src="<%= item.productId.images[0] %>"
+                        alt="<%= item.productId.name %>"
+                        class="h-full w-full object-cover object-center"
+                      />
+                    </div>
+                    <div class="ml-4">
+                      <h3
+                        class="text-lg font-medium text-gray-900 hover:text-indigo-600 transition"
+                      >
+                        <a href="/user/view-product/<%= item.productId._id %>"
+                          ><%= item.productId.name %></a
+                        >
+                      </h3>
+                      <p class="text-sm text-gray-500 line-clamp-2 max-w-md">
+                        <%= item.productId.description %>
+                      </p>
+                    </div>
+                  </div>
+                </td>
+                <td
+                  class="px-6 py-4 whitespace-nowrap text-center text-lg font-semibold text-gray-900"
+                >
+                  <%= item.productId.variants.length > 0 ?
+                  item.productId.variants[0].regularPrice.toFixed(2) : "N/A" %>
+                </td>
+
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                  <div class="flex items-center space-x-4 justify-center">
+                    <!-- Size Selector -->
+                    <select
+                      id="size-<%= item.productId._id %>"
+                      class="border border-gray-300 rounded-md px-3 py-2 text-sm"
+                    >
+                      <% item.productId.variants.forEach(variant => { %>
+                      <option value="<%= variant.size %>">
+                        <%= variant.size %>
+                      </option>
+                      <% }); %>
+                    </select>
+                    <!-- Add to Cart Button -->
+                    <button
+                      onclick="addToCart('<%= item.productId._id %>')"
+                      class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5 mr-2"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                        />
+                      </svg>
+                      Add to Cart
+                    </button>
+                    <button
+                      onclick="removeFromWishlist('<%= item.productId._id %>')"
+                      class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+        <% } else { %>
+        <div class="py-16 px-4 sm:px-6 lg:px-8 text-center">
+          <h3 class="mt-4 text-xl font-medium text-gray-900">
+            Your wishlist is empty
+          </h3>
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </section>
+</main>
+<%- include("partials/footer") %>
+
+<script>
+  async function removeFromWishlist(productId) {
+    try {
+      const response = await fetch("/user/remove-from-wishlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId }),
+      });
+      console.log(productId)
+      const data = await response.json();
+      if (data.success) {
+        Toastify({
+          text: "Product removed from wishlist!",
+          duration: 3000,
+          gravity: "bottom", // Position at the bottom
+          position: "center", // Center align
+          backgroundColor: "#DC2626", // Red color for removal
+          stopOnFocus: true,
+        }).showToast();
+
+        // Wait for the toast to disappear before reloading
+        setTimeout(() => {
+          location.reload();
+        }, 1000); // Reload after 3 seconds
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
+
+  async function addToCart(productId) {
+    const sizeSelect = document.getElementById(`size-${productId}`);
+    const selectedSize = sizeSelect ? sizeSelect.value : null;
+
+    if (!selectedSize) {
+      Swal.fire({
+        title: "Error",
+        text: "Please select a size before adding to cart.",
+        icon: "error",
+        confirmButtonColor: "#4f46e5",
+      });
+      return;
+    }
+    console.log("selected sizze : ", selectedSize, " prodduct id", productId);
+
+    try {
+      const response = await fetch("/user/add-to-cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: "<%= wishlist.userId %>",
+          productId,
+          size: selectedSize,
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        Toastify({
+          text: " Product added to cart!",
+          duration: 3000,
+          gravity: "bottom", // Show at bottom
+          position: "center", // Center align
+          backgroundColor: "#4CAF50", // Green color for success
+          stopOnFocus: true,
+        }).showToast();
+      } else {
+        Toastify({
+          text: data.message || "Something went wrong!",
+          duration: 3000,
+          gravity: "bottom",
+          position: "center",
+          backgroundColor: "#FF9800", // Orange color for warnings
+          stopOnFocus: true,
+        }).showToast();
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
+</script>

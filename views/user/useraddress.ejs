@@ -337,7 +337,9 @@ if (isValid) {
                 className: "custom-toast", // Custom class for additional styling
                 stopOnFocus: true
                 }).showToast();
-                window.location.href = result.redirectUrl;
+                if (document.referrer) window.location.href = document.referrer;                 
+                else window.location.href = result.redirectUrl;
+
             } else {
                 alert(result.message);
             }

@@ -17,6 +17,13 @@
     color: #3b82f6;
   }
 </style>
+<head>
+  <!-- Toastify CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<!-- Toastify JS -->
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+</head>
 <main class="bg-gray-50 min-h-screen py-10">
   <div class="container mx-auto px-4">
     <!-- Breadcrumb -->
@@ -170,12 +177,11 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
             </button>
-           
         </div>
-        
+      
     </div>
-    <p id="quantityError" class="text-red-500 text-sm mt-2  hidden" style="margin-left:60px;"></p>
 </td>
+<p id="quantityError" class="text-red-500 text-sm mt-2  hidden" style="margin-left:60px;"></p>
 
 
                   <td class="px-6 py-4 text-center">
@@ -226,7 +232,7 @@
                         yet.
                       </p>
                       <a
-                        href="/shop"
+                        href="/user/shop"
                         class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
                       >
                         Continue Shopping
@@ -299,7 +305,7 @@
             </div>
 
             <a
-              href="/checkout?userId=<%= user.id %>"
+              href="/user/checkout"
               class="mt-8 block w-full py-3 px-4 bg-primary hover:bg-primary-dark text-white text-center font-medium rounded-lg transition-colors"
             >
               Proceed to Checkout
@@ -392,8 +398,14 @@
 quantityError.classList.add("hidden");
 
 if (newQuantity > 6) {
-    quantityError.textContent = "You can only select up to 6 items.";
-    quantityError.classList.remove("hidden");
+  Toastify({
+                text: "You can add upto 6 items",
+                duration: 3000,
+                gravity: "bottom",
+                position: "center",
+                backgroundColor: "#FF9800", // Orange color for warnings
+                stopOnFocus: true,
+            }).showToast();
     return;
 }
 if (quantityError) {
