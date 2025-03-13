@@ -4,6 +4,7 @@ const cartSchema=require("../../model/cartModel")
 const addressSchema=require("../../model/addressModel")
 const productSchema=require("../../model/productModel")
 const { v4: uuidv4 } = require("uuid"); // Import UUID
+// const { default: orders } = require("razorpay/dist/types/orders")
 
 
 const orderController={
@@ -106,6 +107,19 @@ const orderController={
                     outOfStockItems
                 });
             }
+
+
+            for (const item of cart.items) {
+                const product = item.productId;
+                if (!product) continue;
+    
+                const variantIndex = product.variants.findIndex(v => v.size === item.size);
+                if (variantIndex !== -1) {
+                    product.variants[variantIndex].quantity -= item.quantity;
+                    await product.save();
+                }
+            }
+
             console.log("here 11");
             const orderId = uuidv4();
 
@@ -123,6 +137,8 @@ const orderController={
             console.log("here 12");
             await newOrder.save();
 
+            await cartSchema.findOneAndUpdate({ userId }, { $set: { items: [] } });
+
            return res.status(201).json({
                 message: "Order placed successfully",
                 method: "cod",
@@ -137,6 +153,7 @@ const orderController={
     loadOrderDetailsPage:async (req,res) => {
         try {
             const orderId=req.query.id
+            console.log("order id as a query for load Order details page : ",orderId)
             const order = await orderSchema.findById(orderId)
             .populate("address") 
             .populate("items.productId"); 
@@ -146,13 +163,159 @@ const orderController={
             console.log(error)
         }
     },
-    returnOrderReq:async (req,res) => {
+    returnItemReq:async (req,res) => {
         try {
+            console.log("this is my req.body for return : ",req.body)
             const userId=req.session.user?.id
-            const orderId=req.body.orderId
-            const order=await orderSchema.findById(orderId)
+            if(!userId){
+                return res.status(404).json({message:"User not authenticated"})
+            }
             
+
+            const {orderId,productId}=req.body
+            console.log(typeof orderId);
+            
+            console.log(productId)
+            const product=await productSchema.findById(productId)
+            const reason=req.body.reason
+            console.log(reason)
+            const order=await orderSchema.findById(orderId)
+
             console.log(order)
+            if(!order){
+                return res.status(404).json({message:"No order Found"})
+            }
+
+            const item = order.items.find((item) =>  item.productId.toString() === productId.toString());
+
+            console.log("this is item in req for return  : ",item)
+
+            if (!item) {
+                return res.status(404).json({ message: "Product not found in order." });
+            }
+
+
+            item.itemStatus="return request"
+            
+            item.reason=reason
+            // order.returnRequest = {
+            //     isRequested: true,
+            //     reason: reason, // Store the reason for return
+            //     requestedAt: new Date() // Store the request timestamp
+            // };
+
+            console.log(order)
+
+            
+            await order.save()
+            return res.status(200).json({message:"return Send successfullly",success:true})
+        } catch (error) {
+            console.log(error)
+        }
+    },updateQuantity:async (req,res) => {
+        try {
+            console.log("upate quanty here req.body ; ",req.body)
+
+        } catch (error) {
+            console.log(error)
+        }
+    },cancelItem:async (req,res) => {
+        try {
+            const userId = req.session.user?.id;
+            if (!userId) {
+                return res.status(404).json({ message: "User not authenticated..!" });
+            }
+    
+            const { orderId, productId } = req.body;
+            console.log("Cancel Order: ", orderId, "Product ID: ", productId);
+    
+            // Find the order
+            const order = await orderSchema.findById(orderId);
+            if (!order) {
+                return res.status(404).json({ message: "No order found..!" });
+            }
+    
+            // Find the product inside the order and update its itemStatus
+            const itemIndex = order.items.findIndex(item => item.productId.toString() === productId);
+            if (itemIndex === -1) {
+                return res.status(404).json({ message: "Product not found in order..!" });
+            }
+    
+            // Update the itemStatus to "cancelled"
+            order.items[itemIndex].itemStatus = "cancelled";
+    
+            // Increase the product stock back
+            const product = order.items[itemIndex];
+            await productSchema.updateOne(
+                { _id: product.productId, "variants.size": product.size },
+                { $inc: { "variants.$.quantity": product.quantity } }
+            );
+    
+            // Check if all items are cancelled, then cancel the order
+            const allCancelled = order.items.every(item => item.itemStatus === "cancelled");
+            if (allCancelled) {
+                order.status = "cancelled";
+            }
+    
+            // Save the updated order
+            await order.save();
+    
+            res.status(200).json({ message: "Product cancelled successfully!", success: true });
+    
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Internal Server Error" });
+        }
+    },cancelOrder:async (req,res) => {
+        try {
+            console.log("this is for cancel the order : ",req.body)
+            const orderId=req.body
+            const order=await orderSchema.findById(orderId).populate("item.product")
+
+            if(!order){
+                return res.status(404).json({message:"No order Found..!"})
+            }
+
+            for (let item of order.items) {
+                await productSchema.updateOne(
+                    { _id: item.productId, "variants.size": item.size },
+                    { $inc: { "variants.$.quantity": item.quantity } } // Increase quantity
+                );
+            }
+
+            order.status="cancelled"
+
+            const result = await order.save();
+
+            res.status(200).json({ message: "Order Cancelled..!", success: true });
+ 
+        } catch (error) {
+            console.log(error)
+        }
+    },returnOrderReq:async (req,res) => {
+        try {
+            console.log("this is for requset for order : ",req.body)
+            const {orderId,reason}=req.body
+
+            const order=await orderSchema.findById(orderId)
+
+            if(!order){
+             return res.status(404).json({message:"Order not found..!"})
+            }
+console.log("here od fjosdf :");
+console.log("order oss : ",order)
+
+            order.status="return request"
+            console.log(order.status)
+            console.log("fnaly : ",order)
+            order.returnRequest = {
+                isRequested: true,
+                reason: reason, // Store the reason for return
+                requestedAt: new Date() // Store the request timestamp
+            };
+
+            await order.save()
+            return res.status(200).json({message:"Order cancelled",success:true})
 
         } catch (error) {
             console.log(error)

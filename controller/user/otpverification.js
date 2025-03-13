@@ -17,8 +17,8 @@ const sendOTPByEmail = async (email, otp) => {
         let transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
-                user: "sangeethkvdevelops@gmail.com", // Replace with your email
-                pass: "ocux rbfm zykq fzio", // Replace with your app password
+                user: process.env.ADMIN_EMAIL, // Replace with your email
+                pass: process.env.ADMIN_EMAIL_APP_PASS, // Replace with your app password
             },
         });
 

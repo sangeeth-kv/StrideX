@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StrideX User Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -86,13 +88,24 @@
                             class="form-input w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200">
                     </div>
                     
-                    <div>
+                    <div class="relative">
                         <div class="flex items-center justify-between mb-1">
                             <label for="passwordField" class="block text-sm font-medium text-gray-400">Password</label>
                             <a href="#" id="forgotPasswordLink" class="text-sm text-primary-400 hover:text-primary-300 transition-colors">Forgot Password?</a>
                         </div>
+                    
                         <input type="password" id="passwordField" name="password" placeholder="Enter your password" 
                             class="form-input w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200">
+                    
+                        <!-- Eye Icon for Visibility Toggle -->
+                        <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-3 flex items-center">
+                            <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path id="eyeOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                    d="M15.9 12.9A3.5 3.5 0 1112 9.5a3.5 3.5 0 013.9 3.4z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                    d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" />
+                            </svg>
+                        </button>
                     </div>
                     
                     <button type="submit" id="loginButton" 
@@ -183,6 +196,27 @@
     
 
     <script>
+        function togglePassword() {
+    const passwordField = document.getElementById("passwordField");
+    const eyeIcon = document.getElementById("eyeIcon");
+
+    if (passwordField.type === "password") {
+        passwordField.type = "text";
+        eyeIcon.innerHTML = `
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M15.9 12.9A3.5 3.5 0 1112 9.5a3.5 3.5 0 013.9 3.4z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" />
+            <line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`; // Eye off
+    } else {
+        passwordField.type = "password";
+        eyeIcon.innerHTML = `
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M15.9 12.9A3.5 3.5 0 1112 9.5a3.5 3.5 0 013.9 3.4z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" />`; // Eye on
+    }
+}
     document.addEventListener("DOMContentLoaded", function () {
         const forgotPasswordModal = document.getElementById("forgotPasswordModal");
         const forgotPasswordLink = document.getElementById("forgotPasswordLink");
@@ -239,13 +273,20 @@
                 console.log(data);
 
                 if (data.status === "success") {
-                    Swal.fire({
-                        icon: "success",
-                        title: "Login successful!",
-                        text: data.message
-                    }).then(() => {
-                        window.location.href = data.redirectUrl;
-                    });
+                    Toastify({
+        text: "Login successful!",
+        duration: 3000,  // Time in ms (3 sec)
+        close: true,  // Close button
+        gravity: "top",  // Position: "top" or "bottom"
+        position: "right",  // "left", "right", or "center"
+        backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",  // Custom background
+        stopOnFocus: true,  // Stop timeout on hover
+    }).showToast();
+
+    // Redirect after toast disappears
+    setTimeout(() => {
+        window.location.href = data.redirectUrl;
+    }, 2000);
                 } else {
                     Swal.fire({
                         icon: "error",
@@ -302,6 +343,8 @@
                 });
             }
         });
+
+        
     });
     </script>
 </body>

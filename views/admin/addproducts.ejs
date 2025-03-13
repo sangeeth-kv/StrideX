@@ -455,28 +455,38 @@ function addVariant() {
         });
 
         // Get variants dynamically
-        const variants = [];
-        document.querySelectorAll("#variantsContainer .variant").forEach(variantDiv => {
-            const size = variantDiv.querySelector("input[name='size[]']").value;
-            const regularPrice = variantDiv.querySelector("input[name='regularPrice[]']").value;
-            const quantity = variantDiv.querySelector("input[name='quantity[]']").value;
-            const offer = variantDiv.querySelector("input[name='offer[]']").value;
-            const productName=document.getElementById("productName").value
+     // Get variants dynamically
+const variants = [];
+document.querySelectorAll("#variantsContainer .variant").forEach(variantDiv => {
+    const size = variantDiv.querySelector("input[name='size[]']").value;
+    const regularPrice = variantDiv.querySelector("input[name='regularPrice[]']").value;
+    const quantity = variantDiv.querySelector("input[name='quantity[]']").value;
+    const offer = variantDiv.querySelector("input[name='offer[]']").value;
+    const productName = document.getElementById("productName").value;
 
+    // Select error elements within this specific variant
+    const sizeError = variantDiv.querySelector("#sizeError");
+    const regularPriceError = variantDiv.querySelector("#regularPriceError");
+    const quantityError = variantDiv.querySelector("#quantityError");
+    const offerError = variantDiv.querySelector("#offerError");
+    const productNameError = document.getElementById("productNameError");
 
+    // Reset error messages
+    sizeError.textContent = "";
+    regularPriceError.textContent = "";
+    quantityError.textContent = "";
+    offerError.textContent = "";
+    productNameError.textContent = "";
 
-            sizeError.textContent = "";
-            regularPriceError.textContent = "";
-            quantityError.textContent = "";
-            offerError.textContent = "";
-            productName.textContent = "";
+    sizeError.classList.add("hidden");
+    regularPriceError.classList.add("hidden");
+    quantityError.classList.add("hidden");
+    offerError.classList.add("hidden");
+    productNameError.classList.add("hidden");
+    
+    let isValid = true;
 
-            sizeError.classList.add("hidden");
-            regularPriceError.classList.add("hidden");
-            quantityError.classList.add("hidden");
-            offerError.classList.add("hidden");
-            productNameError.classList.add("hidden");
-            let isValid = true;
+    // Continue with your validation logic...
 
             if(!productName.trim()){
                 productNameError.textContent="Product name required"

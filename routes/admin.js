@@ -59,5 +59,7 @@ router.patch("/users/status/:id",userController.UserStatus)
 router.get("/orderList",orderController.loadOrderPage)
 router.get("/order-details/:id",orderController.loadOrderDetailsPage)
 router.post("/change-order-Status",orderController.changeOrderStatus)
+router.post("/update-item-status",orderController.updateItemStatus)
+
 
 module.exports = router;

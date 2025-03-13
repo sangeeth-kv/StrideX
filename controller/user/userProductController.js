@@ -7,7 +7,7 @@ const wishlistSchema=require("../../model/wishlistmodel")
 const userProductController={
     getProductDetails:async (req,res) => {
         try {
-            const id=req.params.id
+            const id=req.params.id 
             console.log(id)
             const product=await productSchema.findById(id)
             .populate('categoryId', 'name')
@@ -89,8 +89,8 @@ const userProductController={
 
             let wishlistItems = [];
 if (req.session.user?.id) {
-    const wishlist = await wishlistSchema.findOne({ userId: req.session.user.id }).populate("items.productId");
-    wishlistItems = wishlist ? wishlist.items.map(item => item.productId._id.toString()) : [];
+    const wishlist = await wishlistSchema.findOne({ userId: req.session.user?.id }).populate("items.productId"); // changed to optional
+    wishlistItems = wishlist ? wishlist.items.map(item => item.productId?._id.toString()) : [];
 }
 console.log("wishslist:  ",wishlistItems)
             res.render("user/shoppage", {

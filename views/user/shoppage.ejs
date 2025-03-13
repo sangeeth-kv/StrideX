@@ -1,7 +1,28 @@
 <%- include("partials/header") %>
+<style>
+  @keyframes popIn {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    60% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.custom-toast {
+    animation: popIn 0.4s ease-in-out;
+}
+
+</style>
 <head>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 </head>
 <div class="bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen py-8">
@@ -283,14 +304,18 @@ document.querySelectorAll(".size-select").forEach(select => {
       });
       const result = await response.json();
       if(result.success){
-        Toastify({
-          text: result.message,
-          duration: 3000,
-          gravity: "bottom", // Position at the bottom
-          position: "center", // Center align
-          backgroundColor: "4CAF50", // green color for removal
-          stopOnFocus: true,
-        }).showToast();
+        let audio = new Audio('/audios/add-to-cart.mp3'); // Replace with your actual sound file path
+                audio.play();
+                Toastify({
+    text: result.message,
+    duration: 3000,
+    gravity: "bottom", // Position at the bottom
+    position: "center", // Center align
+    backgroundColor: "#4CAF50", // Green color for success
+    stopOnFocus: true,
+    className: "custom-toast", // Custom class for animation
+}).showToast();
+
       }else{
         Toastify({
           text: result.message,

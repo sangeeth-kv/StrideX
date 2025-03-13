@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const productSchema=require("../../model/productModel")
 const userSchema=require("../../model/userModel")
 const wishlistSchema=require("../../model/wishlistmodel")
+const cartSchema=require("../../model/cartModel")
 
 
 const wishlistController={
@@ -27,8 +28,19 @@ const wishlistController={
     
     
             console.log("Wishlist:", wishlist.items[0].productId);
+            const cart=await cartSchema.findOne({userId})
+
+            const cartProductIds = cart ? cart.items.map(item => item.productId.toString()) : [];
+
+            const filteredWishlistItems = wishlist.items.filter(item => 
+                !cartProductIds.includes(item.productId?._id.toString()) ///changed to optional 
+            );
+
+            console.log("Filtered Wishlist:", filteredWishlistItems);
+
+
     
-            res.render("user/wishlistpage", { wishlist }); // Pass wishlist data to the frontend
+            res.render("user/wishlistpage",  { wishlist: { items: filteredWishlistItems } }); // Pass wishlist data to the frontend
         } catch (error) {
             console.error("Error loading wishlist:", error);
             res.status(500).send("Internal Server Error");

@@ -1,26 +1,50 @@
 <%- include("partials/header") %>
+<head>
+    <!-- Toastr JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<!-- Toastr CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+</head>
 <body class="bg-gray-100">
     <div class="container mx-auto p-6">
         <div class="bg-white p-6 rounded-lg shadow-md">
             <h2 class="text-2xl font-bold mb-6 text-gray-800">Order Details</h2>
 
             <!-- Order Summary -->
-            <div class="grid grid-cols-2 gap-6 border-b pb-4 mb-4">
-                <div>
-                    <p class="text-gray-700"><strong>Order ID:</strong> <%= orders.orderId %></p>
-                    <p class="text-gray-700">
-                        <strong>Status:</strong> 
-                        <span id="order-status"><%= orders.status %></span>
-                    </p>                    
-                    <p class="text-gray-700"><strong>Payment Method:</strong> <%= orders.paymentMethod %></p>
-                    <p class="text-gray-700"><strong>Order Date:</strong> <%= new Date(orders.orderDate).toLocaleDateString() %></p>
-                    <p class="text-gray-700"><strong>Final Amount:</strong> ₹<%= orders.total %></p>
-                </div>
-                <div>
-                    <p class="text-gray-700"><strong>Customer ID:</strong> <%= orders.userId %></p>
-                    <p class="text-gray-700"><strong>Transaction ID:</strong> <%= orders.transactionId ? orders.transactionId : "N/A" %></p>
-                </div>
-            </div>
+            <!-- Order Summary -->
+<div class="grid grid-cols-2 gap-6 border-b pb-4 mb-4">
+    <div>
+        <p class="text-gray-700"><strong>Order ID:</strong> <%= orders.orderId %></p>
+        <p class="text-gray-700">
+            <strong>Status:</strong> 
+            <span id="order-status"><%= orders.status %></span>
+        </p>                    
+        <p class="text-gray-700"><strong>Payment Method:</strong> <%= orders.paymentMethod %></p>
+        <p class="text-gray-700"><strong>Order Date:</strong> <%= new Date(orders.orderDate).toLocaleDateString() %></p>
+        <p class="text-gray-700"><strong>Final Amount:</strong> ₹<%= orders.total %></p>
+    </div>
+    <div>
+        <p class="text-gray-700"><strong>Customer ID:</strong> <%= orders.userId %></p>
+        <p class="text-gray-700"><strong>Transaction ID:</strong> <%= orders.transactionId ? orders.transactionId : "N/A" %></p>
+    </div>
+</div>
+
+<!-- Show Return Request Reason If Available -->
+<% if (orders.status === "return request" || orders.status === "returned") { %>
+    <div class="bg-red-50 p-4 rounded-md border mt-4">
+        <h3 class="text-lg font-bold text-red-600">Return Request Details</h3>
+        <% if (orders.returnRequest && orders.returnRequest.isRequested) { %>
+            <p class="text-gray-700"><strong>Reason for Return:</strong> <%= orders.returnRequest.reason %></p>
+            <p class="text-gray-700"><strong>Requested At:</strong> <%= new Date(orders.returnRequest.requestedAt).toLocaleDateString() %></p>
+        <% } else { %>
+            <p class="text-red-500">No return reason provided.</p>
+        <% } %>
+    </div>
+<% } %>
+
 
             <!-- Shipping Address -->
             <h3 class="text-xl font-bold mt-6 text-gray-800">Shipping Address</h3>
@@ -46,6 +70,7 @@
                             <th class="border border-gray-300 px-4 py-2">Quantity</th>
                             <th class="border border-gray-300 px-4 py-2">Price</th>
                             <th class="border border-gray-300 px-4 py-2">Total</th>
+                            <th class="border border-gray-300 px-4 py-2">Item Status</th> <!-- ✅ New Column -->
                         </tr>
                     </thead>
                     <tbody>
@@ -58,17 +83,30 @@
                                     </td>
                                     <td class="border border-gray-300 px-4 py-2"><%= item.size %></td>
                                     <td class="border border-gray-300 px-4 py-2"><%= item.quantity %></td>
-                                    <td class="border border-gray-300 px-4 py-2">₹<%= matchedVariant.regularPrice%></td>
-                                    <td class="border border-gray-300 px-4 py-2">₹<%= orders.total%></td>
+                                    <td class="border border-gray-300 px-4 py-2">₹<%= matchedVariant.regularPrice %></td>
+                                    <td class="border border-gray-300 px-4 py-2">₹<%= orders.total %></td>
+                                    <td class="border border-gray-300 px-4 py-2 font-semibold">
+                                        <select 
+                                            class="border px-2 py-1 rounded text-sm"
+                                            onchange="updateItemStatus('<%= orders.orderId %>', '<%= item.productId._id %>', this.value)"
+                                        >
+                                            <% let statuses = ["pending", "processing", "shipped", "delivered", "cancelled", "return request", "returned"]; %>
+                                            <% statuses.forEach(status => { %>
+                                                <option value="<%= status %>" <%= item.itemStatus === status ? "selected" : "" %>>
+                                                    <%= status.charAt(0).toUpperCase() + status.slice(1) %>
+                                                </option>
+                                            <% }); %>
+                                        </select>
+                                    </td>                                    
                                 </tr>
                             <% }); %>
                         <% } else { %>
                             <tr>
-                                <td colspan="5" class="text-red-500 text-center py-4">No items in this order</td>
+                                <td colspan="6" class="text-red-500 text-center py-4">No items in this order</td>
                             </tr>
                         <% } %>
                     </tbody>
-                </table>
+                </table>                
             </div>
 
             <!-- Change Order Status -->
@@ -83,6 +121,7 @@
                     <option value="shipped" <% if(orders.status === "shipped") { %> selected <% } %>>Shipped</option>
                     <option value="delivered" <% if(orders.status === "delivered") { %> selected <% } %>>Delivered</option>
                     <option value="cancelled" <% if(orders.status === "cancelled") { %> selected <% } %>>Cancelled</option>
+                    <option value="returned" <% if(orders.status === "return request") { %> selected <% } %>>Requested for return</option>
                     <option value="returned" <% if(orders.status === "returned") { %> selected <% } %>>Returned</option>
                 </select>
                 <button type="submit" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
@@ -96,6 +135,32 @@
 </body>
 <%- include("partials/footer") %>
 <script>
+
+
+function updateItemStatus(orderId, productId, status) {
+    console.log("here reahcerd product id : ",productId);
+    console.log("here is ordere id : ",orderId)
+    console.log("here is status : ",status)
+    
+    fetch("/admin/update-item-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId,itemProductId:productId, status }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire("Updated!", "Item status updated successfully.", "success");
+        } else {
+            Swal.fire("Error", "Failed to update status.", "error");
+        }
+    })
+    .catch(error => {
+        console.error(error);
+        Swal.fire("Error", "Something went wrong!", "error");
+    });
+}
+
         document.getElementById("statusForm").addEventListener("submit", async function(event) {
             event.preventDefault(); // Prevent form from reloading the page
 
@@ -115,7 +180,13 @@
                 const result = await response.json();
 
                 if (response.ok) {
-                    alert("Order status updated successfully!");
+                    toastr.success("Order status updated successfully!", "Success", {
+                     closeButton: true,
+                    progressBar: true,
+                    timeOut: 3000, // 3 seconds
+                    positionClass: "toast-top-right",
+                    });
+
                     document.getElementById("order-status").textContent = status; // Update status in UI
                 } else {
                     alert(result.message || "Failed to update order status.");

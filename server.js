@@ -6,7 +6,7 @@ const path=require("path")
 const adminRoutes=require("./routes/admin")
 const userRoutes=require("./routes/user")
 const session=require("express-session")
-const jwt = require("jsonwebtoken");
+// const jwt = require("jsonwebtoken");
 require("./config/passport"); 
 console.log("CLIENT_ID:", process.env.CLIENT_ID);
 console.log("CLIENT_SECRET:", process.env.CLIENT_SECRET);

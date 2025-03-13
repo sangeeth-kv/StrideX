@@ -1,6 +1,7 @@
 const addressSchema=require("../../model/addressModel")
 const userSchema=require("../../model/userModel")
 const orderSchema=require("../../model/orderModel")
+const walletSchema=require("../../model/walletModel")
 const crypto = require("crypto");
 const {sendOTPByEmail}=require("../../controller/user/otpverification")
 const saltRounds=10;
@@ -12,17 +13,45 @@ const userProfileController={
     loadProfilePage:async (req,res) => {
         try {
             const userId=req.session.user?.id
-        
            
-            
 
             const user=await userSchema.findById(userId)
             if(!user){
                 return res.redirect("/user/login?error=User not found");
             }
+           
+
+             let wallet=await walletSchema.findOne({userId})
+            
+                if (!wallet) {
+                // If wallet doesn't exist, create one
+                wallet = await walletSchema.create({ userId, balance: 0, transactions: [] });
+                }
+
             const addresses = await addressSchema.find({ userId, isDeleted: false });
-            const orders=await orderSchema.find({userId})
-            res.render("user/userprofile",{user,addresses,orders})
+            const orders = await orderSchema
+            .find({ userId }) 
+            .populate('items.productId', 'name');
+
+            console.log(wallet)
+            res.render("user/userprofile",{user,addresses,orders,wallet})
+        } catch (error) {
+            console.log(error)
+        }
+    },
+    uploadImage:async (req,res) => {
+        try {
+            const userId=req.session.user?.id
+            const user=await userSchema.findById(userId)
+
+            if(!user){
+                return res.status(404).json({message:"User not found"})
+            }
+            const imageUrl=req.file ? `/uploads/${req.file.filename}`:"";
+
+            await userSchema.findByIdAndUpdate(userId, {image:imageUrl});
+
+            return res.status(200).json({message:"Profile pic updated",success:true})
         } catch (error) {
             console.log(error)
         }

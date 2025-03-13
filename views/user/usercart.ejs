@@ -430,7 +430,7 @@ if (quantityError) {
     .then((data) => {
         if (data.success) {
             quantityElement.value = newQuantity; // Update the UI for the clicked product only
-            console.log("Cart updated successfully!");
+            location.reload()
         } else {
             alert(data.message); // Handle errors (e.g., stock limit reached)
         }

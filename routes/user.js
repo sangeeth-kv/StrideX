@@ -11,7 +11,9 @@ const wishlistController=require("../controller/user/wishlistController")
 const checkOutController=require("../controller/user/checkOutController")
 const orderController=require("../controller/user/orderController")
 const InvoiceController=require("../controller/user/invoiceController")
+const paymentContoller=require("../controller/user/paymentController")
 // const adminController = require("../controller/admin/adminController");
+const upload = require("../config/multer");
 require("../config/passport")
 
 router.use(passport.initialize())
@@ -76,6 +78,7 @@ router.get("/shop",userProductController.loadShopPage)
 
 //for user profile
 router.get("/view-profile/:id",userProfileController.loadProfilePage)
+router.post("/upload-profile-image",upload.single("profileImage"),userProfileController.uploadImage)
 router.get("/change-email-otp/:id",userProfileController.loadEmailOtpPage)
 router.post("/email-verify-otp",userProfileController.verifyEmailOtp)
 router.get("/change-email",userProfileController.loadChangeEmailPage)
@@ -120,7 +123,22 @@ router.get("/orderDetails",orderController.loadOrderDetailsPage)
 router.get("/downloadInvoice/:id",InvoiceController.downloadInvoice)
 
 
-//return
-router.post("/return-request-Order",orderController.returnOrderReq)
+//returnfor items
+router.post("/return-request-item",orderController.returnItemReq)
+router.post("/update-return-quantity",orderController.updateQuantity)
+//return for orders
+router.post("/return-request-order",orderController.returnOrderReq)
+
+
+//cancel for items
+router.post("/item-cancel",orderController.cancelItem)
+//cancel for orders
+router.post("/cancel-order",orderController.cancelOrder)
+
+
+
+//for razor payment
+router.post("/payment/create-order",paymentContoller.createOrder)
+router.post("/payment/verify-payment",paymentContoller.verifyPayment)
 
 module.exports=router;

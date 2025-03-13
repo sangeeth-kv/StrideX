@@ -12,65 +12,88 @@
     <meta property="og:image" content="">
     <link rel="shortcut icon" type="image/x-icon" href="#">
     <link href="/admin-assets/css/main.css" rel="stylesheet" type="text/css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.6/dist/sweetalert2.min.css">
-<script src="https://kit.fontawesome.com/16d4885483.js" crossorigin="anonymous"></script>
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<style>
-    .logout-container {
-    display: flex;
-    justify-content: flex-end;
-    padding: 10px;
-}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.6/dist/sweetalert2.min.css">
+    <script src="https://kit.fontawesome.com/16d4885483.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .logout-container {
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px;
+        }
 
-.logout-btn {
-    padding: 10px 20px;
-    background-color: #d9534f;
-    color: white;
-    font-weight: bold;
-    text-decoration: none;
-    border-radius: 8px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s ease, transform 0.2s;
-}
+        .logout-btn {
+            padding: 10px 20px;
+            background-color: #d9534f;
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, transform 0.2s;
+        }
 
-.logout-btn:hover {
-    background-color: #c9302c;
-    transform: scale(1.05);
-}
+        .logout-btn:hover {
+            background-color: #c9302c;
+            transform: scale(1.05);
+        }
 
-body {
-    background-color: #ffffff;
-}
-.navbar {
-    background-color: #75ad94;
-}
-.navbar-aside {
-    background-color: #478669;
-}
-.menu-item a.menu-link {
-    color: #fbf8f8;
-}
+        body {
+            background-color: #f3f4f6;
+        }
+        .navbar {
+            background-color: #0b5082;
+        }
+        .navbar-aside {
+            background-color: #0b5082;
+        }
+        .menu-item a.menu-link {
+            color: #fbf8f8;
+        }
 
-.menu-item a.menu-link:hover{
-    background-color: #22de225f; 
-    color: #ffffff;
-}
-.menu-item a.menu-link.active {
-    background-color: #133013; 
-    color: #ffffff;
-}
-.dropdown-menu {
-    background-color: #bb9aaf;
-}
+        .menu-item a.menu-link:hover{
+            background-color: #22de225f; 
+            color: #ffffff;
+        }
+        .menu-item a.menu-link.active {
+            background-color: #133013; 
+            color: #ffffff;
+        }
+        .dropdown-menu {
+            background-color: #bb9aaf;
+        }
 
-.dropdown-item:hover {
-    background-color: #f8f7f9;
-    color: #ffffff;
-}
+        .dropdown-item:hover {
+            background-color: #f8f7f9;
+            color: #ffffff;
+        }
 
-</style>
+        /* Status Badge Styles */
+        .status-badge {
+            @apply px-3 py-1 rounded-full text-xs font-medium;
+        }
+        .status-pending {
+            @apply bg-yellow-100 text-yellow-800;
+        }
+        .status-processing {
+            @apply bg-blue-100 text-blue-800;
+        }
+        .status-shipped {
+            @apply bg-indigo-100 text-indigo-800;
+        }
+        .status-delivered {
+            @apply bg-green-100 text-green-800;
+        }
+        .status-cancelled {
+            @apply bg-red-100 text-red-800;
+        }
+        .status-return {
+            @apply bg-purple-100 text-purple-800;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-gray-100">
     <script>
         $(document).ready(function () {
             // Get the current URL path
@@ -83,13 +106,13 @@ body {
                 }
             });
         });
-        </script>
+    </script>
         
     <div class="screen-overlay"></div>
     <aside class="navbar-aside" id="offcanvas_aside">
         <div class="aside-top">
             <a href="#" class="brand-wrap">
-                <img src="/admin-assets/imgs/logos/logo-transparent-png.png"  class="logo" alt="Men Fashion Dashboard" >
+                <img src="/admin-assets/imgs/logos/logo-transparent-png.png" class="logo" alt="Men Fashion Dashboard">
             </a>
             <div>
                 <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
@@ -97,7 +120,7 @@ body {
         </div>
         <nav>
             <ul class="menu-aside">
-                <li class="menu-item ">
+                <li class="menu-item">
                     <a class="menu-link" href="/admin/dashboard"> <i class="icon material-icons md-home"></i>
                         <span class="text">Dashboard</span>
                     </a>
@@ -106,13 +129,11 @@ body {
                     <a class="menu-link" href="/admin/users"> <i class="icon material-icons md-person"></i>
                         <span class="text">Customers</span>
                     </a>
-
                 </li>
                 <li class="menu-item">
                     <a class="menu-link" href="/admin/category"> <i class="icon material-icons md-person"></i>
                         <span class="text">Category</span>
                     </a>
-
                 </li>
                 <li class="menu-item">
                     <a class="menu-link" href="/admin/brands"> <i class="icon material-icons md-stars"></i>
@@ -123,7 +144,6 @@ body {
                         <span class="text">Products</span>
                     </a>
                 </li>
-            
                 <li class="menu-item">
                     <a class="menu-link" href="/admin/coupon"> <i class="icon material-icons md-class"></i>
                         <span class="text">Coupon</span> </a>
@@ -132,7 +152,6 @@ body {
                     <a class="menu-link" href="/admin/banner"> <i class="icon material-icons md-photo_size_select_actual"></i>
                         <span class="text">Banner</span> </a>
                 </li>
-
                 <li class="menu-item">
                     <a class="menu-link" href="/admin/orderList"> <i class="icon material-icons md-shopping_cart"></i>
                         <span class="text">Orders</span>
@@ -150,6 +169,4 @@ body {
                     Logout
                 </a>
             </div>
-           
-            
         </header>

@@ -10,8 +10,6 @@ const cartController={
             console.log("works for two..")
             const {productId,size}=req.body
             console.log(productId,"hi",size,"sizeee")
-            
-            
 
             const userId = req.session.user?.id; 
 
@@ -100,12 +98,31 @@ const cartController={
             }
 
 
-            const cart=await cartSchema.findOne({userId}).populate("items.productId")
+            const cart = await cartSchema.findOne({ userId });
+
             if(!cart){
                 return res.status(400).json({message:"Cart not found..!"})
             }
 
-            const item=cart.items.find(itm=>itm.productId._id.toString()===productId)
+            console.log(cart.items)
+
+            console.log("Cart items: ", cart.items.map(itm => ({
+                productId: itm.productId.toString(),
+                size: itm.size,
+                quantity: itm.quantity
+            })));
+            
+            console.log("Looking for productId:", productId, "and size:", size);
+            
+            const item = cart.items.find(itm => 
+                itm.productId.toString() === productId.toString() && itm.size === size
+            );
+            
+            console.log("this is my itemss : ",item)
+            console.log("here it ends.....")
+
+            
+            
             if (!item) {
                 return res.status(400).json({ message: "Product not found in cart" });
             }
@@ -114,6 +131,7 @@ const cartController={
                 return res.status(400).json({ message: `Only ${variant.quantity} items available in stock.` });
             }
 
+            
             item.quantity = quantity;
             await cart.save();
 

@@ -81,7 +81,7 @@
                                         <div class="absolute top-3 right-3">
                                             <input class="form-check-input h-5 w-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" 
                                                    type="radio" id="addressRadio<%= userAddress._id %>" 
-                                                   name="selectedAddress" value="<%= userAddress._id %>">
+                                                   name="selectedAddress" value="<%= userAddress._id %>" checked>
                                         </div>
                                         <div class="pt-2">
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
@@ -304,6 +304,7 @@
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
+
 <script>
 
 
@@ -485,29 +486,31 @@ document.getElementById("confirmDeleteBtn").addEventListener("click", async () =
     }
 
     try {
-        console.log("here 0");
+        const orderData = {
+            totalPrice: numericValue,
+            createdOn: new Date().getTime(),
+            date: new Date(),
+            addressId: address,
+            payment: payment
+        };
 
+        // Handle Cash on Delivery
         if (payment === "cod") {
-            console.log("here 1");
-
             const response = await fetch('/user/cash-on-delivery', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    totalPrice: numericValue,
-                    createdOn: new Date().getTime(),
-                    date: new Date(),
-                    addressId: address,
-                    payment: payment,
-                })
-            }); // ✅ **Fixed: Closing Parenthesis Added Here**
+                body: JSON.stringify(orderData)
+            });
 
             const result = await response.json();
+            console.log(result)
             let orderId = result.order._id;
 
             if (result.method === "cod") {
+                let audio = new Audio('/audios/success-sound.mp3');
+                audio.play();
                 Swal.fire({
                     title: "Order Placed",
                     text: "Your order has been placed successfully",
@@ -520,14 +523,24 @@ document.getElementById("confirmDeleteBtn").addEventListener("click", async () =
                     if (result.value) {
                         location.href = `/user/orderDetails?id=${orderId}`;
                     } else if (result.dismiss === "cancel") {
-                        location.href = '/';
+                        location.href = '/user/shop';
                     }
                 });
             }
         } 
-        
         // Handle Wallet Payment
-        else if (result.method === "wallet") {
+        else if (payment === "wallet") {
+            const response = await fetch('/user/wallet-payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(orderData)
+            });
+            
+            const result = await response.json();
+            let orderId = result.order?._id;
+            
             if (result.payment === true) {
                 Swal.fire({
                     title: "Order Placed",
@@ -539,9 +552,9 @@ document.getElementById("confirmDeleteBtn").addEventListener("click", async () =
                     reverseButtons: true
                 }).then((result) => {
                     if (result.value) {
-                        location.href = `/orderDetails?id=${orderId}`;
+                        location.href = `/user/orderDetails?id=${orderId}`;
                     } else if (result.dismiss === "cancel") {
-                        location.href = '/';
+                        location.href = '/user/shop';
                     }
                 });
             } else {
@@ -552,21 +565,69 @@ document.getElementById("confirmDeleteBtn").addEventListener("click", async () =
                     confirmButtonText: "OK"
                 });
             }
-        }
-
+        } 
         // Handle Razorpay Payment
-        else if (result.method === "razorpay") {
-            let orderAmount = Math.round(numericValue * 100);
+        
+        else if (payment === "razorpay") {
+            console.log(orderData)
+            const response = await fetch("/user/payment/create-order", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(orderData)
+            });
+
+            const order = await response.json();
+            console.log(order)
+            
             var options = {
-                "key": "rzp_test_vWkG4lrwiDnQ0g",
-                "amount": orderAmount,
+                "key": "<%= process.env.RAZORPAY_KEY_ID %>",
+                "amount": order.amount,
                 "currency": "INR",
-                "name": "Trend Setter",
+                "name": "Stirdex",
                 "description": "Purchase Payment",
                 "image": "https://firebasestorage.googleapis.com/v0/b/ecommerce-397a7.appspot.com/o/logo.jpg?alt=media&token=07b6be19-1ce8-4797-a3a0-f0eaeaafedad",
-                "order_id": result.razorPayOrder.id,
-                "handler": function (status) {
-                    verifyPayment(result.razorPayOrder, status, result.order._id);
+                "order_id": order.id,
+                "handler": async function (response) {
+                    const requestData = {
+                    ...response, // Spread the response object from Razorpay
+                    addressId: orderData.addressId,
+                    total:orderData.totalPrice// Add addressId from orderData
+                    };
+
+                    const verifyResponse = await fetch("/user/payment/verify-payment", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(requestData)
+                    });
+                    
+                    const verifyResult = await verifyResponse.json();
+                    console.log(verifyResult)
+                    if (verifyResult.success) {
+                        Swal.fire({
+                            title: "Payment Successful",
+                            text: "Your order has been placed successfully",
+                            icon: "success",
+                            showCancelButton: true,
+                            confirmButtonText: "View Order",
+                            cancelButtonText: "Continue Shopping",
+                            reverseButtons: true
+                        }).then((result) => {
+                            if (result.value) {
+                                location.href= `/user/orderDetails?id=${verifyResult.order._id}`;
+                                
+                            } else if (result.dismiss === "cancel") {
+                                location.href = '/user/shop';
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            title: "Payment Failed",
+                            text: verifyResult.message || "Payment verification failed",
+                            icon: "error",
+                            confirmButtonText: "OK"
+                        });
+                        location.href = "/user/order-failure";
+                    }
                 },
                 "prefill": {
                     "name": "<%= user.fullname %>",
@@ -582,10 +643,11 @@ document.getElementById("confirmDeleteBtn").addEventListener("click", async () =
         } else {
             Swal.fire({
                 title: 'Error',
-                text: "Unable to process your order. Please try again.",
+                text: "Invalid payment method. Please try again.",
                 icon: 'error',
                 timer: 3000
             });
+            location.href = "/user/order-failure";
         }
     } catch (error) {
         console.error("Order placement error:", error);
@@ -595,6 +657,7 @@ document.getElementById("confirmDeleteBtn").addEventListener("click", async () =
             icon: 'error',
             timer: 3000
         });
+      
     }
 }
 
