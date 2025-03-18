@@ -6,13 +6,15 @@ const categoryController = require("../controller/admin/categoryController");
 const brandController = require("../controller/admin/brandController");
 const userController=require("../controller/admin/userController")
 const orderController=require("../controller/admin/orderController")
+const couponController=require("../controller/admin/couponController")
+const saleController=require("../controller/admin/saleController")
 const upload = require("../config/multer");
 
 
 //for login page adminController
 router.get("/login", adminController.login);
 router.post("/login", adminController.postLogin);
-router.get("/dashboard", adminController.loadDashboard);
+
 
 
 
@@ -60,6 +62,19 @@ router.get("/orderList",orderController.loadOrderPage)
 router.get("/order-details/:id",orderController.loadOrderDetailsPage)
 router.post("/change-order-Status",orderController.changeOrderStatus)
 router.post("/update-item-status",orderController.updateItemStatus)
+
+//for coupons
+router.get("/coupon",couponController.loadCouponPage)
+router.post("/addcoupon",couponController.addCoupon)
+router.get("/edit-coupon",couponController.loadEditCouponPage)
+router.post("/updatecoupon",couponController.updateCoupon)
+router.patch("/coupons/toggle-status/:id",couponController.toggleCouponStatus)
+
+//sale report 
+router.get("/dashboard", saleController.loadSaleReport);
+router.post("/generatePDF",saleController.generatePDF)
+router.post("/downloadExcel",saleController.generateExecl)
+
 
 
 module.exports = router;

@@ -188,95 +188,113 @@
                 </div>
 
                 <!-- Orders Section -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden" id="orders">
-                    <div class="p-6 border-b flex justify-between items-center">
-                        <h2 class="text-xl font-bold text-gray-900">Order History</h2>
-                        
-                        <!-- Search Bar -->
-                        <div class="flex items-center gap-2">
-                            <input type="text" id="searchInput" placeholder="Search Order ID..." class="p-2 border rounded-md">
-                            <button onclick="searchOrders()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                                Search
-                            </button>
-                            <button onclick="clearSearch()" class="px-4 py-2 bg-gray-400 text-white rounded-md hover:bg-gray-500">
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                                <tr class="bg-gray-50">
-                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Order ID</th>
-                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Name</th>
-                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Date</th>
-                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Status</th>
-                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Total</th>
-                                    <th class="px-6 py-4 text-right text-sm font-semibold text-gray-600">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="orderTableBody" class="divide-y divide-gray-200">
-                                <% if (orders.length > 0) { %>
-                                    <% orders.forEach(order => { %>
-                                        <tr class="hover:bg-gray-50 transition-colors order-row">
-                                            <td class="px-6 py-4 text-sm text-gray-600">Order #<%= order._id %></td>
-                                            <td class="px-6 py-4 text-sm text-gray-600">
-                                                <% order.items.forEach(item => { %>
-                                                    <p><%= item.productId ? item.productId.name : "Unknown Product" %></p>
-                                                <% }); %>
-                                            </td>
-                                            <td class="px-6 py-4 text-sm text-gray-600">
-                                                <%= new Date(order.orderDate).toLocaleDateString() %>
-                                            </td>
-                                            <td class="px-6 py-4">
-                                                <% if (order.status === "pending") { %>
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                                        Pending
-                                                    </span>
-                                                <% } else if (order.status === "processing") { %>
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                        Processing
-                                                    </span>
-                                                <% } else if (order.status === "shipped") { %>
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                                                        Shipped
-                                                    </span>
-                                                <% } else if (order.status === "delivered") { %>
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                        Delivered
-                                                    </span>
-                                                <% } else if (order.status === "returned") { %>
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                                        Returned
-                                                    </span>
-                                                <% } else if (order.status === "return request") { %>
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                                                        Waiting for approve
-                                                    </span>
-                                                <% } else { %>
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                                        Cancelled
-                                                    </span>
-                                                <% } %>
-                                            </td>
-                                            <td class="px-6 py-4 text-sm text-gray-600">₹<%= order.total.toLocaleString() %></td>
-                                            <td class="px-6 py-4 text-right">
-                                                <a href="/user/orderdetails?id=<%= order._id %>" class="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition-colors text-sm">
-                                                    <i class="fas fa-eye"></i> View Details
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    <% }); %>
+               <!-- Orders Section -->
+<div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden" id="orders">
+    <div class="p-6 border-b flex justify-between items-center">
+        <h2 class="text-xl font-bold text-gray-900">Order History</h2>
+        
+        <!-- Search Bar -->
+        <div class="flex items-center gap-2">
+            <input type="text" id="searchInput" placeholder="Search Order ID..." class="p-2 border rounded-md">
+            <button onclick="searchOrders()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                Search
+            </button>
+            <button onclick="clearSearch()" class="px-4 py-2 bg-gray-400 text-white rounded-md hover:bg-gray-500">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr class="bg-gray-50">
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Order ID</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Name</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Date</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Status</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Total</th>
+                    <th class="px-6 py-4 text-right text-sm font-semibold text-gray-600">Action</th>
+                </tr>
+            </thead>
+            <tbody id="orderTableBody" class="divide-y divide-gray-200">
+                <% if (orders.length > 0) { %>
+                    <% orders.forEach((order, index) => { %>
+                        <tr class="hover:bg-gray-50 transition-colors order-row <%= index >= 5 ? 'hidden extra-order' : '' %>">
+                            <td class="px-6 py-4 text-sm text-gray-600">Order #<%= order._id %></td>
+                            <td class="px-6 py-4 text-sm text-gray-600">
+                                <% order.items.forEach(item => { %>
+                                    <p><%= item.productId ? item.productId.name : "Unknown Product" %></p>
+                                <% }); %>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600">
+                                <%= new Date(order.orderDate).toLocaleDateString() %>
+                            </td>
+                            <td class="px-6 py-4">
+                                <% if (order.status === "pending") { %>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                        Pending
+                                    </span>
+                                <% } else if (order.status === "processing") { %>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        Processing
+                                    </span>
+                                <% } else if (order.status === "shipped") { %>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                        Shipped
+                                    </span>
+                                <% } else if (order.status === "delivered") { %>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        Delivered
+                                    </span>
+                                <% } else if (order.status === "returned") { %>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        Returned
+                                    </span>
+                                <% } else if (order.status === "return request") { %>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                        Waiting for approve
+                                    </span>
                                 <% } else { %>
-                                    <tr>
-                                        <td colspan="6" class="text-center py-4 text-gray-600">No orders found.</td>
-                                    </tr>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        Cancelled
+                                    </span>
                                 <% } %>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600">₹<%= order.total.toLocaleString() %></td>
+                            <td class="px-6 py-4 text-right">
+                                <a href="/user/orderdetails?id=<%= order._id %>" class="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition-colors text-sm">
+                                    <i class="fas fa-eye"></i> View Details
+                                </a>
+                            </td>
+                        </tr>
+                    <% }); %>
+                    
+                    <% if (orders.length > 5) { %>
+                        <tr id="seeAllRow">
+                            <td colspan="6" class="text-center py-4">
+                                <button id="seeAllButton" onclick="showAllOrders()" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all duration-200">
+                                    See All Orders (<%= orders.length - 5 %> more)
+                                </button>
+                            </td>
+                        </tr>
+                        <tr id="showLessRow" class="hidden">
+                            <td colspan="6" class="text-center py-4">
+                                <button onclick="showLessOrders()" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all duration-200">
+                                    Show Less
+                                </button>
+                            </td>
+                        </tr>
+                    <% } %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-gray-600">No orders found.</td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
             
 
                 <!-- Wallet & Referral Section -->
@@ -317,17 +335,20 @@
                                 <div class="absolute top-0 right-0 w-32 h-32 transform translate-x-8 -translate-y-8">
                                     <div class="w-full h-full bg-white/10 rounded-full"></div>
                                 </div>
-                                
                                 <div class="relative space-y-4">
                                     <div>
                                         <p class="text-orange-100 mb-1">Your Referral Code</p>
                                         <div class="bg-white/10 backdrop-blur-sm rounded-lg p-3 flex items-center justify-between">
-                                            <code class="text-lg font-mono">FRIEND50</code>
-                                            <button class="p-2 hover:bg-white/20 rounded-lg transition-colors">
+                                            <code id="refIdDisplay" class="text-lg font-mono"><%= user.referralCode %></code>
+                                            <input type="text" id="refId" value="<%= user.referralCode %>" readonly class="hidden">
+                                            <button onclick="copyReferral()" class="p-2 hover:bg-white/20 rounded-lg transition-colors">
                                                 <i class="fas fa-copy"></i>
                                             </button>
                                         </div>
+                                        <p id="copySuccess" class="text-green-500 text-sm hidden">Copied to clipboard!</p>
                                     </div>
+                                </div>
+                                
 
                                     <div class="flex items-center gap-4">
                                         <div class="flex-1">
@@ -339,6 +360,16 @@
                                             <p class="text-2xl font-bold">0</p>
                                         </div>
                                     </div>
+                                    
+            <!-- Others' Referral Code Input -->
+            <div class="mt-6">
+                <label class="block mb-2 text-orange-100">Enter Referral Code</label>
+                <input type="text" id="otherReferralCode" placeholder="Enter referral code" class="w-full p-2 rounded-lg text-gray-900">
+                <button onclick="submitReferralCode()" class="mt-2 bg-white text-orange-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition">
+                    Submit Code
+                </button>
+                <p id="referralResponse" class="text-sm mt-2"></p>
+            </div>
                                 </div>
                             </div>
                         </div>
@@ -446,6 +477,88 @@
 
 <script>
 
+function submitReferralCode() {
+        const referralCode = document.getElementById('otherReferralCode').value.trim();
+        const responsePara = document.getElementById('referralResponse');
+
+        if (referralCode === '') {
+            responsePara.textContent = 'Please enter a referral code.';
+            responsePara.classList.add('text-red-500');
+            return;
+        }
+
+        fetch('/user/apply-referral', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                 
+            },
+            body: JSON.stringify({ referralCode })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                responsePara.textContent = 'Referral code applied successfully!';
+                responsePara.classList.remove('text-red-500');
+                responsePara.classList.add('text-green-500');
+            } else {
+                responsePara.textContent = data.message || 'Failed to apply referral code.';
+                responsePara.classList.remove('text-green-500');
+                responsePara.classList.add('text-red-500');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            responsePara.textContent = 'Error applying referral code.';
+            responsePara.classList.add('text-red-500');
+        });
+    }
+function showAllOrders() {
+    // Show all the hidden orders
+    document.querySelectorAll('.extra-order').forEach(function(order) {
+        order.classList.remove('hidden');
+    });
+    
+    // Hide the "See All" button row
+    document.getElementById('seeAllRow').classList.add('hidden');
+    
+    // Show the "Show Less" button row
+    document.getElementById('showLessRow').classList.remove('hidden');
+}
+
+function showLessOrders() {
+    // Hide all orders beyond the first 5
+    document.querySelectorAll('.extra-order').forEach(function(order) {
+        order.classList.add('hidden');
+    });
+    
+    // Show the "See All" button row
+    document.getElementById('seeAllRow').classList.remove('hidden');
+    
+    // Hide the "Show Less" button row
+    document.getElementById('showLessRow').classList.add('hidden');
+    
+    // Scroll back to the orders section
+    document.getElementById('orders').scrollIntoView({ behavior: 'smooth' });
+}
+//copy
+function copyReferral() {
+    const referralInput = document.getElementById("refId");
+
+    // Copy to clipboard
+    navigator.clipboard.writeText(referralInput.value).then(() => {
+        // Show success message
+        const successMessage = document.getElementById("copySuccess");
+        successMessage.classList.remove("hidden");
+
+        // Hide message after 2 seconds
+        setTimeout(() => {
+            successMessage.classList.add("hidden");
+        }, 2000);
+    }).catch(err => {
+        console.error("Failed to copy: ", err);
+    });
+}
 
 //search
 function searchOrders() {

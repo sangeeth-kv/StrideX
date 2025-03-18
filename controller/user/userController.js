@@ -1,6 +1,7 @@
 const userSchema=require("../../model/userModel")
 const productSchema=require("../../model/productModel")
 const categorySchema=require("../../model/categoryModel")
+const cartSchema=require("../../model/cartModel")
 const bcrypt=require("bcrypt")
 const crypto = require("crypto");
 const {sendOTPByEmail}=require("../../controller/user/otpverification")
@@ -338,6 +339,7 @@ const userController={
             name: user.fullname,
             email: user.email
          }
+        
          
          return res.status(201).json({
             message: "Signin successful! Redirecting to home page..",
@@ -362,6 +364,7 @@ const userController={
             
             const products = await productSchema.find({ isActive: true }).sort({ createdAt: -1 });
             const categories=await categorySchema.find({ isListed: true })
+            
             console.log(products);
             
             res.render("user/home",{products,categories})

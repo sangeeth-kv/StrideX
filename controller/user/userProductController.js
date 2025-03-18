@@ -10,11 +10,24 @@ const userProductController={
             const id=req.params.id 
             console.log(id)
             const product=await productSchema.findById(id)
-            .populate('categoryId', 'name')
-            .populate('brand', 'name logo');
+            .populate('categoryId', 'name description')
+            .populate('brand', 'name image description');
+
+            const relatedProducts = await productSchema.find({
+                _id: { $ne: id }, // Not equal to current product
+                categoryId: product.categoryId._id // Same category
+            })
+            .limit(4) // Limit to 4 related products
+            .populate('brand', 'name');
 
 
-            res.render("user/productview",{product})
+            let wishlistItems = [];
+        if (req.session.user?.id) {
+        const wishlist = await wishlistSchema.findOne({ userId: req.session.user?.id }).populate("items.productId"); // changed to optional
+        wishlistItems = wishlist ? wishlist.items.map(item => item.productId?._id.toString()) : [];
+        }
+
+            res.render("user/productview",{product, wishlist:wishlistItems,relatedProducts})
         } catch (error) {
             console.log(error)
         }

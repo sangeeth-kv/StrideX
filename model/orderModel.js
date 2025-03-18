@@ -5,7 +5,8 @@ const orderSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   paymentMethod: { type: String, required: true },
   orderDate: { type: Date, default: Date.now },
-  status: { type: String, enum: ["pending", "processing", "shipped","delivered", "cancelled","return request","returned",], default: "pending" },
+  paymentStatus:{ type: String},
+  status: { type: String, enum: ["pending", "processing", "shipped","delivered", "cancelled","return request","returned","failed"], default: "pending" },
   address: { type: mongoose.Schema.Types.ObjectId, ref: "Address", required: true },
   items: [
     {
@@ -22,6 +23,7 @@ const orderSchema = new mongoose.Schema({
   couponId: { type: mongoose.Schema.Types.ObjectId, ref: "Coupon" },
   total: { type: Number, required: true },
   deliveredDate: { type: Date },
+  
 
   // for return request....
   returnRequest: {

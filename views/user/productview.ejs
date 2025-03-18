@@ -1,5 +1,9 @@
 <%- include("partials/header") %>
-
+<head>
+    <!-- Toastify CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</head>
 <main class="min-h-screen bg-gray-50">
     <!-- Breadcrumb -->
     <div class="border-b">
@@ -50,10 +54,25 @@
                 <div class="space-y-8">
                     <div>
                         <h1 class="text-3xl font-bold text-gray-900 mb-2"><%= product.name %></h1>
-                        <div class="flex items-center space-x-4">
+                        
+                        <!-- Enhanced Brand Section -->
+                        <div class="flex items-center space-x-4 mb-4">
                             <span class="text-sm text-gray-600">Brand:</span>
+                            <div class="flex items-center">
+                                <% if (product.brand.logo) { %>
+                                    <img src="<%= product.brand.logo %>" alt="<%= product.brand.name %>" class="h-8 w-auto mr-2">
+                                <% } %>
+                                <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors">
+                                    <%= product.brand.name %>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Category Info -->
+                        <div class="flex items-center space-x-4">
+                            <span class="text-sm text-gray-600">Category:</span>
                             <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors">
-                                <%= product.brand.name %>
+                                <%= product.categoryId.name %>
                             </a>
                         </div>
                     </div>
@@ -108,15 +127,23 @@
                                 </button>
                             </div>
 
-                            
                             <button id="addToCart" class="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200">
                                 Add to Cart
                             </button>
-                            <button class="p-3 border-2 border-gray-200 rounded-lg text-gray-600 hover:text-red-500 hover:border-red-500 transition-all duration-200">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                </svg>
-                            </button>
+                            <div class="relative">
+                                <button class="wishlist-btn p-3 border-2 border-gray-200 rounded-lg text-gray-600 hover:text-red-500 hover:border-red-500 transition-all duration-200" 
+                                    data-product-id="<%= product._id %>">
+                                    <% if (wishlist && wishlist.includes(product._id.toString())) { %>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-red-500" fill="currentColor" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5A5.5 5.5 0 0112 3a5.5 5.5 0 0110 5.5c0 3.78-3.4 6.86-8.55 11.18L12 21z" />
+                                        </svg>
+                                    <% } else { %>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-400 hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                        </svg>
+                                    <% } %>
+                                </button>
+                            </div>
                         </div>
                     </div>
                    
@@ -138,8 +165,118 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Brand and Category Information Section -->
+            <div class="mt-12 border-t pt-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Brand Information -->
+                    <div class="bg-gray-50 rounded-xl p-6">
+                        <div class="flex items-center mb-4">
+                            <% if (product.brand.image) { %>
+                                <img src="<%= product.brand.image %>" alt="<%= product.brand.name %>" class="h-12 w-auto mr-4">
+                            <% } %>
+                            <h3 class="text-lg font-medium text-gray-900">About <%= product.brand.name %></h3>
+                        </div>
+                        <p class="text-gray-600">
+                            <%= product.brand.description || "Information about this brand is currently unavailable." %>
+                        </p>
+                        <a href="/user/shop?brand=<%= product.brand.name %>" class="inline-block mt-4 text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors">
+                            View all <%= product.brand.name %> products
+                            <svg class="inline-block w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </a>
+                    </div>
+                    
+                    <!-- Category Information -->
+                    <div class="bg-gray-50 rounded-xl p-6">
+                        <div class="flex items-center mb-4">
+                            <% if (product.categoryId.image) { %>
+                                <img src="<%= product.categoryId.image %>" alt="<%= product.categoryId.name %>" class="h-12 w-auto mr-4">
+                            <% } %>
+                            <h3 class="text-lg font-medium text-gray-900">About <%= product.categoryId.name %></h3>
+                        </div>
+                        <p class="text-gray-600">
+                            <%= product.categoryId.description || "Information about this category is currently unavailable." %>
+                        </p>
+                        <a href="/user/shop?category=<%= product.categoryId.name %>" class="inline-block mt-4 text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors">
+                            Explore more <%= product.categoryId.name %>
+                            <svg class="inline-block w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
+    <!-- Related Products Section -->
+<section class="container mx-auto px-4 py-12">
+    <div class="bg-white rounded-2xl shadow-sm border p-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-8">Related Products</h2>
+        
+        <% if (relatedProducts && relatedProducts.length > 0) { %>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <% relatedProducts.forEach(relatedProduct => { %>
+                    <div class="group relative bg-white rounded-xl border overflow-hidden transition-all duration-300 hover:shadow-lg">
+                        <!-- Product Image -->
+                        <a href="/user/product/<%= relatedProduct._id %>" class="block aspect-w-1 aspect-h-1 overflow-hidden bg-gray-100">
+                            <img src="<%= relatedProduct.images[0] %>" alt="<%= relatedProduct.name %>" 
+                                 class="w-full h-64 object-cover object-center group-hover:scale-105 transition-transform duration-300">
+                        </a>
+                        
+                        <!-- Product Details -->
+                        <div class="p-4">
+                            <!-- Brand -->
+                            <p class="text-sm text-gray-500 mb-1"><%= relatedProduct.brand.name %></p>
+                            
+                            <!-- Product Name -->
+                            <h3 class="text-lg font-medium text-gray-900 mb-2 line-clamp-2">
+                                <a href="/user/product/<%= relatedProduct._id %>" class="hover:text-indigo-600 transition-colors">
+                                    <%= relatedProduct.name %>
+                                </a>
+                            </h3>
+                            
+                            <!-- Price -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-lg font-bold text-gray-900">₹<%= relatedProduct.variants[0].regularPrice %></span>
+                                
+                                <!-- Wishlist Button -->
+                                <button class="wishlist-btn p-2 text-gray-400 hover:text-red-500 transition-colors" 
+                                        data-product-id="<%= relatedProduct._id %>">
+                                    <% if (wishlist && wishlist.includes(relatedProduct._id.toString())) { %>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-red-500" fill="currentColor" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5A5.5 5.5 0 0112 3a5.5 5.5 0 0110 5.5c0 3.78-3.4 6.86-8.55 11.18L12 21z" />
+                                        </svg>
+                                    <% } else { %>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                        </svg>
+                                    <% } %>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% } else { %>
+            <div class="text-center py-12">
+                <p class="text-gray-500">No related products found.</p>
+            </div>
+        <% } %>
+        
+        <!-- View More Button -->
+        <div class="mt-8 text-center">
+            <a href="/user/shop?category=<%= product.categoryId.name %>" 
+               class="inline-flex items-center px-6 py-3 border border-indigo-600 text-indigo-600 bg-white rounded-lg font-medium hover:bg-indigo-50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                View More <%= product.categoryId.name %>
+                <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+            </a>
+        </div>
+    </div>
+</section>
 </main>
 
 <style>
@@ -164,6 +301,46 @@
 </style>
 
 <script>
+
+document.querySelectorAll(".wishlist-btn").forEach(button => {
+    button.addEventListener("click", async function () {
+        const productId = this.getAttribute("data-product-id");
+        const heartIcon = this.querySelector("svg");
+        const isWishlisted = heartIcon.classList.contains("text-red-500");
+        const url = isWishlisted ? '/user/remove-from-wishlist' : '/user/add-to-wishlist';
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId })
+            });
+
+            const result = await response.json();
+            console.log(result)
+
+            if (result.success) {
+                if (isWishlisted) {
+                    // Change to unliked heart
+                    heartIcon.classList.remove("text-red-500");
+                    heartIcon.classList.add("text-gray-400");
+                    location.reload()
+                  
+                    
+                } else {
+                    // Change to liked heart
+                    heartIcon.classList.remove("text-gray-400");
+                    heartIcon.classList.add("text-red-500");
+                    location.reload()
+                }
+            } else {
+                console.error("Failed to update wishlist");
+            }
+        } catch (error) {
+            console.error("Error updating wishlist", error);
+        }
+    });
+});
     // Your existing JavaScript code remains unchanged
     function selectSize(element, size, price) {
         console.log("Size selected:", size, "Price:", price);
@@ -316,7 +493,15 @@
         const result = await response.json();
 
         if (result.success) {
-            alert("Product added to cart successfully!");
+            Toastify({
+            text: "Product added to cart",
+            duration: 3000, // 3 seconds
+            close: true,
+            gravity: "top", // "top" or "bottom"
+            position: "right", // "left", "center", or "right"
+            backgroundColor: "success",
+            stopOnFocus: true, // Prevent dismissing on hover
+        }).showToast();
         } else {
             alert(result.message || "Failed to add product to cart.");
         }

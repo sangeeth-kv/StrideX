@@ -41,8 +41,5 @@ postLogin: async (req, res) => {
     }
 },
 
-loadDashboard:async (req,res) => {
-    res.render("admin/dashboard")
-},
 }
 module.exports=adminController

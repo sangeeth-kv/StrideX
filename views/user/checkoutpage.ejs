@@ -79,7 +79,7 @@
                                 <% userAddresses.forEach((userAddress) => { %>
                                     <div class="border border-gray-200 hover:border-indigo-500 rounded-lg p-4 transition-all duration-200 relative group">
                                         <div class="absolute top-3 right-3">
-                                            <input class="form-check-input h-5 w-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" 
+                                               <input class="form-check-input h-5 w-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" 
                                                    type="radio" id="addressRadio<%= userAddress._id %>" 
                                                    name="selectedAddress" value="<%= userAddress._id %>" checked>
                                         </div>
@@ -187,7 +187,7 @@
                         
                         <div class="mt-6">
                             <h3 class="text-sm font-medium text-gray-900 mb-3">Available Coupons</h3>
-                            <% if (locals.Coupon && Coupon.length > 0) { %>
+                            <% if (Coupon && Coupon.length > 0) { %>
                                 <div class="space-y-3">
                                     <% for (let i = 0; i < Coupon.length; i++) { %>
                                         <div class="border border-gray-200 rounded-lg p-3 flex justify-between items-center bg-gradient-to-r from-gray-50 to-white">
@@ -357,40 +357,44 @@ document.getElementById("confirmDeleteBtn").addEventListener("click", async () =
         }
         
         // Send AJAX request to validate coupon
-        $.ajax({
-            url: '/validateCoupon',
-            method: 'POST',
-            data: {
-                couponName: couponName,
-                grandTotal: grandTotal
-            },
-            success: function(response) {
-                if (response.valid) {
-                    updatePriceWithCoupon(response.discount);
-                    Swal.fire({
-                        title: 'Coupon Applied',
-                        text: `Discount of ₹${response.discount} applied successfully!`,
-                        icon: 'success',
-                        timer: 2000
-                    });
-                } else {
-                    Swal.fire({
-                        title: 'Invalid Coupon',
-                        text: response.message || 'This coupon cannot be applied',
-                        icon: 'error',
-                        timer: 2000
-                    });
-                }
-            },
-            error: function() {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Failed to validate coupon',
-                    icon: 'error',
-                    timer: 2000
-                });
-            }
+        fetch('/user/validateCoupon', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        couponName: couponName,
+        grandTotal: grandTotal
+    })
+})
+.then(response => response.json())
+.then(data => {
+    if (data.valid) {
+        updatePriceWithCoupon(data.discount);
+        Swal.fire({
+            title: 'Coupon Applied',
+            text: `Discount of ₹${data.discount} applied successfully!`,
+            icon: 'success',
+            timer: 2000
         });
+    } else {
+        Swal.fire({
+            title: 'Invalid Coupon',
+            text: data.message || 'This coupon cannot be applied',
+            icon: 'error',
+            timer: 2000
+        });
+    }
+})
+.catch(() => {
+    Swal.fire({
+        title: 'Error',
+        text: 'Failed to validate coupon',
+        icon: 'error',
+        timer: 2000
+    });
+});
+
     }
     
     // Function to use coupon from available coupons list
@@ -454,6 +458,8 @@ document.getElementById("confirmDeleteBtn").addEventListener("click", async () =
     const couponDiscountText = document.getElementById("couponDiscount").textContent;
     const couponDiscountValue = parseFloat(couponDiscountText.replace(/[^\d.]/g, '')) || 0;
 
+    const couponName=document.getElementById("inputCoupon").value
+
     // Validate selections
     if (!payment) {
         Swal.fire({
@@ -484,14 +490,20 @@ document.getElementById("confirmDeleteBtn").addEventListener("click", async () =
         });
         return;
     }
-
+   
     try {
         const orderData = {
             totalPrice: numericValue,
             createdOn: new Date().getTime(),
             date: new Date(),
             addressId: address,
-            payment: payment
+            payment: payment,
+            couponDiscountText:couponDiscountText,
+            couponDiscountValue:couponDiscountValue,
+            discountText:discountText,
+            discountValue:discountValue,
+            couponName:couponName || ""
+
         };
 
         // Handle Cash on Delivery
@@ -509,23 +521,24 @@ document.getElementById("confirmDeleteBtn").addEventListener("click", async () =
             let orderId = result.order._id;
 
             if (result.method === "cod") {
-                let audio = new Audio('/audios/success-sound.mp3');
-                audio.play();
-                Swal.fire({
-                    title: "Order Placed",
-                    text: "Your order has been placed successfully",
-                    icon: "success",
-                    showCancelButton: true,
-                    confirmButtonText: "View Order",
-                    cancelButtonText: "Continue Shopping",
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.value) {
-                        location.href = `/user/orderDetails?id=${orderId}`;
-                    } else if (result.dismiss === "cancel") {
-                        location.href = '/user/shop';
-                    }
-                });
+                // let audio = new Audio('/audios/success-sound.mp3');
+                // audio.play();
+                // Swal.fire({
+                //     title: "Order Placed",
+                //     text: "Your order has been placed successfully",
+                //     icon: "success",
+                //     showCancelButton: true,
+                //     confirmButtonText: "View Order",
+                //     cancelButtonText: "Continue Shopping",
+                //     reverseButtons: true
+                // }).then((result) => {
+                //     if (result.value) {
+                //         location.href = `/user/orderDetails?id=${orderId}`;
+                //     } else if (result.dismiss === "cancel") {
+                //         location.href = '/user/shop';
+                //     }
+                // });
+                location.href = `/user/payment-success-page?id=${orderId}`;
             }
         } 
         // Handle Wallet Payment
@@ -577,69 +590,99 @@ document.getElementById("confirmDeleteBtn").addEventListener("click", async () =
             });
 
             const order = await response.json();
-            console.log(order)
+            console.log("resposne of create order : ",order)
+
+            var globalOrderId;
+            globalOrderId = order.newOrder._id
             
             var options = {
-                "key": "<%= process.env.RAZORPAY_KEY_ID %>",
-                "amount": order.amount,
-                "currency": "INR",
-                "name": "Stirdex",
-                "description": "Purchase Payment",
-                "image": "https://firebasestorage.googleapis.com/v0/b/ecommerce-397a7.appspot.com/o/logo.jpg?alt=media&token=07b6be19-1ce8-4797-a3a0-f0eaeaafedad",
-                "order_id": order.id,
-                "handler": async function (response) {
-                    const requestData = {
-                    ...response, // Spread the response object from Razorpay
-                    addressId: orderData.addressId,
-                    total:orderData.totalPrice// Add addressId from orderData
-                    };
+    "key": "<%= process.env.RAZORPAY_KEY_ID %>",
+    "amount": order.order.amount,
+    "currency": "INR",
+    "name": "Stridex",
+    "description": "Purchase Payment",
+    "image": "https://firebasestorage.googleapis.com/v0/b/ecommerce-397a7.appspot.com/o/logo.jpg?alt=media&token=07b6be19-1ce8-4797-a3a0-f0eaeaafedad",
+    "order_id": order.newOrder.orderId,
+    "handler": async function (response) {
+        console.log("✅ Razorpay Payment Response:", response)
+        const requestData = {
+            ...response,
+            addressId: orderData.addressId,
+            total: orderData.totalPrice
+        };
+        console.log("thit is requset order data : ",requestData)
 
-                    const verifyResponse = await fetch("/user/payment/verify-payment", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(requestData)
-                    });
-                    
-                    const verifyResult = await verifyResponse.json();
-                    console.log(verifyResult)
-                    if (verifyResult.success) {
-                        Swal.fire({
-                            title: "Payment Successful",
-                            text: "Your order has been placed successfully",
-                            icon: "success",
-                            showCancelButton: true,
-                            confirmButtonText: "View Order",
-                            cancelButtonText: "Continue Shopping",
-                            reverseButtons: true
-                        }).then((result) => {
-                            if (result.value) {
-                                location.href= `/user/orderDetails?id=${verifyResult.order._id}`;
-                                
-                            } else if (result.dismiss === "cancel") {
-                                location.href = '/user/shop';
-                            }
-                        });
-                    } else {
-                        Swal.fire({
-                            title: "Payment Failed",
-                            text: verifyResult.message || "Payment verification failed",
-                            icon: "error",
-                            confirmButtonText: "OK"
-                        });
-                        location.href = "/user/order-failure";
-                    }
-                },
-                "prefill": {
-                    "name": "<%= user.fullname %>",
-                    "email": "<%= user.email %>",
-                    "contact": "<%= user.phoneNumber || '9999999999' %>"
-                },
-                "theme": {
-                    "color": "#4f46e5"
-                }
-            };
-            var rzp1 = new Razorpay(options);
-            rzp1.open();
+        const verifyResponse = await fetch("/user/payment/verify-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(requestData)
+        });
+
+        console.log("✅ Verify Payment API Request Sent!");
+
+        const verifyResult = await verifyResponse.json();
+        console.log("✅ Verify Payment Result:", verifyResult);
+
+        const orderId = verifyResult.order._id;
+        console.log("this is URL order Id:", orderId);
+        
+
+        if (verifyResult.success) {
+            location.href = `/user/payment-success-page?id=${orderId}`;
+        } else {
+            console.error("⚠️ Payment Verification Failed:", verifyResult);
+            alert("Payment Failed! Redirecting to failure page...");
+            location.href = `/user/order-failure/${orderId}`;
+        }
+    },
+    "prefill": {
+        "name": "<%= user.fullname %>",
+        "email": "<%= user.email %>",
+        "contact": "<%= user.phoneNumber || '9999999999' %>"
+    },
+    "theme": { "color": "#4f46e5" },
+    "modal": {
+        "escape": false,  // Prevent closing with Esc key
+        "backdropclose": false,  // Prevent closing by clicking outside
+        "ondismiss": function () {
+            console.log("❌ Razorpay modal closed by user.",globalOrderId);
+            location.href = `/user/order-failure/${globalOrderId}`;
+        }
+    }
+};
+
+var rzp1 = new Razorpay(options);
+
+// Handle failed payment
+rzp1.on('payment.failed', async function (response) {
+    console.error("❌ Razorpay Payment Failed:", response.error);
+    console.log("Failure order Id:",);
+    location.href = `/user/order-failure/${globalOrderId}`;
+    // try {
+    //     const failureResponse = await fetch("/user/payment/payment-failed", {
+    //         method: "POST",
+    //         headers: { "Content-Type": "application/json" },
+    //         body: JSON.stringify({
+    //             orderId: order.id,
+    //             reason: response.error.reason,
+    //             message: response.error.description
+    //         })
+    //     });
+
+    //     const failureResult = await failureResponse.json();
+    //     console.log("⚠️ Order Failure API Response:", failureResult);
+
+    //     const failedOrderId = failureResult.orderId;
+    //     location.href = `/user/order-failure/${failedOrderId}`;
+
+    // } catch (error) {
+    //     console.error("⚠️ Error reporting failed payment:", error);
+    // }
+
+});
+
+rzp1.open();
+
         } else {
             Swal.fire({
                 title: 'Error',

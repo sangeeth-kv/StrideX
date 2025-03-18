@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const crypto = require("crypto");
+
 
 const userSchema = new mongoose.Schema({
     email: {
@@ -28,11 +30,22 @@ const userSchema = new mongoose.Schema({
         default:true,
     },
     image: { type: String },
+    referralCode: { type: String, unique: true },
     
 },
 {timestamps : true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
 });
+
+userSchema.pre("save", function (next) {
+    if (!this.referralCode) {
+        this.referralCode = generateReferralCode(this.email);
+    }
+    next();
+});
+function generateReferralCode(email) {
+    return crypto.createHash("md5").update(email + Date.now()).digest("hex").substring(0, 8).toUpperCase();
+}
 
 module.exports = mongoose.model("User", userSchema);

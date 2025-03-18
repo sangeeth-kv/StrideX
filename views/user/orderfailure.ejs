@@ -1,0 +1,103 @@
+<%- include("partials/header") %>
+
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen flex flex-col">
+    <div class="flex-grow flex items-center justify-center p-4">
+        <div class="max-w-md w-full bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:shadow-xl">
+            <div class="p-8 text-center relative">
+                <!-- Top wave decoration -->
+                <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-red-400 via-red-500 to-red-400"></div>
+
+                <div class="mb-6 flex justify-center">
+                    <img src="/images/failure.svg" alt="Failed Transaction" class="w-40 h-40 object-contain drop-shadow-md animate-pulse">
+                </div>
+
+                <h1 class="text-2xl font-bold text-gray-800 mb-3">Oops! Payment Failed</h1>
+
+                <div class="h-1 w-16 bg-red-500 mx-auto mb-4 rounded-full"></div>
+
+                <p class="text-gray-600 mb-8">Something went wrong with your payment. Please try again or contact support if the issue persists.</p>
+
+                <div class="space-y-3">
+                    <button id="retry-payment" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 shadow-md">
+                        <span class="flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Retry Payment
+                        </span>
+                    </button>
+
+                    <a href="/user/checkout" class="block w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 px-4 rounded-lg transition-all duration-200 text-center focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50">
+                        View Checkout Page
+                    </a>
+                </div>
+
+                <div class="mt-8 text-sm text-gray-500">
+                    <p>Need help? <a href="#" class="text-indigo-600 hover:text-indigo-800 font-medium">Contact Support</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <script>
+        document.getElementById("retry-payment").addEventListener("click", async () => {
+            try {
+                const response = await fetch(`/user/payment/retry-order/<%= orderId %>`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" }
+                });
+
+                const order = await response.json();
+                console.log("✅ Retrying Payment:", order.newOrder.id);
+
+                var options = {
+                    "key": "<%= process.env.RAZORPAY_KEY_ID %>",
+                    "amount": order.newOrder.amount,
+                    "currency": "INR",
+                    "name": "Stridex",
+                    "description": "Retrying Payment",
+                    "order_id": order.newOrder.id,
+                    "handler": async function (response) {
+                        console.log("✅ Razorpay Payment Response:========", response);
+                        const requestData = {
+                            ...response,
+                            addressId: order.addressId,
+                            total: order.total
+                        };
+
+                        const verifyResponse = await fetch("/user/payment/verify-payment", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(requestData)
+                        });
+
+                        const verifyResult = await verifyResponse.json();
+                        console.log("✅ Verify Payment Result:", verifyResult);
+
+                        if (verifyResult.success) {
+                            location.href = `/user/payment-success-page?id=${verifyResult.order._id}`;
+                        } else {
+                            alert("Payment Failed! Redirecting to failure page...");
+                            location.href = verifyResult.redirectUrl;
+                        }
+                    },
+                    "prefill": {
+                        "name": "<%= user.fullname %>",
+                        "email": "<%= user.email %>",
+                        "contact": "<%= user.phoneNumber || '9999999999' %>"
+                    },
+                    "theme": { "color": "#4f46e5" }
+                };
+
+                var rzp1 = new Razorpay(options);
+                rzp1.open();
+            } catch (error) {
+                console.error("❌ Retry Payment Error:", error);
+            }
+        });
+    </script>
+</body>
+
+<%- include("partials/footer") %>

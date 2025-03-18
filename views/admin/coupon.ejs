@@ -1,0 +1,335 @@
+<%- include("partials/header") %>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <!-- Toastify CSS -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <!-- Toastify JS -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              200: '#bae6fd',
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+            },
+          },
+          boxShadow: {
+            'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<section class="py-8 px-4 md:px-8 bg-gray-50 min-h-screen">
+  <div class="mb-6">
+    <div class="flex items-center justify-between">
+      <h2 class="text-2xl font-bold text-gray-800">Coupons Management</h2>
+    </div>
+    <form action="/admin/coupon" method="GET" id="search-form">
+      <div class="input-group">
+        <input type="text" name="search" class="form-control" placeholder="Search categories..." id="searchInput" value="<%= search %>">
+        <button class="btn btn-outline-secondary" type="submit" id="searchBtn">
+          <i class="bi bi-search"></i>
+        </button>
+        <button class="btn btn-outline-secondary" type="button" id="resetBtn">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+      </div>
+    </form>
+  </div>
+  
+  
+  <div class="bg-white rounded-lg shadow-card">
+    
+    <div class="p-6">
+      <div class="flex flex-col lg:flex-row gap-8">
+        
+        <!-- Coupon Form -->
+        <div class="lg:w-1/3 bg-gray-50 p-6 rounded-lg border border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">Add New Coupon</h3>
+          <form id="couponForm" class="space-y-4">
+            <div>
+              <label for="coupon-name" class="block text-sm font-medium text-gray-700 mb-1">Coupon Name</label>
+              <input type="text" id="coupon-name" name="couponName" placeholder="Enter coupon name" 
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors" />
+              <div id="error-coupon-name" class="text-red-500 text-xs mt-1"></div>
+            </div>
+            
+            <div>
+              <label for="startingDate" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+              <input type="date" name="startDate" required id="startingDate" 
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors" />
+              <div id="error-start-date" class="text-red-500 text-xs mt-1"></div>
+            </div>
+            
+            <div>
+              <label for="expiringDate" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+              <input type="date" name="endDate" required id="expiringDate" 
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors" />
+              <div id="error-end-date" class="text-red-500 text-xs mt-1"></div>
+            </div>
+            
+            <div>
+              <label for="offer-price" class="block text-sm font-medium text-gray-700 mb-1">Offer Price</label>
+              <input type="text" name="offerPrice" placeholder="Enter offer price" 
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors" />
+              <div id="error-offer-price" class="text-red-500 text-xs mt-1"></div>
+            </div>
+            
+            <div>
+              <label for="minimum-price" class="block text-sm font-medium text-gray-700 mb-1">Minimum Price</label>
+              <input type="text" name="minimumPrice" placeholder="Enter minimum price" 
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors" />
+              <div id="error-minimum-price" class="text-red-500 text-xs mt-1"></div>
+            </div>
+            
+            <div>
+              <button type="submit" 
+                class="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-2.5 px-4 rounded-md transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
+                Add Coupon
+              </button>
+              <div id="err-msg" class="text-red-500 text-xs mt-2"></div>
+            </div>
+          </form>
+        </div>
+        
+        <!-- Coupons Table -->
+        <div class="lg:w-2/3">
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created On</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expire On</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Offer Price</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Minimum Price</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <% if (coupons.length > 0) { %>
+                  <% coupons.forEach(coupon => { %>
+                    <tr class="hover:bg-gray-50 transition-colors">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= coupon.name %></td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= new Date(coupon.createdOn).toLocaleDateString() %></td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= new Date(coupon.expireOn).toLocaleDateString() %></td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= coupon.offerPrice %></td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= coupon.minimumPrice %></td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <% if (coupon.isList) { %>
+                          <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Active</span>
+                        <% } else { %>
+                          <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Inactive</span>
+                        <% } %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                        <a href="/admin/edit-coupon?id=<%= coupon._id %>" 
+                          class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                          Edit
+                        </a>
+                        <a href="#" onclick="toggleCouponStatus('<%= coupon._id %>', '<%= coupon.isList %>')"
+                          class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white 
+                          <%= coupon.isList ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500' : 'bg-green-600 hover:bg-green-700 focus:ring-green-500' %>">
+                          <%= coupon.isList ? 'Block' : 'Unblock' %>
+                       </a>                       
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">No coupons available</td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <nav>
+    <ul class="pagination justify-content-center">
+      <% if (currentPage > 1) { %>
+        <li class="page-item">
+          <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">Previous</a>
+        </li>
+      <% } %>
+      <% for (let i = 1; i <= totalPages; i++) { %>
+        <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+          <a class="page-link" href="?page=<%= i %>&search=<%= search %>"><%= i %></a>
+        </li>
+      <% } %>
+      <% if (currentPage < totalPages) { %>
+        <li class="page-item">
+          <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">Next</a>
+        </li>
+      <% } %>
+    </ul>
+  </nav>
+</section>
+
+<script>
+
+
+const searchForm = document.getElementById("search-form");
+      searchForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        const formData = new FormData(searchForm);
+        const queryParams = new URLSearchParams(formData);
+        window.location.href = `/admin/coupon?${queryParams.toString()}`;
+      });
+      
+      const resetBtn = document.getElementById("resetBtn");
+      resetBtn.addEventListener("click", function() {
+        document.getElementById("searchInput").value = "";
+        window.location.href = "/admin/coupon";
+      });
+
+document.getElementById("couponForm").addEventListener("submit", async function (event) {
+    event.preventDefault(); // Prevent default form submission
+
+    // Validate form
+    if (!validateForm()) {
+        return;
+    }
+
+    // Collect form data
+    const formData = {
+        couponName: document.getElementsByName("couponName")[0].value.trim(),
+        startDate: document.getElementsByName("startDate")[0].value,
+        endDate: document.getElementsByName("endDate")[0].value,
+        offerPrice: document.getElementsByName("offerPrice")[0].value.trim(),
+        minimumPrice: document.getElementsByName("minimumPrice")[0].value.trim(),
+    };
+
+    try {
+        const response = await fetch("/admin/addcoupon", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          Toastify({
+                text: "Coupon added successfully! 🎉",
+                duration: 3000, // 3 seconds
+                close: true,
+                gravity: "top", // Position at the top
+                position: "right", // Right side
+                backgroundColor: "#28a745", // Green success color
+                stopOnFocus: true,
+            }).showToast();
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } else {
+            document.getElementById("err-msg").innerText = result.message || "Error adding coupon.";
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        document.getElementById("err-msg").innerText = "Failed to send request. Please try again.";
+    }
+});
+
+function validateForm() {
+   document.querySelectorAll(".error-message").forEach((element) => (element.innerHTML = ""));
+   const sDate = document.getElementsByName("startDate")[0].value;
+   const eDate = document.getElementsByName("endDate")[0].value;
+   const sDateObj = new Date(sDate);
+   const eDateObj = new Date(eDate);
+   const todayDateObj = new Date();
+   todayDateObj.setHours(0, 0, 0, 0);
+
+
+   if (sDateObj > eDateObj) {
+     document.getElementById("error-end-date").innerHTML ="End date should be after the start date";
+     return false;
+   }
+
+
+   if (sDateObj <= todayDateObj) {
+     document.getElementById("error-start-date").innerHTML ="Starting date should be greater than or equal to today's date";
+     return false;
+   }
+
+
+   let name = document.getElementsByName("couponName")[0].value;
+   const nameRegex = /^[A-Za-z0-9]{1,50}$/;
+
+
+   if (!nameRegex.test(name)) {
+     document.getElementById("error-coupon-name").innerHTML =
+       "Coupon Name error";
+     return false;
+   }
+
+
+   const offerPriceInput = document.getElementsByName("offerPrice")[0];
+   const minimumPriceInput = document.getElementsByName("minimumPrice")[0];
+
+
+   const offerPrice = offerPriceInput.value.trim() !== ""? parseInt(offerPriceInput.value): NaN;
+   const minimumPrice = minimumPriceInput.value.trim() !== ""? parseInt(minimumPriceInput.value): NaN;
+
+
+   if (isNaN(offerPrice) || isNaN(minimumPrice) || offerPrice >= minimumPrice) {
+     document.getElementById("error-offer-price").innerHTML = "Offer Price must be greater than Minimum Price";
+     return false;
+   }
+
+
+   if (isNaN(offerPrice) || isNaN(minimumPrice)) {
+     document.getElementById("error-offer-price").innerHTML ="Please enter numeric values for Offer Price and Minimum Price";
+     return false;
+   }
+
+
+   const formData = {
+     couponName: name,
+     startDate: sDateObj,
+     endDate: eDateObj,
+     offerPrice: offerPrice,
+     minimumPrice: minimumPrice
+   };
+   return true;
+}
+async function toggleCouponStatus(couponId, currentStatus) {
+   await fetch(`/admin/coupons/toggle-status/${couponId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isList: !currentStatus }) // Toggle the status
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload(); // Refresh to update UI
+        } else {
+            alert("Failed to update coupon status.");
+        }
+    })
+    .catch(error => console.error("Error:", error));
+}
+
+</script>
+<%- include("partials/footer") %>

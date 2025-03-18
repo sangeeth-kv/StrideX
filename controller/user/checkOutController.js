@@ -2,6 +2,7 @@ const userSchema=require("../../model/userModel")
 const orderSchema=require("../../model/orderModel")
 const cartSchema=require("../../model/cartModel")
 const addressSchema=require("../../model/addressModel")
+const couponSchema=require("../../model/coupenModel")
 
 
 const checkOutController={
@@ -11,7 +12,16 @@ const checkOutController={
             if (!userId) {
                 return res.render("user/login");
             }
-    
+            const coupon = await couponSchema.find({
+                $or: [
+                    { userId: userId }, // ✅ Coupons assigned to this user
+                    { userId: { $size: 0 } } // ✅ General coupons with an empty userId array
+                ],
+                usedBy: { $nin: [userId] } // ✅ Exclude already used coupons
+            }).lean();
+            
+            
+
             const user = await userSchema.findById(userId);
             
             // Get cart with populated product data
@@ -98,6 +108,7 @@ const checkOutController={
                     ...item,
                     additionalDiscount // Add the additionalDiscount to each item
                 })), 
+                Coupon:coupon,
                 cart: cart,
                 grandTotal, 
                 shippingCharge, 
@@ -118,6 +129,55 @@ const checkOutController={
     } catch (error) {
         console.log(error)
     }
+    },verifyCoupon:async (req,res) => {
+        try {
+            const userId=req.session.user?.id
+            console.log("req body of verify coupon: ", req.body);
+        const { couponName, grandTotal } = req.body;
+        
+        // Find the coupon in the database
+        const coupon = await couponSchema.findOne({ 
+            name: couponName, 
+            isList: true,
+            expireOn: { $gt: new Date() } // Check if coupon hasn't expired
+        });
+        
+        // If coupon not found or expired
+        if (!coupon) {
+            return res.status(200).json({ 
+                valid: false, 
+                message: "Invalid coupon code or coupon has expired" 
+            });
+        }
+        
+        // Check if minimum purchase requirement is met
+        if (grandTotal < coupon.minimumPrice) {
+            return res.status(200).json({ 
+                valid: false, 
+                message: `Minimum purchase of ₹${coupon.minimumPrice} required for this coupon` 
+            });
+        }
+        
+        // Check if user has already used this coupon (assuming req.user.id is available)
+        if (req.session.user.id && coupon.usedBy.includes(req.session.user.id)) {
+            return res.status(200).json({ 
+                valid: false, 
+                message: "You have already used this coupon" 
+            });
+        }
+        
+        // Calculate discount (cannot exceed the offer price)
+        const discountAmount = Math.min(coupon.offerPrice, grandTotal);
+        
+        // Return success with discount amount
+        return res.status(200).json({
+            valid: true,
+            discount: discountAmount,
+            couponId: coupon._id
+        });
+        } catch (error) {
+            console.log(error)
+        }
     }
 }
 

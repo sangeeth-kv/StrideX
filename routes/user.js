@@ -12,6 +12,7 @@ const checkOutController=require("../controller/user/checkOutController")
 const orderController=require("../controller/user/orderController")
 const InvoiceController=require("../controller/user/invoiceController")
 const paymentContoller=require("../controller/user/paymentController")
+const referralController=require("../controller/user/referralController")
 // const adminController = require("../controller/admin/adminController");
 const upload = require("../config/multer");
 require("../config/passport")
@@ -113,10 +114,13 @@ router.post("/remove-from-wishlist",wishlistController.removeFromWishlist)
 //checkout page
 router.get("/checkout",checkOutController.loadCheckoutPage)
 router.get("/add-order-address/:id",checkOutController.loadOrderAddress)
+router.post("/validateCoupon",checkOutController.verifyCoupon)
 
 //cod payment
 router.post("/cash-on-delivery",orderController.verifyCOD)
+router.get("/payment-success-page",orderController.loadSuccessOrderPage)
 router.get("/orderDetails",orderController.loadOrderDetailsPage)
+
 
 
 //invoice
@@ -140,5 +144,12 @@ router.post("/cancel-order",orderController.cancelOrder)
 //for razor payment
 router.post("/payment/create-order",paymentContoller.createOrder)
 router.post("/payment/verify-payment",paymentContoller.verifyPayment)
+router.post("/payment/payment-failed",paymentContoller.paymentFailed)
+router.get("/order-failure/:id",paymentContoller.orderFailure)
+router.post("/payment/retry-order/:id",paymentContoller.retryPayment)
+
+//for referal
+router.post("/apply-referral",referralController.applyReferral)
+
 
 module.exports=router;
