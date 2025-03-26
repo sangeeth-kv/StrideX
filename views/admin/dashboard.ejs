@@ -1,123 +1,872 @@
-<%-include("partials/header") %>
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<%-include("partials/header")%>
+    <title>Admin Order Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f7ff',
+                            100: '#e0eefe',
+                            200: '#bae0fd',
+                            300: '#7cc8fb',
+                            400: '#36aaf5',
+                            500: '#0d8de3',
+                            600: '#026fc2',
+                            700: '#0559a0',
+                            800: '#0a4b84',
+                            900: '#0f406e',
+                            950: '#0a2847',
+                        },
+                        secondary: {
+                            50: '#fdf2f8',
+                            100: '#fce7f3',
+                            200: '#fbcfe8',
+                            300: '#f9a8d4',
+                            400: '#f472b6',
+                            500: '#ec4899',
+                            600: '#db2777',
+                            700: '#be185d',
+                            800: '#9d174d',
+                            900: '#831843',
+                            950: '#500724',
+                        },
+                        success: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            200: '#a7f3d0',
+                            300: '#6ee7b7',
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                            950: '#022c22',
+                        },
+                        warning: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            200: '#fde68a',
+                            300: '#fcd34d',
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                            800: '#92400e',
+                            900: '#78350f',
+                            950: '#451a03',
+                        },
+                        danger: {
+                            50: '#fef2f2',
+                            100: '#fee2e2',
+                            200: '#fecaca',
+                            300: '#fca5a5',
+                            400: '#f87171',
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            700: '#b91c1c',
+                            800: '#991b1b',
+                            900: '#7f1d1d',
+                            950: '#450a0a',
+                        },
+                        dark: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        card: '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
+                        'card-hover': '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+                        'inner-glow': 'inset 0 1px 4px 0 rgba(0, 0, 0, 0.05)',
+                        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'pulse-slow': 'pulse 3s infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    },
+                    backdropBlur: {
+                        xs: '2px',
+                    },
+                },
+            },
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .bg-dashboard-gradient {
+                background-image: 
+                    radial-gradient(at 0% 0%, rgba(13, 141, 227, 0.03) 0px, transparent 50%),
+                    radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.03) 0px, transparent 50%),
+                    radial-gradient(at 0% 100%, rgba(245, 158, 11, 0.03) 0px, transparent 50%),
+                    radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.03) 0px, transparent 50%);
+                background-attachment: fixed;
+                background-size: cover;
+            }
+            
+            .glass-card {
+                @apply bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl shadow-glass;
+            }
+            
+            .stat-card {
+                @apply glass-card p-6 transition-all duration-300 hover:shadow-card-hover hover:bg-white/90 hover:-translate-y-1;
+            }
+            
+            .chart-card {
+                @apply glass-card overflow-hidden transition-all duration-300 hover:shadow-card-hover hover:bg-white/90 hover:-translate-y-1;
+            }
+            
+            .chart-header {
+                @apply flex justify-between items-center p-5 border-b border-gray-100/50 bg-white/50 backdrop-blur-xs;
+            }
+            
+            .chart-body {
+                @apply p-6 h-80 relative;
+            }
+            
+            .btn-primary {
+                @apply inline-flex items-center gap-2 bg-gradient-to-r from-primary-600 to-primary-500 text-white font-semibold py-3 px-6 rounded-xl shadow-md hover:from-primary-700 hover:to-primary-600 hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-opacity-50;
+            }
+            
+            .form-select {
+                @apply bg-white/80 backdrop-blur-sm border border-gray-200/70 text-dark-700 py-2.5 pl-4 pr-10 rounded-xl shadow-inner-glow focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm font-medium;
+            }
+            
+            .best-selling-item {
+                @apply glass-card p-5 transition-all duration-300 hover:shadow-card-hover hover:bg-white/90;
+            }
+            
+            .table-header {
+                @apply bg-gradient-to-r text-white font-medium text-sm py-2.5 px-4 first:rounded-tl-lg last:rounded-tr-lg;
+            }
+            
+            .table-cell {
+                @apply border-b border-gray-100/70 py-3 px-4 text-dark-700;
+            }
+            
+            .badge {
+                @apply inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-medium;
+            }
+            
+            .badge-success {
+                @apply bg-success-100 text-success-800;
+            }
+            
+            .badge-danger {
+                @apply bg-danger-100 text-danger-800;
+            }
+            
+            .badge-warning {
+                @apply bg-warning-100 text-warning-800;
+            }
+            
+            .badge-info {
+                @apply bg-primary-100 text-primary-800;
+            }
+            
+            /* Custom scrollbar */
+            ::-webkit-scrollbar {
+                @apply w-1.5 h-1.5;
+            }
+            
+            ::-webkit-scrollbar-track {
+                @apply bg-gray-100/50 rounded-full;
+            }
+            
+            ::-webkit-scrollbar-thumb {
+                @apply bg-gray-300/70 rounded-full hover:bg-gray-400/70;
+            }
+            
+            .icon-circle {
+                @apply flex items-center justify-center w-10 h-10 rounded-full text-lg flex-shrink-0;
+            }
+        }
+    </style>
 </head>
-<body>
-    <div class="container mt-4">
-        <h2 class="text-center mb-4">Admin Dashboard</h2>
-
-        <!-- Filters for Sales Reports -->
-        <div class="d-flex justify-content-between mb-3">
-            <h4>Sales Reports</h4>
-            <input type="hidden" id="salesData" value='<%= JSON.stringify(salesData) %>'>
-
-            <select id="salesFilter" class="form-select w-auto">
-                <option value="yearly">Yearly</option>
-                <option value="monthly">Monthly</option>
-                <option value="weekly">Weekly</option>
-                <option value="daily">Daily</option>
-            </select>
+<body class="font-sans bg-gray-50 bg-dashboard-gradient text-dark-800 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 pb-6 border-b border-gray-200/50">
+            <div class="mb-4 sm:mb-0">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="bg-gradient-to-r from-primary-500 to-primary-600 text-white p-2 rounded-lg">
+                        <i class="fas fa-chart-line text-xl"></i>
+                    </div>
+                    <h1 class="text-3xl font-bold text-dark-900 tracking-tight">Admin Order Dashboard</h1>
+                </div>
+                <p class="text-dark-500 flex items-center gap-2">
+                    <i class="fas fa-calendar-alt text-primary-500"></i>
+                    <span>Order analytics and sales performance</span>
+                    <span class="badge badge-info ml-2">Last updated: Today</span>
+                </p>
+            </div>
+            <div class="flex gap-3">
+                <button class="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm text-dark-700 font-medium py-2.5 px-4 rounded-xl border border-gray-200/70 shadow-sm hover:bg-white hover:shadow-md transition-all duration-300">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+                <button onclick="exportToPDF()" class="btn-primary">
+                    <i class="fas fa-file-pdf"></i> Export Report
+                </button>
+            </div>
+        </div>
+        
+        <!-- Dashboard Stats -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="stat-card animate-fade-in-up" style="animation-delay: 0.1s">
+                <div class="flex justify-between mb-3">
+                    <h3 class="text-dark-500 text-sm font-medium">Total Orders</h3>
+                    <div class="icon-circle bg-primary-100 text-primary-600">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                </div>
+                <div class="text-3xl font-bold text-dark-900 mb-2"><%= totalorderSchemas || 0 %></div>
+                <div class="flex items-center text-sm">
+                    <span class="badge badge-success flex items-center gap-1">
+                        <i class="fas fa-arrow-up text-xs"></i> 12.5%
+                    </span>
+                    <span class="text-dark-500 ml-2">from last month</span>
+                </div>
+            </div>
+            
+            <div class="stat-card animate-fade-in-up" style="animation-delay: 0.2s">
+                <div class="flex justify-between mb-3">
+                    <h3 class="text-dark-500 text-sm font-medium">Revenue</h3>
+                    <div class="icon-circle bg-success-100 text-success-600">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                </div>
+                <div class="text-3xl font-bold text-dark-900 mb-2">₹<%= revenue ? revenue.toLocaleString('en-IN') : '0' %></div>
+                <div class="flex items-center text-sm">
+                    <span class="badge badge-success flex items-center gap-1">
+                        <i class="fas fa-arrow-up text-xs"></i> 8.2%
+                    </span>
+                    <span class="text-dark-500 ml-2">from last month</span>
+                </div>
+            </div>
+            
+            <div class="stat-card animate-fade-in-up" style="animation-delay: 0.3s">
+                <div class="flex justify-between mb-3">
+                    <h3 class="text-dark-500 text-sm font-medium">Average Order Value</h3>
+                    <div class="icon-circle bg-warning-100 text-warning-600">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                </div>
+                <div class="text-3xl font-bold text-dark-900 mb-2">₹<%= avgorderSchemaValue || 0 %></div>
+                <div class="flex items-center text-sm">
+                    <span class="badge badge-danger flex items-center gap-1">
+                        <i class="fas fa-arrow-down text-xs"></i> 3.1%
+                    </span>
+                    <span class="text-dark-500 ml-2">from last month</span>
+                </div>
+            </div>
+            
+            <div class="stat-card animate-fade-in-up" style="animation-delay: 0.4s">
+                <div class="flex justify-between mb-3">
+                    <h3 class="text-dark-500 text-sm font-medium">Conversion Rate</h3>
+                    <div class="icon-circle bg-secondary-100 text-secondary-600">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                </div>
+                <div class="text-3xl font-bold text-dark-900 mb-2">24.8%</div>
+                <div class="flex items-center text-sm">
+                    <span class="badge badge-success flex items-center gap-1">
+                        <i class="fas fa-arrow-up text-xs"></i> 1.2%
+                    </span>
+                    <span class="text-dark-500 ml-2">from last month</span>
+                </div>
+            </div>
         </div>
 
-        <!-- Sales Chart -->
-        <canvas id="salesChart" height="100"></canvas>
+        <!-- Hidden Input Fields for Initial Data -->
+        <input type="hidden" id="ordersData" value='<%= JSON.stringify(ordersData || { labels: [], values: [] }) %>'>
+        <input type="hidden" id="productsData" value='<%= JSON.stringify(topproductSchemas || []) %>'>
+        <input type="hidden" id="categoriesData" value='<%= JSON.stringify(topCategories || []) %>'>
+        <input type="hidden" id="brandsData" value='<%= JSON.stringify(topbrandSchemas || []) %>'>
+        
+        <!-- Main Sales Chart -->
+        <div class="mb-8 animate-fade-in-up" style="animation-delay: 0.5s">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="flex items-center gap-3">
+                        <div class="icon-circle bg-primary-100 text-primary-600">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h2 class="text-lg font-semibold text-dark-900">Orders Statistics</h2>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="text-sm text-dark-500 hidden sm:block">Filter by:</div>
+                        <select class="form-select" id="timeFilter">
+                            <option value="yearly">Yearly</option>
+                            <option value="monthly" selected>Monthly</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="daily">Daily</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart-body">
+                    <canvas id="ordersChart"></canvas>
+                </div>
+            </div>
+        </div>
 
-        <!-- Best Selling Sections -->
-        <div class="row mt-4">
-            <div class="col-md-4">
-                <h5>Best Selling Products</h5>
-                <ul class="list-group">
-                    <% bestSellingProducts.forEach(product => { %>
-                        <li class="list-group-item">
-                            <%= product.name %> - Sold: <%= product.totalSold %>
-                        </li>
-                    <% }) %>
-                </ul>
+        <!-- Top Products Chart -->
+        <div class="mb-8 animate-fade-in-up" style="animation-delay: 0.6s">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="flex items-center gap-3">
+                        <div class="icon-circle bg-success-100 text-success-600">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <h2 class="text-lg font-semibold text-dark-900">Top 10 Best Selling Products</h2>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="badge badge-info">Units Sold</span>
+                    </div>
+                </div>
+                <div class="chart-body">
+                    <canvas id="productsChart"></canvas>
+                </div>
             </div>
-            <div class="col-md-4">
-                <h5>Best Selling Categories</h5>
-                <ul class="list-group">
-                    <% bestSellingCategories.forEach(category => { %>
-                        <li class="list-group-item">
-                            <%= category.name %> - Sold: <%= category.totalSold %>
-                        </li>
-                    <% }) %>
-                </ul>
-            </div>
-            <div class="col-md-4">
-                <h5>Best Selling Brands</h5>
-                <ul class="list-group">
-                    <% bestSellingBrands.forEach(brand => { %>
-                        <li class="list-group-item">
-                            <%= brand.name %> - Sold: <%= brand.totalSold %>
-                        </li>
-                    <% }) %>
-                </ul>
-            </div>
-        </div>>
+        </div>
 
-        <!-- Ledger Book (Optional) -->
-        <div class="mt-5">
-            <h4>Ledger Book</h4>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Description</th>
-                        <th>Amount</th>
-                        <th>Type</th>
-                    </tr>
-                </thead>
-                <tbody id="ledgerTable"></tbody>
-            </table>
+        <!-- Categories and Brands Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div class="chart-card animate-fade-in-up" style="animation-delay: 0.7s">
+                <div class="chart-header">
+                    <div class="flex items-center gap-3">
+                        <div class="icon-circle bg-warning-100 text-warning-600">
+                            <i class="fas fa-tags"></i>
+                        </div>
+                        <h2 class="text-lg font-semibold text-dark-900">Top 10 Categories</h2>
+                    </div>
+                </div>
+                <div class="chart-body">
+                    <canvas id="categoriesChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-card animate-fade-in-up" style="animation-delay: 0.8s">
+                <div class="chart-header">
+                    <div class="flex items-center gap-3">
+                        <div class="icon-circle bg-secondary-100 text-secondary-600">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <h2 class="text-lg font-semibold text-dark-900">Top 10 Brands</h2>
+                    </div>
+                </div>
+                <div class="chart-body">
+                    <canvas id="brandsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Best Selling Items -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <% if (topproductSchemas) { %>
+            <div class="best-selling-item animate-fade-in-up" style="animation-delay: 0.9s">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="icon-circle bg-primary-500 text-white">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h3 class="font-semibold text-dark-900 text-lg">Best Selling Products</h3>
+                </div>
+                <div class="overflow-hidden rounded-xl">
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr>
+                                <th class="table-header from-primary-600 to-primary-500 text-left">Product</th>
+                                <th class="table-header from-primary-500 to-primary-400 text-center">Units Sold</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white/50">
+                            <% topproductSchemas.forEach((itm, index) => { %>
+                            <tr class="<%= index % 2 === 0 ? 'bg-white/30' : 'bg-white/10' %>">
+                                <td class="table-cell font-medium truncate max-w-[150px]"><%= itm.name %></td>
+                                <td class="table-cell text-center">
+                                    <span class="badge badge-info"><%= itm.count %></span>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <% } %>
+        
+            <% if (topbrandSchemas) { %>
+            <div class="best-selling-item animate-fade-in-up" style="animation-delay: 1s">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="icon-circle bg-success-500 text-white">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <h3 class="font-semibold text-dark-900 text-lg">Best Selling Brands</h3>
+                </div>
+                <div class="overflow-hidden rounded-xl">
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr>
+                                <th class="table-header from-success-600 to-success-500 text-left">Brand</th>
+                                <th class="table-header from-success-500 to-success-400 text-center">Units Sold</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white/50">
+                            <% topbrandSchemas.forEach((itm, index) => { %>
+                            <tr class="<%= index % 2 === 0 ? 'bg-white/30' : 'bg-white/10' %>">
+                                <td class="table-cell font-medium"><%= itm.name %></td>
+                                <td class="table-cell text-center">
+                                    <span class="badge badge-success"><%= itm.count %></span>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <% } %>
+        
+            <% if (topCategories) { %>
+            <div class="best-selling-item animate-fade-in-up" style="animation-delay: 1.1s">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="icon-circle bg-warning-500 text-white">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <h3 class="font-semibold text-dark-900 text-lg">Best Selling Categories</h3>
+                </div>
+                <div class="overflow-hidden rounded-xl">
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr>
+                                <th class="table-header from-warning-600 to-warning-500 text-left">Category</th>
+                                <th class="table-header from-warning-500 to-warning-400 text-center">Units Sold</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white/50">
+                            <% topCategories.forEach((itm, index) => { %>
+                            <tr class="<%= index % 2 === 0 ? 'bg-white/30' : 'bg-white/10' %>">
+                                <td class="table-cell font-medium"><%= itm.name %></td>
+                                <td class="table-cell text-center">
+                                    <span class="badge badge-warning"><%= itm.count %></span>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <% } %>
+        </div>
+        
+        <!-- Footer -->
+        <div class="text-center text-dark-500 text-sm py-4 border-t border-gray-200/50 mt-8">
+            <p>© <%= new Date().getFullYear() %> Admin Dashboard. All rights reserved.</p>
         </div>
     </div>
 
+    <!-- Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const ctx = document.getElementById("salesChart").getContext("2d");
-            let salesChart;
-    
-            function renderChart(labels, values) {
-                if (salesChart) {
-                    salesChart.destroy();
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show welcome message
+            Swal.fire({
+                title: '<span class="font-bold text-dark-900">Welcome to Admin Dashboard</span>',
+                html: '<p class="text-dark-600">Loading your analytics data...</p>',
+                icon: 'info',
+                timer: 2000,
+                timerProgressBar: true,
+                showConfirmButton: false,
+                background: '#ffffff',
+                customClass: { 
+                    popup: 'rounded-2xl shadow-xl border border-gray-100',
+                    title: 'text-xl',
+                    timerProgressBar: 'bg-primary-500'
+                },
+                didOpen: () => {
+                    Swal.showLoading();
                 }
-                salesChart = new Chart(ctx, {
-                    type: "bar",
+            });
+
+            try {
+                // Parse initial data from hidden fields
+                const ordersData = JSON.parse(document.getElementById('ordersData').value || '{"labels":[],"values":[]}');
+                const topProducts = JSON.parse(document.getElementById('productsData').value || '[]');
+                const topCategories = JSON.parse(document.getElementById('categoriesData').value || '[]');
+                const topBrands = JSON.parse(document.getElementById('brandsData').value || '[]');
+                console.log('orderData', ordersData, " top product : ", topProducts, " top categroy : ", topCategories, " top brands : ", topBrands);
+
+                // Chart.js global defaults
+                Chart.defaults.font.family = '"Plus Jakarta Sans", sans-serif';
+                Chart.defaults.font.size = 12;
+                Chart.defaults.color = '#64748b';
+                Chart.defaults.elements.point.radius = 4;
+                Chart.defaults.elements.point.hoverRadius = 6;
+                Chart.defaults.elements.line.tension = 0.4;
+
+                // Colors
+                const colors = {
+                    primary: '#0d8de3',
+                    success: '#10b981',
+                    warning: '#f59e0b',
+                    secondary: '#ec4899',
+                    background: [
+                        'rgba(13, 141, 227, 0.8)', 'rgba(5, 105, 194, 0.8)', 'rgba(5, 89, 160, 0.8)',
+                        'rgba(16, 185, 129, 0.8)', 'rgba(5, 150, 105, 0.8)', 'rgba(4, 120, 87, 0.8)',
+                        'rgba(245, 158, 11, 0.8)', 'rgba(217, 119, 6, 0.8)', 'rgba(180, 83, 9, 0.8)',
+                        'rgba(236, 72, 153, 0.8)'
+                    ]
+                };
+
+                // Orders Chart
+                const ordersChartCtx = document.getElementById('ordersChart').getContext('2d');
+                const gradient = ordersChartCtx.createLinearGradient(0, 0, 0, 300);
+                gradient.addColorStop(0, 'rgba(13, 141, 227, 0.3)');
+                gradient.addColorStop(1, 'rgba(13, 141, 227, 0.0)');
+
+                const ordersChart = new Chart(ordersChartCtx, {
+                    type: 'line',
                     data: {
-                        labels: labels,
+                        labels: ordersData.labels && ordersData.labels.length ? ordersData.labels : ['No Data'],
                         datasets: [{
-                            label: "Total Orders",
-                            data: values,
-                            backgroundColor: "rgba(54, 162, 235, 0.6)"
+                            label: 'Orders',
+                            data: ordersData.values && ordersData.values.length ? ordersData.values : [0],
+                            borderColor: colors.primary,
+                            backgroundColor: gradient,
+                            fill: true,
+                            borderWidth: 3,
+                            pointBackgroundColor: colors.primary,
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
                         }]
                     },
-                    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { 
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                },
+                                ticks: {
+                                    padding: 10
+                                }
+                            },
+                            x: { 
+                                grid: { display: false },
+                                ticks: {
+                                    padding: 10
+                                }
+                            }
+                        },
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                titleColor: '#1e293b',
+                                bodyColor: '#475569',
+                                borderColor: 'rgba(0, 0, 0, 0.1)',
+                                borderWidth: 1,
+                                padding: 12,
+                                boxPadding: 6,
+                                usePointStyle: true,
+                                bodyFont: {
+                                    family: '"Plus Jakarta Sans", sans-serif',
+                                    size: 13
+                                },
+                                titleFont: {
+                                    family: '"Plus Jakarta Sans", sans-serif',
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                callbacks: {
+                                    label: function(context) {
+                                        return `Orders: ${context.raw}`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Products Chart
+                const productsChart = new Chart(document.getElementById('productsChart').getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: topProducts.length ? topProducts.map(p => p.name || 'Unknown') : ['No Data'],
+                        datasets: [{
+                            label: 'Units Sold',
+                            data: topProducts.length ? topProducts.map(p => p.count || 0) : [0],
+                            backgroundColor: colors.background,
+                            borderWidth: 0,
+                            borderRadius: 8,
+                            maxBarThickness: 35
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { 
+                            y: { 
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                }
+                            }, 
+                            x: { 
+                                grid: { display: false },
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 45
+                                }
+                            } 
+                        },
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                titleColor: '#1e293b',
+                                bodyColor: '#475569',
+                                borderColor: 'rgba(0, 0, 0, 0.1)',
+                                borderWidth: 1,
+                                padding: 12,
+                                boxPadding: 6,
+                                callbacks: {
+                                    label: function(context) {
+                                        return `Units Sold: ${context.raw}`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Categories Chart
+                const categoriesChart = new Chart(document.getElementById('categoriesChart').getContext('2d'), {
+                    type: 'pie',
+                    data: {
+                        labels: topCategories.length ? topCategories.map(c => c.name || 'Unknown') : ['No Data'],
+                        datasets: [{
+                            data: topCategories.length ? topCategories.map(c => c.count || 0) : [0],
+                            backgroundColor: colors.background,
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { 
+                            legend: { 
+                                position: 'right',
+                                labels: {
+                                    boxWidth: 15,
+                                    padding: 15,
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                titleColor: '#1e293b',
+                                bodyColor: '#475569',
+                                borderColor: 'rgba(0, 0, 0, 0.1)',
+                                borderWidth: 1,
+                                padding: 12,
+                                boxPadding: 6
+                            }
+                        }
+                    }
+                });
+
+                // Brands Chart
+                const brandsChart = new Chart(document.getElementById('brandsChart').getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: topBrands.length ? topBrands.map(b => b.name || 'Unknown') : ['No Data'],
+                        datasets: [{
+                            data: topBrands.length ? topBrands.map(b => b.count || 0) : [0],
+                            backgroundColor: colors.background,
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { 
+                            legend: { 
+                                position: 'right',
+                                labels: {
+                                    boxWidth: 15,
+                                    padding: 15,
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                titleColor: '#1e293b',
+                                bodyColor: '#475569',
+                                borderColor: 'rgba(0, 0, 0, 0.1)',
+                                borderWidth: 1,
+                                padding: 12,
+                                boxPadding: 6
+                            }
+                        },
+                        cutout: '70%'
+                    }
+                });
+
+                // Time Filter Event Listener
+                document.getElementById('timeFilter').addEventListener('change', async function() {
+                    const timeFilter = this.value;
+                    console.log(timeFilter);
+                    try {
+                        Swal.fire({ 
+                            title: 'Loading...', 
+                            showConfirmButton: false, 
+                            didOpen: () => Swal.showLoading(),
+                            background: '#ffffff',
+                            customClass: { 
+                                popup: 'rounded-2xl shadow-xl border border-gray-100',
+                                timerProgressBar: 'bg-primary-500'
+                            }
+                        });
+                        const response = await fetch(`/admin/api/orders-data?timeFilter=${timeFilter}`);
+                        if (!response.ok) throw new Error('Failed to fetch orders data');
+                        const data = await response.json();
+                        console.log("data from fetch : ", data);
+                        
+                        ordersChart.data.labels = data.labels && data.labels.length ? data.labels : ['No Data'];
+                        ordersChart.data.datasets[0].data = data.values && data.values.length ? data.values : [0];
+                        ordersChart.update();
+                        Swal.fire({ 
+                            title: 'Updated', 
+                            icon: 'success', 
+                            timer: 1500, 
+                            showConfirmButton: false,
+                            background: '#ffffff',
+                            customClass: { 
+                                popup: 'rounded-2xl shadow-xl border border-gray-100',
+                                timerProgressBar: 'bg-primary-500'
+                            }
+                        });
+                    } catch (error) {
+                        console.error('Error:', error);
+                        Swal.fire({ 
+                            title: 'Error', 
+                            text: 'Failed to load data', 
+                            icon: 'error',
+                            background: '#ffffff',
+                            customClass: { 
+                                popup: 'rounded-2xl shadow-xl border border-gray-100'
+                            }
+                        });
+                    }
+                });
+            } catch (error) {
+                console.error('Dashboard initialization error:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Failed to initialize dashboard. Please try refreshing the page.',
+                    icon: 'error',
+                    background: '#ffffff',
+                    customClass: { 
+                        popup: 'rounded-2xl shadow-xl border border-gray-100'
+                    }
                 });
             }
-    
-            // ✅ Load Default Monthly Chart on Page Load
-            const defaultLabels = '<%- JSON.stringify(salesData.salesLabels) %>';
-            const defaultValues = '<%- JSON.stringify(salesData.salesValues) %>';
-            renderChart(defaultLabels, defaultValues);
-    
-            // ✅ Update Chart When Filter Changes
-            document.getElementById("salesFilter").addEventListener("change", function () {
-                fetch(`/admin/api/sales-data?filter=${this.value}`)
-                    .then(response => response.json())
-                    .then(data => renderChart(data.salesLabels, data.salesValues))
-                    .catch(error => console.error("Error loading sales chart:", error));
-            });
         });
+
+        // Export to PDF
+        function exportToPDF() {
+            Swal.fire({ 
+                title: 'Generating PDF...', 
+                showConfirmButton: false, 
+                didOpen: () => Swal.showLoading(),
+                background: '#ffffff',
+                customClass: { 
+                    popup: 'rounded-2xl shadow-xl border border-gray-100',
+                    timerProgressBar: 'bg-primary-500'
+                }
+            });
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape', 'pt', 'a4');
+            const content = document.querySelector('.max-w-7xl');
+
+            html2canvas(content, { 
+                scale: 3, 
+                useCORS: true, 
+                backgroundColor: '#f9fafb',
+                logging: false,
+                allowTaint: true
+            }).then(canvas => {
+                setTimeout(() => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgWidth = doc.internal.pageSize.getWidth();
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                    doc.save('admin-order-report.pdf');
+                    Swal.fire({ 
+                        title: 'Success!', 
+                        text: 'Report downloaded', 
+                        icon: 'success',
+                        background: '#ffffff',
+                        customClass: { 
+                            popup: 'rounded-2xl shadow-xl border border-gray-100'
+                        }
+                    });
+                }, 500);
+            }).catch(error => {
+                console.error('PDF Error:', error);
+                Swal.fire({ 
+                    title: 'Error', 
+                    text: 'Failed to generate PDF', 
+                    icon: 'error',
+                    background: '#ffffff',
+                    customClass: { 
+                        popup: 'rounded-2xl shadow-xl border border-gray-100'
+                    }
+                });
+            });
+        }
     </script>
-    
-    
-    
-    
 </body>
 </html>

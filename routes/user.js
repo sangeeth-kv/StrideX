@@ -15,6 +15,7 @@ const paymentContoller=require("../controller/user/paymentController")
 const referralController=require("../controller/user/referralController")
 const reviewController=require("../controller/user/reviewController")
 const authMiddlewire=require("../middlewares/authMiddleware")
+const userEnsure=require("../middlewares/userEnsure")
 // const adminController = require("../controller/admin/adminController");
 const upload = require("../config/multer");
 require("../config/passport")
@@ -62,7 +63,7 @@ router.get("/login",userController.loadLogin)
 router.post("/signup",userController.signUp)
 router.get("/signup",userController.loadSignup)
 router.post("/login",userController.signIn)
-router.get("/home",authMiddlewire.isAuthenticated,authMiddlewire.isBlocked,userController.loadHome)
+router.get("/home",userController.loadHome)
 // router.get("/verify-otp",userController.loadOTPPage)
 router.post("/verify-otp", userController.verifyOTP);
 router.post("/resend-otp", userController.resendOTP);
@@ -80,7 +81,7 @@ router.get("/shop",userProductController.loadShopPage)
 
 
 //for user profile
-router.get("/view-profile",authMiddlewire.isAuthenticated,authMiddlewire.isBlocked,userProfileController.loadProfilePage)
+router.get("/view-profile",userEnsure,authMiddlewire.isAuthenticated,authMiddlewire.isBlocked,userProfileController.loadProfilePage)
 router.post("/upload-profile-image",upload.single("profileImage"),userProfileController.uploadImage)
 router.get("/change-email-otp/:id",authMiddlewire.isAuthenticated,authMiddlewire.isBlocked,userProfileController.loadEmailOtpPage)
 router.post("/email-verify-otp",userProfileController.verifyEmailOtp)
@@ -103,30 +104,30 @@ router.delete("/delete-address/:id",userAddressController.deleteUserAddress)
 //add to cart
 router.post("/add-to-cart",cartController.addToCart)
 router.post("/update-cart-quantity",cartController.updateCartQuantity)
-router.get("/cart",authMiddlewire.isAuthenticated,authMiddlewire.isBlocked,cartController.loadCartPage)
+router.get("/cart",userEnsure,authMiddlewire.isAuthenticated,authMiddlewire.isBlocked,cartController.loadCartPage)
 router.post("/delete-item/:id",cartController.deleteItem)
 
 
 //wishlist 
-router.get("/wishlist",authMiddlewire.isAuthenticated,authMiddlewire.isBlocked,wishlistController.loadWishlistPage)
+router.get("/wishlist",userEnsure,authMiddlewire.isAuthenticated,authMiddlewire.isBlocked,wishlistController.loadWishlistPage)
 router.post("/add-to-wishlist",wishlistController.addToWishlist)
 router.post("/remove-from-wishlist",authMiddlewire.isAuthenticated,authMiddlewire.isBlocked,wishlistController.removeFromWishlist)
 
 
 //checkout page
-router.get("/checkout",authMiddlewire.isAuthenticated,authMiddlewire.isBlocked,checkOutController.loadCheckoutPage)
-router.get("/add-order-address/:id",checkOutController.loadOrderAddress)
+router.get("/checkout",userEnsure,authMiddlewire.isAuthenticated,authMiddlewire.isBlocked,checkOutController.loadCheckoutPage)
+router.get("/add-order-address/:id",userEnsure,checkOutController.loadOrderAddress)
 router.post("/validateCoupon",checkOutController.verifyCoupon)
 
 //cod payment
 router.post("/cash-on-delivery",orderController.verifyCOD)
-router.get("/payment-success-page",orderController.loadSuccessOrderPage)
-router.get("/orderDetails",orderController.loadOrderDetailsPage)
+router.get("/payment-success-page",userEnsure,orderController.loadSuccessOrderPage)
+router.get("/orderDetails",userEnsure,orderController.loadOrderDetailsPage)
 
 
 
 //invoice
-router.get("/downloadInvoice/:id",InvoiceController.downloadInvoice)
+router.get("/downloadInvoice/:id",userEnsure,InvoiceController.downloadInvoice)
 
 
 //returnfor items
@@ -147,7 +148,7 @@ router.post("/cancel-order",orderController.cancelOrder)
 router.post("/payment/create-order",paymentContoller.createOrder)
 router.post("/payment/verify-payment",paymentContoller.verifyPayment)
 router.post("/payment/payment-failed",paymentContoller.paymentFailed)
-router.get("/order-failure/:id",paymentContoller.orderFailure)
+router.get("/order-failure/:id",userEnsure,paymentContoller.orderFailure)
 router.post("/payment/retry-order/:id",paymentContoller.retryPayment)
 
 //for referal

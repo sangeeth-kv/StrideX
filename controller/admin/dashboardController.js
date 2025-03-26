@@ -1,63 +1,79 @@
+
 const orderSchema = require("../../model/orderModel");
 const productSchema = require("../../model/productModel");
-const categorySchema = require("../../model/categoryModel");
+const cateegorySchema = require("../../model/categoryModel");
 const brandSchema = require("../../model/brandModel");
+const walletSchema = require("../../model/walletModel");
 
-// Helper Function to Get Date Range
-const getDateRange = (filter) => {
+// Helper function to determine date range
+const getDateRange = (period) => {
     const now = new Date();
     let startDate = new Date();
     
-    switch (filter) {
-        case "daily":
-            startDate.setDate(now.getDate() - 7);
-            break;
-        case "weekly":
-            startDate.setDate(now.getDate() - 28);
-            break;
-        case "monthly":
-            startDate.setMonth(now.getMonth() - 12);
-            break;
-        case "yearly":
-            startDate.setFullYear(now.getFullYear() - 5);
-            break;
-        default:
-            startDate.setMonth(now.getMonth() - 12);
+    switch (period) {
+        case 'daily': startDate.setDate(now.getDate() - 7); break;
+        case 'weekly': startDate.setDate(now.getDate() - 28); break;
+        case 'monthly': startDate.setMonth(now.getMonth() - 12); break;
+        case 'yearly': startDate.setFullYear(now.getFullYear() - 5); break;
+        default: startDate.setMonth(now.getMonth() - 12);
     }
+    console.log("date find succesfully>>>>>>>>");
     
     return { startDate, endDate: new Date() };
 };
 
+function getGroupingField(timeFilter) {
+    switch(timeFilter) {
+        case 'daily': 
+            return { 
+                day: { $dayOfMonth: "$orderDate" }, 
+                month: { $month: "$orderDate" } 
+            };
+        case 'weekly': 
+            return { $week: "$orderDate" };
+        case 'monthly': 
+            return { $month: "$orderDate" };
+        case 'yearly': 
+            return { $year: "$orderDate" };
+        default: 
+            return { $month: "$orderDate" };
+    }
+}
+
 const dashboardController = {
     loadDashboard: async (req, res) => {
         try {
-            console.log("lloading dashboard");
+            console.log("Loading Admin Dashboard...");
+            const timeFilter = req.query.timeFilter || 'monthly';
+            console.log("timeFilter :",timeFilter)
+            const { startDate, endDate } = getDateRange(timeFilter);
+            console.log("start date : ",startDate," end date : ",endDate)
 
-            const filter = "monthly"; // Default filter
-            const { startDate, endDate } = getDateRange(filter);
-
-            const salesData = await orderSchema.aggregate([
-                { $match: { status: "delivered", orderDate: { $gte: startDate, $lte: endDate } } },
-                { 
-                    $group: {
-                        _id: { $month: "$orderDate" },
-                        totalOrders: { $sum: 1 },
-                        revenue: { $sum: "$amountPaid" }
-                    }
-                },
-                { $sort: { "_id": 1 } }
+            // Get total orders, revenue, and average order value
+            const ordersStats = await orderSchema.aggregate([
+                { $match: { orderDate: { $gte: startDate, $lte: endDate }, status: { $nin: ["cancelled", "returned"] } } },
+                { $group: { _id: null, totalorderSchemas: { $sum: 1 }, revenue: { $sum: "$amountPaid" } } }
             ]);
 
-            const salesLabels = salesData.map(s => `Month ${s._id}`);
-            const salesValues = salesData.map(s => s.totalOrders);
+            console.log("Order stats : ",ordersStats)
 
+            const totalorderSchemas = ordersStats[0]?.totalorderSchemas || 0;
+            const revenue = ordersStats[0]?.revenue || 0;
+            const avgorderSchemaValue = totalorderSchemas > 0 ? (revenue / totalorderSchemas).toFixed(2) : 0;
+            console.log("total order schemas : ",totalorderSchemas)
 
-            // Fetch Best-Selling Products (Top 10)
-            const bestSellingProducts = await orderSchema.aggregate([
+            // Fetch top 10 best-selling products
+            const topproductSchemas = await orderSchema.aggregate([
+               
                 { $unwind: "$items" },
-                { $match: { "items.itemStatus": "delivered" } },
-                { $group: { _id: "$items.productId", totalSold: { $sum: "$items.quantity" } } },
-                { $sort: { totalSold: -1 } },
+                {$match:{"items.itemStatus":{$nin:["cancelled", "returned"]}}},
+                { 
+                    $group: {
+                        _id: "$items.productId",
+                        count: { $sum: "$items.quantity" }
+                    }
+                },
+                { $sort: { count: -1 } },
                 { $limit: 10 },
                 { 
                     $lookup: {
@@ -68,13 +84,19 @@ const dashboardController = {
                     }
                 },
                 { $unwind: "$productDetails" },
-                { $project: { name: "$productDetails.name", totalSold: 1 } }
+                { 
+                    $project: {
+                        name: "$productDetails.name",
+                        count: 1
+                    }
+                }
             ]);
 
-            // Fetch Best-Selling Categories (Top 10)
-            const bestSellingCategories = await orderSchema.aggregate([
+            // Fetch top 10 best-selling categories
+            const topCategories = await orderSchema.aggregate([
+              
                 { $unwind: "$items" },
-                { $match: { "items.itemStatus": "delivered" } },
+                {$match:{"items.itemStatus":{$nin:["cancelled", "returned"]}}},
                 { 
                     $lookup: {
                         from: "products",
@@ -84,8 +106,13 @@ const dashboardController = {
                     }
                 },
                 { $unwind: "$productDetails" },
-                { $group: { _id: "$productDetails.categoryId", totalSold: { $sum: "$items.quantity" } } },
-                { $sort: { totalSold: -1 } },
+                { 
+                    $group: {
+                        _id: "$productDetails.categoryId",
+                        count: { $sum: "$items.quantity" }
+                    }
+                },
+                { $sort: { count: -1 } },
                 { $limit: 10 },
                 { 
                     $lookup: {
@@ -96,13 +123,19 @@ const dashboardController = {
                     }
                 },
                 { $unwind: "$categoryDetails" },
-                { $project: { name: "$categoryDetails.name", totalSold: 1 } }
+                { 
+                    $project: {
+                        name: "$categoryDetails.name",
+                        count: 1
+                    }
+                }
             ]);
 
-            // Fetch Best-Selling Brands (Top 10)
-            const bestSellingBrands = await orderSchema.aggregate([
+            // Fetch top 10 best-selling brands
+            const topbrandSchemas = await orderSchema.aggregate([
+                
                 { $unwind: "$items" },
-                { $match: { "items.itemStatus": "delivered" } },
+                {$match:{"items.itemStatus":{$nin:["cancelled", "returned"]}}},
                 { 
                     $lookup: {
                         from: "products",
@@ -112,8 +145,13 @@ const dashboardController = {
                     }
                 },
                 { $unwind: "$productDetails" },
-                { $group: { _id: "$productDetails.brand", totalSold: { $sum: "$items.quantity" } } },
-                { $sort: { totalSold: -1 } },
+                { 
+                    $group: {
+                        _id: "$productDetails.brand",
+                        count: { $sum: "$items.quantity" }
+                    }
+                },
+                { $sort: { count: -1 } },
                 { $limit: 10 },
                 { 
                     $lookup: {
@@ -124,14 +162,45 @@ const dashboardController = {
                     }
                 },
                 { $unwind: "$brandDetails" },
-                { $project: { name: "$brandDetails.name", totalSold: 1 } }
+                { 
+                    $project: {
+                        name: "$brandDetails.name",
+                        count: 1
+                    }
+                }
             ]);
 
+            // Prepare sales chart data
+            const salesData = await orderSchema.aggregate([
+                { 
+                    $group: {
+                        _id: { $month: "$orderDate" },
+                        count: { $sum: 1 },
+                        revenue: { $sum: "$amountPaid" }
+                    }
+                },
+                { $sort: { "_id": 1 } }
+            ]);
+            console.log("sales data : ",salesData);
+            
+
+            const salesLabels = salesData.map(s =>` Month ${s._id}`);
+            const salesValues = salesData.map(s => s.count);
+            
+            console.log("sales laels : ",salesLabels);
+            console.log("sales vlaues : ",salesValues)
+
+            console.log("complted load dashboard >>>>>>>")
+            console.log("top prodyc schma : ",topproductSchemas)
+
             res.render("admin/dashboard", {
-                bestSellingProducts,
-                bestSellingCategories,
-                bestSellingBrands,
-                salesData: { salesLabels, salesValues } 
+                totalorderSchemas,
+                revenue,
+                avgorderSchemaValue,
+                topproductSchemas,
+                topCategories,
+                topbrandSchemas,
+                ordersData: { labels: salesLabels, values: salesValues }
             });
 
         } catch (error) {
@@ -139,41 +208,72 @@ const dashboardController = {
             res.status(500).send("Internal Server Error");
         }
     },
-
-    // API to Fetch Sales Data
-    getSalesData: async (req, res) => {
+    getOrdersDataAPI: async (req, res) => {
         try {
-            const filter = req.query.filter || "monthly";
-            const { startDate, endDate } = getDateRange(filter);
+            const timeFilter = req.query.timeFilter || 'monthly';
+            const { startDate, endDate } = getDateRange(timeFilter);
 
             const salesData = await orderSchema.aggregate([
-                { $match: { status: "delivered", orderDate: { $gte: startDate, $lte: endDate } } },
+                { 
+                    $match: { 
+                        orderDate: { $gte: startDate, $lte: endDate },
+                        status: { $nin: ["cancelled", "returned"] } 
+                    } 
+                },
                 { 
                     $group: {
-                        _id: filter === "yearly" ? { $year: "$orderDate" } :
-                            filter === "monthly" ? { $month: "$orderDate" } :
-                            filter === "weekly" ? { $week: "$orderDate" } :
-                            { $dayOfWeek: "$orderDate" },
-                        totalOrders: { $sum: 1 },
+                        _id: getGroupingField(timeFilter),
+                        count: { $sum: 1 },
                         revenue: { $sum: "$amountPaid" }
                     }
                 },
-                { $sort: { "_id": 1 } }  
+                { $sort: { "_id": 1 } }
             ]);
 
-            const salesLabels = salesData.map(s => filter === "yearly" ? `Year ${s._id}` :
-                                                   filter === "monthly" ? `Month ${s._id}` :
-                                                   filter === "weekly" ? `Week ${s._id}` :
-                                                   `Day ${s._id}`);
-            const salesValues = salesData.map(s => s.totalOrders);
+            // Create labels and values based on the time filter
+            const labels = salesData.map(s => {
+                switch(timeFilter) {
+                    case 'daily': return `${s._id.day}/${s._id.month}`;
+                    case 'weekly': return `Week ${s._id}`;
+                    case 'monthly': return `Month ${s._id}`;
+                    case 'yearly': return `${s._id}`;
+                    default: return `${s._id}`;
+                }
+            });
+            const values = salesData.map(s => s.count);
+            console.log("lables : ",labels)
+            console.log("values : ",values)
 
-            res.json({ salesLabels, salesValues,salesData});
-
+            res.json({ labels, values });
         } catch (error) {
-            console.log("Error fetching sales data:", error);
-            res.status(500).json({ message: "Error fetching sales data" });
+            console.error("Error fetching orders data:", error);
+            res.status(500).json({ message: "Error fetching orders data" });
         }
     }
+
+    // Get ledger data for chart
+    // getLedgerDataAPI: async (req, res) => {
+    //     try {
+    //         const dateRange = req.query.dateRange || "30";
+    //         const days = dateRange === "all" ? Infinity : parseInt(dateRange);
+    //         const startDate = days === Infinity ? new Date(0) : new Date(new Date().setDate(new Date().getDate() - days));
+
+    //         const ledgerStats = await orderSchema.aggregate([
+    //             { $match: { orderDate: { $gte: startDate }, status: { $nin: ["cancelled", "returned"] } } },
+    //             { $group: { _id: null, revenue: { $sum: "$amountPaid" } } }
+    //         ]);
+
+    //         const revenue = ledgerStats[0]?.revenue || 0;
+    //         const expenses = 0; // Modify if needed
+    //         const profit = revenue - expenses;
+
+    //         res.json({ revenue, expenses, profit });
+    //     } catch (error) {
+    //         console.error("Error fetching ledger data:", error);
+    //         res.status(500).json({ message: "Error fetching ledger data" });
+    //     }
+    // }
 };
+
 
 module.exports = dashboardController;
