@@ -6,18 +6,21 @@ const path=require("path")
 const adminRoutes=require("./routes/admin")
 const userRoutes=require("./routes/user")
 const session=require("express-session")
+const nocache = require("nocache");
 // const jwt = require("jsonwebtoken");
 require("./config/passport"); 
 console.log("CLIENT_ID:", process.env.CLIENT_ID);
 console.log("CLIENT_SECRET:", process.env.CLIENT_SECRET);
 
 
+app.use(express.static("public"))
 app.use(session({
     secret:process.env.SESSION_SECRET,
     resave:false,
     saveUninitialized:true
     
 }))
+app.use(nocache());
 
 app.use(express.urlencoded({extended:true}));
 app.use(express.json())
@@ -40,7 +43,7 @@ app.use((req, res, next) => {
 });
 
 
-app.use(express.static("public"))
+
 
 app.use("/admin",adminRoutes)
 app.use("/user",userRoutes)

@@ -54,7 +54,8 @@ loadAddProducts:async (req,res) => {
 addproducts:async (req,res) => {
     try {
         // const {name,description,categoryId,brand,offer,stock,variants}=req.body
-        const { name, description, categoryId, brand, stock, variants } = req.body;
+        console.log("req body of add products : ",req.body)
+        const { name, description, categoryId, brand, variants, offer } = req.body;
         console.log(variants)
         console.log("ad produc is working "+ name,description)
 
@@ -71,17 +72,19 @@ addproducts:async (req,res) => {
         console.log("Variants received:", req.body.variants);
 
         const images = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
+        
         console.log("image doneeeee")
         // const parsedVariants = variants ? JSON.parse(variants) : [];
         const parsedVariants = variants ? JSON.parse(variants).map(variant => ({
             ...variant,
-            salePrice: variant.regularPrice - (variant.regularPrice * (variant.offer / 100))
+            salePrice: variant.regularPrice - (variant.regularPrice * (offer / 100))
         })) : [];
         console.log("parsed done")
 
           const newProduct = new productSchema({
             name,
             description,
+            offer,
             categoryId,
             brand,
             images,
@@ -134,7 +137,8 @@ loadEditProductPage:async (req,res) => {
 },
 updateProduct: async (req, res) => {
     try {
-        const { productId, name, brand, categoryId, description, variants } = req.body;
+        console.log("req body of update or edit product : ",req.body)
+        const { productId, name, brand, categoryId, description, variants ,offer} = req.body;
         const deletedImages = JSON.parse(req.body.deletedImages || "[]");
         console.log(variants)
         console.log(deletedImages+"thti")
@@ -154,12 +158,18 @@ updateProduct: async (req, res) => {
             existingProduct.images.push(...newImages);
         }
 
+        const parsedVariants = JSON.parse(variants).map((variant) => ({
+            ...variant,
+            salePrice: variant.regularPrice - (variant.regularPrice * (offer / 100)) // Recalculate sale price
+        }));
+
         // Update other product details
         existingProduct.name = name;
+        existingProduct.offer=offer;
         existingProduct.brand = brand;
         existingProduct.categoryId = categoryId;
         existingProduct.description = description;
-        existingProduct.variants = JSON.parse(variants);
+        existingProduct.variants = parsedVariants;
 
         // Save the updated product
         await existingProduct.save(); // <-- Save after removing images

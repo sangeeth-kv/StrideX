@@ -8,6 +8,8 @@ const userController=require("../controller/admin/userController")
 const orderController=require("../controller/admin/orderController")
 const couponController=require("../controller/admin/couponController")
 const saleController=require("../controller/admin/saleController")
+const adminWalletController=require("../controller/admin/adminWalletController")
+const dashboardController=require("../controller/admin/dashboardController")
 const upload = require("../config/multer");
 
 
@@ -71,10 +73,23 @@ router.post("/updatecoupon",couponController.updateCoupon)
 router.patch("/coupons/toggle-status/:id",couponController.toggleCouponStatus)
 
 //sale report 
-router.get("/dashboard", saleController.loadSaleReport);
+router.get("/sale-reports", saleController.loadSaleReport);
 router.post("/generatePDF",saleController.generatePDF)
 router.post("/downloadExcel",saleController.generateExecl)
 
+
+//for wallet managemenmt
+router.get("/wallet-management",adminWalletController.loadWalletPage)
+router.get("/transaction-details/:id",adminWalletController.loadTransactionPage)
+
+//for dahsboard
+// router.get("/dashboard",dashboardController.loadDashboard)
+// router.post("/api/orders-data",dashboardController.loadDashboard)
+// router.post("/admin/api/ledger-data",dashboardController.getLedgerDataAPI)
+
+//for dasgh
+router.get("/dashboard", dashboardController.loadDashboard); // Renders dashboard page
+router.get("/api/sales-data", dashboardController.getSalesData); // Fetches JSON sales data
 
 
 module.exports = router;

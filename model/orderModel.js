@@ -13,6 +13,7 @@ const orderSchema = new mongoose.Schema({
       productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
       size: { type: String, required: true }, 
       quantity: { type: Number, required: true, min: 1 },
+      itemSalePrice:{type:Number},
       // salePrice: { type: Number, required: true, set: v => parseFloat(v.toFixed(2)) },
       itemStatus: { type: String, enum: ["pending", "processing", "shipped","delivered", "cancelled","return request","returned",], default: "pending" },
       reason:{type:String},
@@ -21,6 +22,7 @@ const orderSchema = new mongoose.Schema({
   ],
   transactionId: { type: String },
   couponId: { type: mongoose.Schema.Types.ObjectId, ref: "Coupon" },
+  amountPaid:{ type: Number, },
   total: { type: Number, required: true },
   deliveredDate: { type: Date },
   

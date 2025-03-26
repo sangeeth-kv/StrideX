@@ -13,6 +13,8 @@ const orderController=require("../controller/user/orderController")
 const InvoiceController=require("../controller/user/invoiceController")
 const paymentContoller=require("../controller/user/paymentController")
 const referralController=require("../controller/user/referralController")
+const reviewController=require("../controller/user/reviewController")
+const authMiddlewire=require("../middlewares/authMiddleware")
 // const adminController = require("../controller/admin/adminController");
 const upload = require("../config/multer");
 require("../config/passport")
@@ -60,7 +62,7 @@ router.get("/login",userController.loadLogin)
 router.post("/signup",userController.signUp)
 router.get("/signup",userController.loadSignup)
 router.post("/login",userController.signIn)
-router.get("/home",userController.loadHome)
+router.get("/home",authMiddlewire.isAuthenticated,authMiddlewire.isBlocked,userController.loadHome)
 // router.get("/verify-otp",userController.loadOTPPage)
 router.post("/verify-otp", userController.verifyOTP);
 router.post("/resend-otp", userController.resendOTP);
@@ -78,9 +80,9 @@ router.get("/shop",userProductController.loadShopPage)
 
 
 //for user profile
-router.get("/view-profile/:id",userProfileController.loadProfilePage)
+router.get("/view-profile",authMiddlewire.isAuthenticated,authMiddlewire.isBlocked,userProfileController.loadProfilePage)
 router.post("/upload-profile-image",upload.single("profileImage"),userProfileController.uploadImage)
-router.get("/change-email-otp/:id",userProfileController.loadEmailOtpPage)
+router.get("/change-email-otp/:id",authMiddlewire.isAuthenticated,authMiddlewire.isBlocked,userProfileController.loadEmailOtpPage)
 router.post("/email-verify-otp",userProfileController.verifyEmailOtp)
 router.get("/change-email",userProfileController.loadChangeEmailPage)
 router.post("/change-email",userProfileController.changeEmail)
@@ -101,18 +103,18 @@ router.delete("/delete-address/:id",userAddressController.deleteUserAddress)
 //add to cart
 router.post("/add-to-cart",cartController.addToCart)
 router.post("/update-cart-quantity",cartController.updateCartQuantity)
-router.get("/cart",cartController.loadCartPage)
+router.get("/cart",authMiddlewire.isAuthenticated,authMiddlewire.isBlocked,cartController.loadCartPage)
 router.post("/delete-item/:id",cartController.deleteItem)
 
 
 //wishlist 
-router.get("/wishlist",wishlistController.loadWishlistPage)
+router.get("/wishlist",authMiddlewire.isAuthenticated,authMiddlewire.isBlocked,wishlistController.loadWishlistPage)
 router.post("/add-to-wishlist",wishlistController.addToWishlist)
-router.post("/remove-from-wishlist",wishlistController.removeFromWishlist)
+router.post("/remove-from-wishlist",authMiddlewire.isAuthenticated,authMiddlewire.isBlocked,wishlistController.removeFromWishlist)
 
 
 //checkout page
-router.get("/checkout",checkOutController.loadCheckoutPage)
+router.get("/checkout",authMiddlewire.isAuthenticated,authMiddlewire.isBlocked,checkOutController.loadCheckoutPage)
 router.get("/add-order-address/:id",checkOutController.loadOrderAddress)
 router.post("/validateCoupon",checkOutController.verifyCoupon)
 
@@ -150,6 +152,11 @@ router.post("/payment/retry-order/:id",paymentContoller.retryPayment)
 
 //for referal
 router.post("/apply-referral",referralController.applyReferral)
+
+//for reviews
+router.post("/submit-review",reviewController.addReviews)
+router.post("/edit-review",reviewController.editReview)
+router.delete("/delete-review",reviewController.deleteReview)
 
 
 module.exports=router;

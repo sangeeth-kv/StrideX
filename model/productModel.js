@@ -4,6 +4,12 @@
     {
       name: { type: String, required: true },
       description: { type: String, required: true },
+      offer: {
+        type: Number,
+        default: 0, // Offer in percentage (0 means no discount)
+        min: [0, "Offer cannot be negative"],
+        max: [100, "Offer cannot exceed 100%"],
+      },
       categoryId: { type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true },
       brand: { type: mongoose.Schema.Types.ObjectId, ref: "Brand", required: true },
       images: [String],
@@ -19,12 +25,7 @@
             required: true,
             min: [0, "Regular price cannot be negative"],
           },
-          offer: {
-            type: Number,
-            default: 0, // Offer in percentage (0 means no discount)
-            min: [0, "Offer cannot be negative"],
-            max: [100, "Offer cannot exceed 100%"],
-          },
+          
           salePrice: {
             type: Number,
             min: [0, "Sale price cannot be negative"],

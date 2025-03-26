@@ -3,6 +3,11 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <!-- SweetAlert2 JS -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Toastify CSS -->
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<!-- Toastify JS -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
 </head>
 <main class="bg-gray-50 py-8 md:py-12">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -136,13 +141,13 @@
                         <div class="relative border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
                             <input class="payment absolute h-5 w-5 left-4 top-1/2 -translate-y-1/2 text-indigo-600 border-gray-300 focus:ring-indigo-500" 
                                    type="radio" value="cod" name="payment_option" id="CashOnDelivery"
-                                   <% if (grandTotal > 10000) { %>disabled<% } %>>
+                                   <% if (grandTotal < 1000) { %>disabled<% } %>>
                             <div class="pl-8">
                                 <label class="font-medium text-gray-900 <% if (grandTotal > 1000) { %>text-gray-400<% } %>" for="CashOnDelivery">
                                     Cash on Delivery
                                 </label>
-                                <% if (grandTotal > 10000) { %>
-                                    <p class="mt-1 text-xs text-red-500">Not available for orders above ₹10,000</p>
+                                <% if (grandTotal < 1000) { %>
+                                    <p class="mt-1 text-xs text-red-500">Not available for orders below ₹1000</p>
                                 <% } %>
                             </div>
                         </div>
@@ -190,23 +195,35 @@
                             <% if (Coupon && Coupon.length > 0) { %>
                                 <div class="space-y-3">
                                     <% for (let i = 0; i < Coupon.length; i++) { %>
-                                        <div class="border border-gray-200 rounded-lg p-3 flex justify-between items-center bg-gradient-to-r from-gray-50 to-white">
-                                            <div>
-                                                <span class="text-sm font-semibold text-gray-900"><%= Coupon[i].name %></span>
-                                                <p class="text-xs text-gray-500 mt-1">Save up to <%= Coupon[i].discount %>%</p>
-                                            </div>
-                                            <div>
-                                                <button onclick="useCoupon('<%= Coupon[i].name %>')" id="useButton_<%= Coupon[i].name %>"
-                                                        class="px-3 py-1 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded-md transition-colors">
-                                                    Use
-                                                </button>
-                                                <button onclick="cancelCoupon('<%= Coupon[i].name %>')" id="cancelButton_<%= Coupon[i].name %>"
-                                                        class="px-3 py-1 text-xs font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors"
-                                                        style="display: none;">
-                                                    Cancel
-                                                </button>
-                                            </div>
+                                        <% 
+                                        let currentDate = new Date(); // Get current date
+                                        let expireDate = new Date(Coupon[i].expireOn); // Convert coupon expire date
+                                        let isExpired = expireDate < currentDate; // Check if expired
+                                    %>
+                                    
+                                    <div class="border border-gray-200 rounded-lg p-3 flex justify-between items-center bg-gradient-to-r from-gray-50 to-white">
+                                        <div>
+                                            <span class="text-sm font-semibold text-gray-900"><%= Coupon[i].name %></span>
+                                            <p class="text-xs text-gray-500 mt-1">Save up to <%= Coupon[i].offerPrice %> ₹</p>
+                                            <p class="text-xs <%= isExpired ? 'text-red-600 font-bold' : 'text-gray-500' %> mt-1">
+                                                <%= isExpired ? 'Coupon Expired' : 'Valid until ' + expireDate.toDateString() %>
+                                            </p>
                                         </div>
+                                        <div>
+                                            <button onclick="useCoupon('<%= Coupon[i].name %>')" id="useButton_<%= Coupon[i].name %>"
+                                                    class="px-3 py-1 text-xs font-medium text-white rounded-md transition-colors
+                                                    <%= isExpired ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700' %>" 
+                                                    <%= isExpired ? 'disabled' : '' %>>
+                                                Use
+                                            </button>
+                                            <button onclick="cancelCoupon('<%= Coupon[i].name %>')" id="cancelButton_<%= Coupon[i].name %>"
+                                                    class="px-3 py-1 text-xs font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors"
+                                                    style="display: none;">
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
                                     <% } %>
                                 </div>
                             <% } else { %>
@@ -227,6 +244,21 @@
                     </div>
                     <div class="p-6 space-y-4">
                         <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Actual Amounnt</span>
+                            <span class="font-medium text-gray-900">₹<%= actualTotal.toFixed(2) %></span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Discount</span>
+                            <span id="discount" class="text-green-600">
+                                <% if (data && data.length > 0 && data[0].additionalDiscount) { %>
+                                    -₹<%=Math.round(actualTotal - grandTotal) %>
+                                <% } else { %>
+                                    ₹0.00
+                                <% } %>
+                            </span>
+                        </div>
+                        
+                        <div class="flex justify-between text-sm">
                             <span class="text-gray-600">Subtotal</span>
                             <span class="font-medium text-gray-900">₹<%= grandTotal.toFixed(2) %></span>
                         </div>
@@ -242,16 +274,7 @@
                             </span>
                         </div>
                         
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Discount</span>
-                            <span id="discount" class="text-green-600">
-                                <% if (data && data.length > 0 && data[0].additionalDiscount) { %>
-                                    -₹<%= data[0].additionalDiscount.toFixed(2) %>
-                                <% } else { %>
-                                    ₹0.00
-                                <% } %>
-                            </span>
-                        </div>
+                        
                         
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-600">Coupon Discount</span>
@@ -371,19 +394,42 @@ document.getElementById("confirmDeleteBtn").addEventListener("click", async () =
 .then(data => {
     if (data.valid) {
         updatePriceWithCoupon(data.discount);
-        Swal.fire({
-            title: 'Coupon Applied',
-            text: `Discount of ₹${data.discount} applied successfully!`,
-            icon: 'success',
-            timer: 2000
-        });
+        Toastify({
+    text: `🎉 Discount of ₹${data.discount} applied successfully! 🎉`,
+    duration: 4000,  // Stay for 4 seconds
+    gravity: "bottom",  // Appears at the bottom
+    position: "center", // Centered horizontally
+    style: {
+        background: "linear-gradient(to right, #ff416c, #ff4b2b)", // Stylish red-orange gradient
+        color: "#fff",  // White text
+        fontWeight: "bold",
+        borderRadius: "8px",
+        padding: "12px",
+        fontSize: "16px",
+        textAlign: "center"
+    },
+    close: true // Show close button
+}).showToast();
+
+
     } else {
-        Swal.fire({
-            title: 'Invalid Coupon',
-            text: data.message || 'This coupon cannot be applied',
-            icon: 'error',
-            timer: 2000
-        });
+        Toastify({
+    text: "❌ Invalid Coupon! This coupon cannot be applied.",
+    duration: 3000,  // Stay for 3 seconds
+    gravity: "bottom",  // Appears at the bottom
+    position: "center", // Centered horizontally
+    style: {
+        background: "linear-gradient(to right, #ff5f6d, #ffc371)", // Red to Orange Gradient
+        color: "#fff",  // White text
+        fontWeight: "bold",
+        borderRadius: "8px",
+        padding: "12px",
+        fontSize: "16px",
+        textAlign: "center"
+    },
+    close: true // Show close button
+}).showToast();
+
     }
 })
 .catch(() => {

@@ -1,72 +1,89 @@
 <%- include("partials/header") %>
 
-<div class="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-    <div class="container mx-auto px-4 py-8">
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100">
+    <div class="container mx-auto px-4 py-10">
         <!-- Page Header -->
-        <div class="mb-8">
-            <h1 class="text-2xl font-bold text-gray-900 sm:text-3xl">My Account</h1>
+        <div class="mb-10 text-center md:text-left">
+            <h1 class="text-3xl font-bold text-gray-900 sm:text-4xl bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-500">My Account</h1>
             <p class="mt-2 text-sm text-gray-600">Manage your profile, orders, and preferences</p>
         </div>
 
         <div class="flex flex-col lg:flex-row gap-8">
-            <!-- Enhanced Sidebar -->
+            <!-- Enhanced Sidebar with Glass Morphism -->
             <div class="lg:w-80">
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden sticky top-8">
-                    <div class="p-6 bg-gradient-to-br from-emerald-600 to-emerald-700 text-white relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-32 h-32 transform translate-x-8 -translate-y-8">
+                <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg border border-gray-100 overflow-hidden sticky top-8">
+                    <div class="p-8 bg-gradient-to-r from-emerald-600 to-teal-500 text-white relative overflow-hidden">
+                        <div class="absolute -top-10 -right-10 w-40 h-40">
                             <div class="w-full h-full bg-white/10 rounded-full"></div>
                         </div>
-                        <div class="relative flex items-center gap-4">
-                            <div id="profileContainer" class="relative w-16 h-16 rounded-full border-2 border-white/30 overflow-hidden cursor-pointer group">
+                        <div class="absolute -bottom-16 -left-16 w-32 h-32">
+                            <div class="w-full h-full bg-white/10 rounded-full"></div>
+                        </div>
+                        <div class="relative flex flex-col items-center text-center">
+                            <div id="profileContainer" class="relative w-24 h-24 rounded-full border-4 border-white/30 overflow-hidden cursor-pointer group mb-4 shadow-lg">
                                 <!-- Profile Image -->
-                                <img id="profileImage" src="<%=user.image%>" alt="User Profile" class="w-full h-full object-cover rounded-full" >
+                                <img id="profileImage" src="<%=user.image%>" alt="User Profile" class="w-full h-full object-cover rounded-full transition-transform duration-300 group-hover:scale-110">
                                 
                                 <!-- Hidden File Input -->
                                 <input type="file" id="imageUpload" accept="image/png, image/jpeg, image/jpg" class="hidden" onchange="previewImage(event)">
                             
                                 <!-- Plus Icon Overlay -->
                                 <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <i class="fas fa-plus text-white text-lg"></i>
+                                    <i class="fas fa-camera text-white text-xl"></i>
                                 </div>
                             </div>
                             <div>
-                                <h2 class="font-bold text-lg">Welcome Back</h2>
+                                <h2 class="font-bold text-xl"><%=user.fullname %></h2>
                                 <p class="text-sm text-emerald-100">Manage your account</p>
                             </div>
                         </div>
                     </div>
 
                     <nav class="p-4">
-                        <div class="space-y-1">
-                            <a href="#dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200">
-                                <i class="fas fa-home w-5 text-center"></i>
+                        <div class="space-y-1.5">
+                            <a href="#dashboard" class="flex items-center gap-3 px-5 py-3.5 rounded-xl text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 group">
+                                <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
+                                    <i class="fas fa-home text-emerald-600"></i>
+                                </div>
                                 <span class="font-medium">Dashboard</span>
                             </a>
-                            <a href="#address" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200">
-                                <i class="fas fa-map-marker-alt w-5 text-center"></i>
+                            <a href="#address" class="flex items-center gap-3 px-5 py-3.5 rounded-xl text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 group">
+                                <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
+                                    <i class="fas fa-map-marker-alt text-emerald-600"></i>
+                                </div>
                                 <span class="font-medium">My Addresses</span>
                             </a>
-                            <a href="#orders" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200">
-                                <i class="fas fa-shopping-bag w-5 text-center"></i>
+                            <a href="#orders" class="flex items-center gap-3 px-5 py-3.5 rounded-xl text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 group">
+                                <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
+                                    <i class="fas fa-shopping-bag text-emerald-600"></i>
+                                </div>
                                 <span class="font-medium">Orders</span>
                             </a>
-                            <a href="#wallet" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200">
-                                <i class="fas fa-wallet w-5 text-center"></i>
+                            <a href="#wallet" class="flex items-center gap-3 px-5 py-3.5 rounded-xl text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 group">
+                                <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
+                                    <i class="fas fa-wallet text-emerald-600"></i>
+                                </div>
                                 <span class="font-medium">Wallet</span>
                             </a>
-                            <a href="#wallet-history" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200">
-                                <i class="fas fa-history w-5 text-center"></i>
+                            <a href="#wallet-history" class="flex items-center gap-3 px-5 py-3.5 rounded-xl text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 group">
+                                <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
+                                    <i class="fas fa-history text-emerald-600"></i>
+                                </div>
                                 <span class="font-medium">Transaction History</span>
                             </a>
-                            <a href="#referal" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200">
-                                <i class="fas fa-users w-5 text-center"></i>
+                            <a href="#referal" class="flex items-center gap-3 px-5 py-3.5 rounded-xl text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 group">
+                                <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
+                                    <i class="fas fa-users text-emerald-600"></i>
+                                </div>
                                 <span class="font-medium">Referrals</span>
                             </a>
                         </div>
 
-                        <div class="mt-4 pt-4 border-t">
-                            <a href="/logout" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition-all duration-200">
-                                <i class="fas fa-sign-out-alt w-5 text-center"></i>
+                        <div class="mt-6 pt-6 border-t border-gray-100">
+                            <a href="/logout" class="flex items-center gap-3 px-5 py-3.5 rounded-xl text-red-600 hover:bg-red-50 transition-all duration-200 group">
+                                <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center group-hover:bg-red-200 transition-colors">
+                                    <i class="fas fa-sign-out-alt text-red-600"></i>
+                                </div>
                                 <span class="font-medium">Logout</span>
                             </a>
                         </div>
@@ -77,26 +94,28 @@
             <!-- Enhanced Content Area -->
             <div class="flex-1 space-y-8">
                 <!-- Profile Section -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden" id="dashboard">
-                    <div class="p-6 border-b">
+                <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg border border-gray-100 overflow-hidden" id="dashboard">
+                    <div class="p-8 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
                         <div class="flex items-center justify-between">
-                            <h2 class="text-xl font-bold text-gray-900">Profile Information</h2>
-                            <button onclick="openChangePasswordModal()" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition-all duration-200">
+                            <h2 class="text-2xl font-bold text-gray-900">Profile Information</h2>
+                            <button onclick="openChangePasswordModal()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-100 text-emerald-700 rounded-xl hover:bg-emerald-200 transition-all duration-200 shadow-sm">
                                 <i class="fas fa-key text-sm"></i>
                                 <span class="text-sm font-medium">Change Password</span>
                             </button>
                         </div>
                     </div>
 
-                    <div class="p-6">
-                        <div class="grid md:grid-cols-2 gap-6">
+                    <div class="p-8">
+                        <div class="grid md:grid-cols-2 gap-8">
                             <!-- Phone Number -->
-                            <div class="bg-gray-50 rounded-xl p-4">
+                            <div class="bg-gray-50 rounded-2xl p-6 hover:shadow-md transition-shadow duration-300 border border-gray-100">
                                 <div class="flex items-center justify-between">
                                     <div>
-                                        <p class="text-sm text-gray-500 mb-1">Phone Number</p>
-                                        <div class="text-lg font-medium flex items-center gap-2">
-                                            <i class="fas fa-phone text-emerald-600"></i>
+                                        <p class="text-sm text-gray-500 mb-2">Phone Number</p>
+                                        <div class="text-lg font-medium flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
+                                                <i class="fas fa-phone text-emerald-600"></i>
+                                            </div>
                                             <%= user.phoneNumber ? user.phoneNumber : "No phone number provided" %>
                                         </div>
                                     </div>
@@ -104,17 +123,19 @@
                             </div>
 
                             <!-- Email -->
-                            <div class="bg-gray-50 rounded-xl p-4">
+                            <div class="bg-gray-50 rounded-2xl p-6 hover:shadow-md transition-shadow duration-300 border border-gray-100">
                                 <div class="flex items-center justify-between">
                                     <div>
-                                        <p class="text-sm text-gray-500 mb-1">Email Address</p>
-                                        <div class="text-lg font-medium flex items-center gap-2">
-                                            <i class="fas fa-envelope text-emerald-600"></i>
+                                        <p class="text-sm text-gray-500 mb-2">Email Address</p>
+                                        <div class="text-lg font-medium flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
+                                                <i class="fas fa-envelope text-emerald-600"></i>
+                                            </div>
                                             <%= user.email ? user.email : "No Email address provided" %>
                                         </div>
                                     </div>
                                     <button onclick="confirmEmailChange('<%= user.id %>')" 
-                                            class="inline-flex items-center gap-2 px-3 py-2 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition-all duration-200">
+                                            class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-100 text-emerald-700 rounded-xl hover:bg-emerald-200 transition-all duration-200 shadow-sm">
                                         <i class="fas fa-edit text-sm"></i>
                                         <span class="text-sm font-medium">Change</span>
                                     </button>
@@ -125,48 +146,48 @@
                 </div>
 
                 <!-- Address Section -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden" id="address">
-                    <div class="p-6 border-b">
+                <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg border border-gray-100 overflow-hidden" id="address">
+                    <div class="p-8 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
                         <div class="flex items-center justify-between">
-                            <h2 class="text-xl font-bold text-gray-900">My Addresses</h2>
+                            <h2 class="text-2xl font-bold text-gray-900">My Addresses</h2>
                             <a href="/user/add-address" 
-                               class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all duration-200">
+                               class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-xl hover:from-emerald-700 hover:to-teal-600 transition-all duration-200 shadow-md">
                                 <i class="fas fa-plus text-sm"></i>
                                 <span class="text-sm font-medium">Add New Address</span>
                             </a>
                         </div>
                     </div>
 
-                    <div class="p-6">
+                    <div class="p-8">
                         <% if (addresses.length > 0) { %>
-                            <div class="grid md:grid-cols-2 gap-6">
+                            <div class="grid md:grid-cols-2 gap-8">
                                 <% addresses.forEach(address => { %>
-                                    <div class="bg-gray-50 rounded-xl p-6 relative group">
+                                    <div class="bg-gray-50 rounded-2xl p-6 relative group hover:shadow-lg transition-all duration-300 border border-gray-100">
                                         <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <div class="flex items-center gap-2">
                                                 <a href="/user/edit-address/<%= address._id %>" 
-                                                   class="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors">
+                                                   class="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors shadow-sm">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                                 <button onclick="deleteAddress('<%= address._id %>')" 
-                                                        class="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors">
+                                                        class="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors shadow-sm">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </div>
                                         </div>
 
-                                        <div class="space-y-3">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                                                    <i class="fas fa-home text-emerald-600"></i>
+                                        <div class="space-y-4">
+                                            <div class="flex items-center gap-4">
+                                                <div class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
+                                                    <i class="fas fa-home text-emerald-600 text-lg"></i>
                                                 </div>
                                                 <h3 class="font-medium text-lg"><%= address.name %></h3>
                                             </div>
                                             
-                                            <div class="space-y-1 text-gray-600">
-                                                <p><%= address.address %></p>
+                                            <div class="space-y-2 text-gray-600 pl-16">
+                                                <p class="leading-relaxed"><%= address.address %></p>
                                                 <p><%= address.city %>, <%= address.state %> <%= address.pinCode %></p>
-                                                <p class="flex items-center gap-2">
+                                                <p class="flex items-center gap-2 mt-3 text-emerald-600">
                                                     <i class="fas fa-phone text-sm"></i>
                                                     <%= address.mobile_number %>
                                                 </p>
@@ -176,200 +197,255 @@
                                 <% }) %>
                             </div>
                         <% } else { %>
-                            <div class="text-center py-12">
-                                <div class="w-16 h-16 bg-gray-100 rounded-full mx-auto flex items-center justify-center mb-4">
-                                    <i class="fas fa-map-marker-alt text-gray-400 text-xl"></i>
+                            <div class="text-center py-16 bg-gray-50 rounded-2xl">
+                                <div class="w-20 h-20 bg-gray-100 rounded-full mx-auto flex items-center justify-center mb-6">
+                                    <i class="fas fa-map-marker-alt text-gray-400 text-2xl"></i>
                                 </div>
-                                <h3 class="text-gray-500 mb-2">No addresses added yet</h3>
-                                <p class="text-sm text-gray-400">Add your first address to get started</p>
+                                <h3 class="text-gray-700 text-xl font-medium mb-3">No addresses added yet</h3>
+                                <p class="text-gray-500 mb-6">Add your first address to get started</p>
+                                <a href="/user/add-address" class="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-all duration-200 shadow-md">
+                                    <i class="fas fa-plus"></i>
+                                    <span>Add New Address</span>
+                                </a>
                             </div>
                         <% } %>
                     </div>
                 </div>
 
                 <!-- Orders Section -->
-               <!-- Orders Section -->
-<div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden" id="orders">
-    <div class="p-6 border-b flex justify-between items-center">
-        <h2 class="text-xl font-bold text-gray-900">Order History</h2>
-        
-        <!-- Search Bar -->
-        <div class="flex items-center gap-2">
-            <input type="text" id="searchInput" placeholder="Search Order ID..." class="p-2 border rounded-md">
-            <button onclick="searchOrders()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                Search
-            </button>
-            <button onclick="clearSearch()" class="px-4 py-2 bg-gray-400 text-white rounded-md hover:bg-gray-500">
-                Cancel
-            </button>
-        </div>
-    </div>
+                <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg border border-gray-100 overflow-hidden" id="orders">
+                    <div class="p-8 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <h2 class="text-2xl font-bold text-gray-900">Order History</h2>
+                        
+                        <!-- Search Bar -->
+                        <div class="flex items-center gap-2 w-full md:w-auto">
+                            <div class="relative flex-1 md:w-64">
+                                <input type="text" id="searchInput" placeholder="Search Order ID..." 
+                                       class="w-full p-3 pl-10 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors">
+                                <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                            </div>
+                            <button onclick="searchOrders()" 
+                                    class="px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors shadow-sm">
+                                Search
+                            </button>
+                            <button onclick="clearSearch()" 
+                                    class="px-4 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors">
+                                Clear
+                            </button>
+                        </div>
+                    </div>
 
-    <div class="overflow-x-auto">
-        <table class="w-full">
-            <thead>
-                <tr class="bg-gray-50">
-                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Order ID</th>
-                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Name</th>
-                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Date</th>
-                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Status</th>
-                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Total</th>
-                    <th class="px-6 py-4 text-right text-sm font-semibold text-gray-600">Action</th>
-                </tr>
-            </thead>
-            <tbody id="orderTableBody" class="divide-y divide-gray-200">
-                <% if (orders.length > 0) { %>
-                    <% orders.forEach((order, index) => { %>
-                        <tr class="hover:bg-gray-50 transition-colors order-row <%= index >= 5 ? 'hidden extra-order' : '' %>">
-                            <td class="px-6 py-4 text-sm text-gray-600">Order #<%= order._id %></td>
-                            <td class="px-6 py-4 text-sm text-gray-600">
-                                <% order.items.forEach(item => { %>
-                                    <p><%= item.productId ? item.productId.name : "Unknown Product" %></p>
-                                <% }); %>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-600">
-                                <%= new Date(order.orderDate).toLocaleDateString() %>
-                            </td>
-                            <td class="px-6 py-4">
-                                <% if (order.status === "pending") { %>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                        Pending
-                                    </span>
-                                <% } else if (order.status === "processing") { %>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                        Processing
-                                    </span>
-                                <% } else if (order.status === "shipped") { %>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                                        Shipped
-                                    </span>
-                                <% } else if (order.status === "delivered") { %>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                        Delivered
-                                    </span>
-                                <% } else if (order.status === "returned") { %>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                        Returned
-                                    </span>
-                                <% } else if (order.status === "return request") { %>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                                        Waiting for approve
-                                    </span>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="px-8 py-5 text-left text-sm font-semibold text-gray-600">Order ID</th>
+                                    <th class="px-8 py-5 text-left text-sm font-semibold text-gray-600">Name</th>
+                                    <th class="px-8 py-5 text-left text-sm font-semibold text-gray-600">Date</th>
+                                    <th class="px-8 py-5 text-left text-sm font-semibold text-gray-600">Status</th>
+                                    <th class="px-8 py-5 text-left text-sm font-semibold text-gray-600">Total</th>
+                                    <th class="px-8 py-5 text-right text-sm font-semibold text-gray-600">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orderTableBody" class="divide-y divide-gray-100">
+                                <% if (orders.length > 0) { %>
+                                    <% orders.forEach((order, index) => { %>
+                                        <tr class="hover:bg-gray-50 transition-colors order-row <%= index >= 5 ? 'hidden extra-order' : '' %>">
+                                            <td class="px-8 py-5 text-sm text-gray-600 font-medium">Order #<%= order._id %></td>
+                                            <td class="px-8 py-5 text-sm text-gray-600">
+                                                <% order.items.forEach(item => { %>
+                                                    <p><%= item.productId ? item.productId.name : "Unknown Product" %></p>
+                                                <% }); %>
+                                            </td>
+                                            <td class="px-8 py-5 text-sm text-gray-600">
+                                                <%= new Date(order.orderDate).toLocaleDateString() %>
+                                            </td>
+                                            <td class="px-8 py-5">
+                                                <% if (order.status === "pending") { %>
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                        <span class="w-2 h-2 rounded-full bg-yellow-500 mr-1.5"></span>
+                                                        Pending
+                                                    </span>
+                                                <% } else if (order.status === "processing") { %>
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                        <span class="w-2 h-2 rounded-full bg-blue-500 mr-1.5"></span>
+                                                        Processing
+                                                    </span>
+                                                <% } else if (order.status === "shipped") { %>
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                                        <span class="w-2 h-2 rounded-full bg-indigo-500 mr-1.5"></span>
+                                                        Shipped
+                                                    </span>
+                                                <% } else if (order.status === "delivered") { %>
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                        <span class="w-2 h-2 rounded-full bg-green-500 mr-1.5"></span>
+                                                        Delivered
+                                                    </span>
+                                                <% } else if (order.status === "returned") { %>
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                        <span class="w-2 h-2 rounded-full bg-red-500 mr-1.5"></span>
+                                                        Returned
+                                                    </span>
+                                                <% } else if (order.status === "return request") { %>
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                                        <span class="w-2 h-2 rounded-full bg-orange-500 mr-1.5"></span>
+                                                        Waiting for approve
+                                                    </span>
+                                                <% } else { %>
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                        <span class="w-2 h-2 rounded-full bg-red-500 mr-1.5"></span>
+                                                        Cancelled
+                                                    </span>
+                                                <% } %>
+                                            </td>
+                                            <td class="px-8 py-5 text-sm font-medium text-gray-800">₹<%= order.total.toLocaleString() %></td>
+                                            <td class="px-8 py-5 text-right">
+                                                <a href="/user/orderdetails?id=<%= order._id %>" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-xl hover:bg-emerald-200 transition-colors text-sm shadow-sm">
+                                                    <i class="fas fa-eye"></i> View Details
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                    
+                                    <% if (orders.length > 5) { %>
+                                        <tr id="seeAllRow">
+                                            <td colspan="6" class="text-center py-6">
+                                                <button id="seeAllButton" onclick="showAllOrders()" class="px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-xl hover:from-emerald-700 hover:to-teal-600 transition-all duration-200 shadow-md">
+                                                    See All Orders (<%= orders.length - 5 %> more)
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr id="showLessRow" class="hidden">
+                                            <td colspan="6" class="text-center py-6">
+                                                <button onclick="showLessOrders()" class="px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-xl hover:from-emerald-700 hover:to-teal-600 transition-all duration-200 shadow-md">
+                                                    Show Less
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <% } %>
                                 <% } else { %>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                        Cancelled
-                                    </span>
+                                    <tr>
+                                        <td colspan="6" class="text-center py-16">
+                                            <div class="w-20 h-20 bg-gray-100 rounded-full mx-auto flex items-center justify-center mb-4">
+                                                <i class="fas fa-shopping-bag text-gray-400 text-2xl"></i>
+                                            </div>
+                                            <h3 class="text-gray-700 text-xl font-medium mb-2">No orders found</h3>
+                                            <p class="text-gray-500">Your order history will appear here</p>
+                                        </td>
+                                    </tr>
                                 <% } %>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-600">₹<%= order.total.toLocaleString() %></td>
-                            <td class="px-6 py-4 text-right">
-                                <a href="/user/orderdetails?id=<%= order._id %>" class="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition-colors text-sm">
-                                    <i class="fas fa-eye"></i> View Details
-                                </a>
-                            </td>
-                        </tr>
-                    <% }); %>
-                    
-                    <% if (orders.length > 5) { %>
-                        <tr id="seeAllRow">
-                            <td colspan="6" class="text-center py-4">
-                                <button id="seeAllButton" onclick="showAllOrders()" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all duration-200">
-                                    See All Orders (<%= orders.length - 5 %> more)
-                                </button>
-                            </td>
-                        </tr>
-                        <tr id="showLessRow" class="hidden">
-                            <td colspan="6" class="text-center py-4">
-                                <button onclick="showLessOrders()" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all duration-200">
-                                    Show Less
-                                </button>
-                            </td>
-                        </tr>
-                    <% } %>
-                <% } else { %>
-                    <tr>
-                        <td colspan="6" class="text-center py-4 text-gray-600">No orders found.</td>
-                    </tr>
-                <% } %>
-            </tbody>
-        </table>
-    </div>
-</div>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             
 
                 <!-- Wallet & Referral Section -->
                 <div class="grid md:grid-cols-2 gap-8">
                     <!-- Wallet Card -->
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden" id="wallet">
-                        <div class="p-6 border-b">
+                    <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg border border-gray-100 overflow-hidden" id="wallet">
+                        <div class="p-8 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
                             <div class="flex items-center justify-between">
-                                <h2 class="text-xl font-bold text-gray-900">Wallet Balance</h2>
-                                <button class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all duration-200">
+                                <h2 class="text-2xl font-bold text-gray-900">Wallet Balance</h2>
+                                <button class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-xl hover:from-emerald-700 hover:to-teal-600 transition-all duration-200 shadow-md">
                                     <i class="fas fa-plus text-sm"></i>
-                                    <span class="text-sm font-medium">Add Money</span>
+                                    <!-- <span class="text-sm font-medium">Add Money</span> -->
                                 </button>
                             </div>
                         </div>
 
-                        <div class="p-6">
-                            <div class="bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-xl p-6 text-white relative overflow-hidden">
-                                <div class="absolute top-0 right-0 w-32 h-32 transform translate-x-8 -translate-y-8">
+                        <div class="p-8">
+                            <div class="bg-gradient-to-br from-emerald-600 to-teal-500 rounded-2xl p-8 text-white relative overflow-hidden shadow-lg">
+                                <div class="absolute top-0 right-0 w-40 h-40 transform translate-x-10 -translate-y-10">
+                                    <div class="w-full h-full bg-white/10 rounded-full"></div>
+                                </div>
+                                <div class="absolute bottom-0 left-0 w-32 h-32 transform -translate-x-10 translate-y-10">
                                     <div class="w-full h-full bg-white/10 rounded-full"></div>
                                 </div>
                                 <div class="relative">
-                                    <p class="text-emerald-100 mb-2">Available Balance</p>
-                                    <h3 class="text-4xl font-bold"><%=wallet.balance%></h3>
+                                    <div class="flex items-center gap-4 mb-6">
+                                        <div class="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                                            <i class="fas fa-wallet text-white text-2xl"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-emerald-100 text-sm">Available Balance</p>
+                                            <h3 class="text-4xl font-bold">₹<%=wallet.balance%></h3>
+                                        </div>
+                                    </div>
+                                    <div class="mt-6 pt-6 border-t border-white/20">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-emerald-100">Last Updated</span>
+                                            <span class="text-white"><%= new Date().toLocaleDateString() %></span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Referral Card -->
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden" id="referal">
-                        <div class="p-6 border-b">
-                            <h2 class="text-xl font-bold text-gray-900">Referral Program</h2>
+                    <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg border border-gray-100 overflow-hidden" id="referal">
+                        <div class="p-8 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                            <h2 class="text-2xl font-bold text-gray-900">Referral Program</h2>
                         </div>
 
-                        <div class="p-6">
-                            <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white relative overflow-hidden">
-                                <div class="absolute top-0 right-0 w-32 h-32 transform translate-x-8 -translate-y-8">
+                        <div class="p-8">
+                            <div class="bg-gradient-to-br from-orange-500 to-amber-500 rounded-2xl p-8 text-white relative overflow-hidden shadow-lg">
+                                <div class="absolute top-0 right-0 w-40 h-40 transform translate-x-10 -translate-y-10">
                                     <div class="w-full h-full bg-white/10 rounded-full"></div>
                                 </div>
-                                <div class="relative space-y-4">
+                                <div class="absolute bottom-0 left-0 w-32 h-32 transform -translate-x-10 translate-y-10">
+                                    <div class="w-full h-full bg-white/10 rounded-full"></div>
+                                </div>
+                                <div class="relative space-y-6">
+                                    <div class="flex items-center gap-4 mb-2">
+                                        <div class="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                                            <i class="fas fa-gift text-white text-2xl"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-orange-100 text-sm">Share & Earn</p>
+                                            <h3 class="text-2xl font-bold">Referral Program</h3>
+                                        </div>
+                                    </div>
+
                                     <div>
-                                        <p class="text-orange-100 mb-1">Your Referral Code</p>
-                                        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-3 flex items-center justify-between">
-                                            <code id="refIdDisplay" class="text-lg font-mono"><%= user.referralCode %></code>
+                                        <p class="text-orange-100 mb-2">Your Referral Code</p>
+                                        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 flex items-center justify-between">
+                                            <code id="refIdDisplay" class="text-lg font-mono font-bold"><%= user.referralCode %></code>
                                             <input type="text" id="refId" value="<%= user.referralCode %>" readonly class="hidden">
                                             <button onclick="copyReferral()" class="p-2 hover:bg-white/20 rounded-lg transition-colors">
                                                 <i class="fas fa-copy"></i>
                                             </button>
                                         </div>
-                                        <p id="copySuccess" class="text-green-500 text-sm hidden">Copied to clipboard!</p>
+                                        <p id="copySuccess" class="text-green-300 text-sm mt-2 hidden">Copied to clipboard!</p>
                                     </div>
-                                </div>
-                                
 
-                                    <div class="flex items-center gap-4">
-                                        <div class="flex-1">
-                                            <p class="text-orange-100 text-sm">Total Earned</p>
+                                    <div class="flex items-center gap-6 mt-4">
+                                        <div class="flex-1 bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
+                                            <p class="text-orange-100 text-sm mb-1">Total Earned</p>
                                             <p class="text-2xl font-bold">₹0.00</p>
                                         </div>
-                                        <div class="flex-1">
-                                            <p class="text-orange-100 text-sm">Referrals</p>
+                                        <div class="flex-1 bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
+                                            <p class="text-orange-100 text-sm mb-1">Referrals</p>
                                             <p class="text-2xl font-bold">0</p>
                                         </div>
                                     </div>
                                     
-            <!-- Others' Referral Code Input -->
-            <div class="mt-6">
-                <label class="block mb-2 text-orange-100">Enter Referral Code</label>
-                <input type="text" id="otherReferralCode" placeholder="Enter referral code" class="w-full p-2 rounded-lg text-gray-900">
-                <button onclick="submitReferralCode()" class="mt-2 bg-white text-orange-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition">
-                    Submit Code
-                </button>
-                <p id="referralResponse" class="text-sm mt-2"></p>
-            </div>
+                                    <!-- Others' Referral Code Input -->
+                                    <div class="mt-6 pt-6 border-t border-white/20">
+                                        <label class="block mb-2 text-orange-100">Enter Referral Code</label>
+                                        <div class="flex gap-2">
+                                            <input type="text" id="otherReferralCode" placeholder="Enter referral code" 
+                                                class="w-full p-3 rounded-xl text-gray-900 focus:ring-2 focus:ring-orange-300 focus:border-orange-300">
+                                            <button onclick="submitReferralCode()" 
+                                                class="bg-white text-orange-600 px-5 py-3 rounded-xl font-semibold hover:bg-orange-50 transition shadow-md">
+                                                Submit
+                                            </button>
+                                        </div>
+                                        <p id="referralResponse" class="text-sm mt-2"></p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -377,44 +453,61 @@
                 </div>
 
                 <!-- Wallet History -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden" id="wallet-history">
-                    <div class="p-6 border-b">
-                        <h2 class="text-xl font-bold text-gray-900">Transaction History</h2>
+                <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg border border-gray-100 overflow-hidden" id="wallet-history">
+                    <div class="p-8 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                        <h2 class="text-2xl font-bold text-gray-900">Transaction History</h2>
                     </div>
                 
-                    <div class="p-6">
-                        <p class="text-lg font-semibold text-gray-800">Wallet Balance: ₹<%= wallet ? wallet.balance.toFixed(2) : "0.00" %></p>
+                    <div class="p-8">
+                        <div class="bg-gray-50 rounded-2xl p-6 mb-8 border border-gray-100">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
+                                    <i class="fas fa-wallet text-emerald-600 text-lg"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Current Balance</p>
+                                    <p class="text-2xl font-bold text-gray-800">₹<%= wallet ? wallet.balance.toFixed(2) : "0.00" %></p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 
                     <div class="overflow-x-auto">
                         <table class="w-full">
                             <thead>
                                 <tr class="bg-gray-50">
-                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Date</th>
-                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Transaction ID</th>
-                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Type</th>
-                                    <th class="px-6 py-4 text-right text-sm font-semibold text-gray-600">Amount</th>
+                                    <th class="px-8 py-5 text-left text-sm font-semibold text-gray-600">Date</th>
+                                    <th class="px-8 py-5 text-left text-sm font-semibold text-gray-600">Transaction ID</th>
+                                    <th class="px-8 py-5 text-left text-sm font-semibold text-gray-600">Type</th>
+                                    <th class="px-8 py-5 text-right text-sm font-semibold text-gray-600">Amount</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-200">
+                            <tbody class="divide-y divide-gray-100">
                                 <% if (!wallet || wallet.transactions.length === 0) { %>
                                     <tr>
-                                        <td colspan="4" class="text-center py-4 text-gray-600">No transactions found</td>
+                                        <td colspan="4" class="text-center py-16">
+                                            <div class="w-20 h-20 bg-gray-100 rounded-full mx-auto flex items-center justify-center mb-4">
+                                                <i class="fas fa-receipt text-gray-400 text-2xl"></i>
+                                            </div>
+                                            <h3 class="text-gray-700 text-xl font-medium mb-2">No transactions found</h3>
+                                            <p class="text-gray-500">Your transaction history will appear here</p>
+                                        </td>
                                     </tr>
                                 <% } else { %>
                                     <% wallet.transactions.forEach(transaction => { %>
                                         <tr class="hover:bg-gray-50 transition-colors">
-                                            <td class="px-6 py-4 text-sm text-gray-600">
+                                            <td class="px-8 py-5 text-sm text-gray-600">
                                                 <%= new Date(transaction.date).toLocaleDateString() %>
                                             </td>
-                                            <td class="px-6 py-4 text-sm text-gray-600"><%= transaction._id %></td>
-                                            <td class="px-6 py-4">
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                            <td class="px-8 py-5 text-sm font-medium text-gray-700"><%= transaction.transactionId %></td>
+                                            <td class="px-8 py-5">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium 
                                                     <%= transaction.type === 'credit' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800' %>">
+                                                    <span class="w-2 h-2 rounded-full <%= transaction.type === 'credit' ? 'bg-emerald-500' : 'bg-red-500' %> mr-1.5"></span>
                                                     <%= transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1) %>
                                                 </span>
                                             </td>
-                                            <td class="px-6 py-4 text-right text-sm font-medium 
+                                            <td class="px-8 py-5 text-right text-sm font-medium 
                                                 <%= transaction.type === 'credit' ? 'text-emerald-600' : 'text-red-600' %>">
                                                 ₹<%= transaction.amount.toFixed(2) %>
                                             </td>
@@ -432,37 +525,42 @@
 </div>
 
 <!-- Enhanced Password Change Modal -->
-<div id="changePasswordModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+<div id="changePasswordModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden">
     <div class="min-h-screen px-4 text-center">
         <!-- This element is to trick the browser into centering the modal contents. -->
         <span class="inline-block h-screen align-middle" aria-hidden="true">&#8203;</span>
         
-        <div class="inline-block w-full max-w-md p-6 my-8 text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+        <div class="inline-block w-full max-w-md p-8 my-8 text-left align-middle transition-all transform bg-white shadow-xl rounded-3xl">
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-bold text-gray-900">Change Password</h3>
-                <button onclick="closeChangePasswordModal()" class="text-gray-400 hover:text-gray-500">
+                <h3 class="text-xl font-bold text-gray-900">Change Password</h3>
+                <button onclick="closeChangePasswordModal()" class="text-gray-400 hover:text-gray-500 p-2 rounded-full hover:bg-gray-100 transition-colors">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
 
-            <div class="space-y-4">
+            <div class="space-y-6">
                 <div>
-                    <label for="currentPassword" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="currentPassword" class="block text-sm font-medium text-gray-700 mb-2">
                         Current Password
                     </label>
-                    <input type="password" 
-                           id="currentPassword" 
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors" 
-                           placeholder="Enter your current password">
+                    <div class="relative">
+                        <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <input type="password" 
+                               id="currentPassword" 
+                               class="w-full px-4 py-3 pl-10 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors" 
+                               placeholder="Enter your current password">
+                    </div>
                 </div>
 
-                <div class="flex items-center justify-end space-x-3 mt-6">
+                <div class="flex items-center justify-end space-x-4 mt-8">
                     <button onclick="closeChangePasswordModal()" 
-                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                            class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors">
                         Cancel
                     </button>
                     <button onclick="verifyPassword()" 
-                            class="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors">
+                            class="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-emerald-600 to-teal-500 rounded-xl hover:from-emerald-700 hover:to-teal-600 transition-colors shadow-md">
                         Verify & Continue
                     </button>
                 </div>

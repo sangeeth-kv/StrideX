@@ -50,7 +50,7 @@ const saleController={
 
                 console.log("there are sale data : ====>>",salesData)
         
-                res.render("admin/dashboard", {
+                res.render("admin/salesreport", {
                     data: salesData,
                     overallSalesCount,
                     overallOrderAmount,

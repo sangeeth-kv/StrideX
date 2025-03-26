@@ -1,0 +1,282 @@
+<%- include("partials/header") %>
+
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4 md:mb-0">
+        <span class="inline-block mr-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+        </span>
+        Sales Report
+      </h1>
+      <div class="flex space-x-2">
+        <a href="#" id="createSalesReport" class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+          </svg>
+          Generate PDF
+        </a>
+        <a href="#" id="downloadExcelReport" class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+          </svg>
+          Download Excel
+        </a>
+      </div>
+    </div>
+
+    <!-- Filters Card -->
+    <div class="bg-white rounded-xl shadow-md mb-6 overflow-hidden">
+      <div class="p-5 border-b border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-800">Filter Options</h2>
+      </div>
+      <div class="p-5">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Time Period Filter -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Time Period</label>
+            <select
+            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            onchange="location.href='/admin/dashboard?day=' + this.value"
+          >
+            <% const filters = ["salesToday", "salesWeekly", "salesMonthly", "salesYearly"]; %>
+      
+            <% const currentFilter = selectedDay || "salesToday"; %>
+            
+          
+            <% filters.forEach(filter => { %>
+              <option value="<%= filter %>" <%= currentFilter === filter ? "selected" : "" %>>
+                <%= filter.replace("sales", "") %>
+              </option>
+            <% }) %>
+          </select>
+          
+          </div>
+
+         
+
+          <!-- Custom Date Range -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Custom Date Range</label>
+            <div class="grid grid-cols-2 gap-2">
+              <input 
+                type="date" 
+                id="startDate" 
+                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" 
+                placeholder="Start Date"
+              />
+              <input 
+                type="date" 
+                id="endDate" 
+                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" 
+                placeholder="End Date"
+              />
+            </div>
+            <button 
+              class="mt-2 w-full inline-flex justify-center items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-sm"
+              onclick="filterByDate()"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+              Apply Filter
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <!-- Total Orders Card -->
+      <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <div class="p-5 flex items-center">
+          <div class="rounded-full bg-blue-100 p-3 mr-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500 font-medium">Total Orders</p>
+            <h3 class="text-2xl font-bold text-gray-800"><%= overallSalesCount %></h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Sales Card -->
+      <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <div class="p-5 flex items-center">
+          <div class="rounded-full bg-green-100 p-3 mr-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500 font-medium">Total Sales</p>
+            <h3 class="text-2xl font-bold text-gray-800">₹<%= overallOrderAmount %></h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Discount Card -->
+      <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <div class="p-5 flex items-center">
+          <div class="rounded-full bg-purple-100 p-3 mr-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500 font-medium">Total Discount for coupons</p>
+            <h3 class="text-2xl font-bold text-gray-800">₹<%= overallDiscount %></h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+      <div class="p-5 border-b border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-800">Sales Data</h2>
+      </div>
+      <div class="overflow-x-auto">
+        <table id="salesTable" class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data ID</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total Price</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% let grandTotal = 0; %> 
+            <% for (let i = 0; i < data.length; i++) { %>
+            <tr class="hover:bg-gray-50 transition-colors duration-150">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= i + 1 %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= data[i].orderId %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= data[i].address.name %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= data[i].items && data[i].items.length > 0 ? data[i].items[0].productId.name : "N/A" %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= data[i].orderDate.toLocaleString('en-IN') %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <span class="<%= data[i].paymentMethod === 'COD' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' %> px-2 py-1 rounded-full text-xs font-medium">
+                  <%= data[i].paymentMethod %>
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm">
+                <% if (data[i].status === 'Delivered') { %>
+                  <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Delivered</span>
+                <% } else if (data[i].status === 'Shipped') { %>
+                  <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">Shipped</span>
+                <% } else if (data[i].status === 'Cancelled') { %>
+                  <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">Cancelled</span>
+                <% } else if (data[i].status === 'Pending') { %>
+                  <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">Pending</span>
+                <% } else { %>
+                  <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium"><%= data[i].status %></span>
+                <% } %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-gray-900"><%= data[i].total %></td>
+            </tr>
+            <% grandTotal += data[i].total; %> 
+            <% } %>
+          </tbody>
+          <tfoot>
+            <tr class="bg-gray-50">
+              <td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm font-bold text-right text-gray-900">Grand Total:</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-right text-gray-900"><%= grandTotal %></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pagination (if needed) -->
+    <div class="mt-6 flex justify-center">
+      <nav class="inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+        <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+          <span class="sr-only">Previous</span>
+          <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+          </svg>
+        </a>
+        <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-indigo-50 text-sm font-medium text-indigo-600">1</a>
+        <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">2</a>
+        <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">3</a>
+        <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+          <span class="sr-only">Next</span>
+          <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+          </svg>
+        </a>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<script>
+  document.getElementById("createSalesReport").addEventListener("click", async (event) => {
+    event.preventDefault();
+    const salesData = collectSalesData(); // Collect filtered sales data
+    await fetch("/admin/generatePdf", {
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(salesData),
+    }).then((response) => response.blob())
+      .then((blob) => downloadFile(blob, "report.pdf"));
+  });
+
+  document.getElementById("downloadExcelReport").addEventListener("click", async (event) => {
+    event.preventDefault();
+    const salesData = collectSalesData();
+    await fetch("/admin/downloadExcel", {
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(salesData),
+    }).then((response) => response.blob())
+      .then((blob) => downloadFile(blob, "report.xlsx"));
+  });
+
+  function collectSalesData() {
+    return [...document.querySelectorAll("#salesTable tbody tr")].map(row => ({
+        orderId: row.cells[1].textContent.trim(),
+        name: row.cells[2].textContent,
+        date: row.cells[4].textContent,
+        paymentMethod:row.cells[5].textContent,
+        totalAmount: parseFloat(row.cells[7].textContent.replace(/[^0-9]/g, "")),
+    }));
+  }
+
+  function downloadFile(blob, filename) {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  function filterByDate() {
+    let startDate = document.getElementById("startDate").value;
+    let endDate = document.getElementById("endDate").value;
+    if (!startDate || !endDate) {
+      alert("Please select both start and end date");
+      return;
+    }
+    window.location.href = `/admin/dashboard?startDate=${startDate}&endDate=${endDate}`;
+  }
+
+</script>
+
+<%- include("partials/footer") %>
+

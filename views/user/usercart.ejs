@@ -16,6 +16,13 @@
   .hover\:text-primary:hover {
     color: #3b82f6;
   }
+  
+  /* Added styles for disabled button */
+  .btn-disabled {
+    background-color: #d1d5db;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
 </style>
 <head>
   <!-- Toastify CSS -->
@@ -248,7 +255,6 @@
       </div>
 
       <!-- Order Summary -->
-      <!-- Order Summary -->
       <div class="lg:w-1/3 w-full">
         <div class="bg-white rounded-xl shadow-sm overflow-hidden sticky top-6">
           <div class="p-6 border-b border-gray-100">
@@ -304,12 +310,21 @@
               </div>
             </div>
 
+            <% if (data && data.length > 0) { %>
             <a
               href="/user/checkout"
               class="mt-8 block w-full py-3 px-4 bg-primary hover:bg-primary-dark text-white text-center font-medium rounded-lg transition-colors"
             >
               Proceed to Checkout
             </a>
+            <% } else { %>
+            <button
+              disabled
+              class="mt-8 block w-full py-3 px-4 btn-disabled text-white text-center font-medium rounded-lg"
+            >
+              Proceed to Checkout
+            </button>
+            <% } %>
           </div>
         </div>
       </div>
@@ -395,23 +410,23 @@
 
     const quantityError = document.getElementById("quantityError");
     quantityError.textContent = "";
-quantityError.classList.add("hidden");
-
-if (newQuantity > 6) {
-  Toastify({
-                text: "You can add upto 6 items",
-                duration: 3000,
-                gravity: "bottom",
-                position: "center",
-                backgroundColor: "#FF9800", // Orange color for warnings
-                stopOnFocus: true,
-            }).showToast();
-    return;
-}
-if (quantityError) {
-    quantityError.textContent = "";
     quantityError.classList.add("hidden");
-}
+
+    if (newQuantity > 6) {
+      Toastify({
+                    text: "You can add upto 6 items",
+                    duration: 3000,
+                    gravity: "bottom",
+                    position: "center",
+                    backgroundColor: "#FF9800", // Orange color for warnings
+                    stopOnFocus: true,
+                }).showToast();
+        return;
+    }
+    if (quantityError) {
+        quantityError.textContent = "";
+        quantityError.classList.add("hidden");
+    }
 
 
     // Send updated quantity to the backend

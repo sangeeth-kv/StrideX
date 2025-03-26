@@ -93,7 +93,7 @@ const userProfileController={
         }
     },loadChangeEmailPage:async (req,res) => {
         try {
-            const id=req.session.userId
+            const id=req.session.user?.id
             
             
             res.render("user/changeEmail")
@@ -108,7 +108,7 @@ const userProfileController={
             const email=req.body.email
             console.log("user enter email"+email);
             
-            const id=req.session.userId
+            const id=req.session.user?.id
             const user=await userSchema.findById(id)
             if(!user){
                 return res.status(404).json({message:"User not found!!!",redirectUrl:"/user/login"})
@@ -137,7 +137,7 @@ const userProfileController={
     },
     resendOtpforEmail:async (req,res) => {
         try {
-            const id=req.session.userId
+            const id=req.session.user?.id
             const user=await userSchema.findById(id)
 
             const otp=generateOTP()
@@ -153,8 +153,9 @@ const userProfileController={
     },
     checkCurrentPassword:async (req,res) => {
         try {
-            const id=req.session.userId
+            const id=req.session.user?.id
             const currentPassword=req.body.password
+            console.log("this is req.body : ",req.body)
             console.log(currentPassword);
             
             
@@ -184,7 +185,7 @@ const userProfileController={
         }
     },changeUserpasswordOtpPage:async (req,res) => {
         try {
-            const id=req.session.userId
+            const id=req.session.user?.id
             
             if(!id){
                 return res.status(401).json({message:"Session time out"})
@@ -227,7 +228,7 @@ const userProfileController={
 
 
         } catch (error) {
-            console.log(erro)
+            console.log(error)
         }
     },
     changeUserPasswordPage:async (req,res) => {
@@ -239,7 +240,7 @@ const userProfileController={
     },
     verifyNewPassword:async (req,res) => {
         try {
-            const id=req.session.userId
+            const id=req.session.user?.id
 
             const password=req.body.password
 

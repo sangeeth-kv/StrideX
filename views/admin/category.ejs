@@ -51,6 +51,7 @@
                 <th>Image</th>
                 <th>Name</th>
                 <th>Description</th>
+                <th>Offer</th>
                 <th>Status</th>
                 <th class="text-start">Actions</th>
               </tr>
@@ -79,6 +80,7 @@
                       <a href="javascript:void(0);" class="read-more-link">read more</a>
                     <% } %>
                   </td>
+                  <td class="text-start"><%= category.offer %></td>
                   <td>
                     <button class="btn toggle-status-btn <%= category.isListed ? 'btn-success' : 'btn-danger' %>" 
                       data-id="<%= category._id %>">
@@ -92,6 +94,7 @@
                               data-bs-target="#editCategoryModal"
                               data-id="<%= category._id %>"
                               data-name="<%= category.name %>"
+                              data-offer="<%=category.offer %>"
                               data-description="<%= category.description %>"
                               data-image="<%= category.image ? category.image : 'default-image-path.jpg' %>">
                         Edit
@@ -151,6 +154,10 @@
               <input type="file" class="form-control" id="addCategoryImage" name="image" accept="image/png, image/jpeg, image/jpg" />
               <img id="imgPreview" class="img-preview" src="#" alt="Image Preview" style="display:none;"/>
             </div>
+            <div class="mb-3">
+              <label for="addCategoryOffer" class="form-label">Offer (%)</label>
+              <input type="number" class="form-control" id="addCategoryOffer" name="offer" placeholder="Enter offer (if any)">
+            </div>            
             <button type="submit" class="btn btn-primary">Add Category</button>
           </form>
         </div>
@@ -177,6 +184,10 @@
               <label for="editCategoryDescription" class="form-label">Description</label>
               <textarea class="form-control" id="editCategoryDescription" name="description"></textarea>
             </div>
+            <div class="mb-3">
+              <label for="editCategoryOffer" class="form-label">Offer(%)</label>
+              <input type="text" class="form-control" id="editCategoryOffer" name="offer" placeholder="Enter offer (if any)">
+            </div>            
             <div class="mb-3">
               <label for="editCategoryImage" class="form-label">Category Image</label>
               <input type="file" class="form-control" id="addCategoryImage" name="image" accept="image/png, image/jpeg, image/jpg" />
@@ -305,10 +316,12 @@
           const categoryName = this.dataset.name;
           const categoryDescription = this.dataset.description;
           const categoryImage=this.dataset.image
+          const categoryOffer=this.dataset.offer
           console.log(categoryImage+"this is my imaege url")
           document.getElementById("editCategoryId").value = categoryId;
           document.getElementById("editCategoryName").value = categoryName;
           document.getElementById("editCategoryDescription").value = categoryDescription;
+          document.getElementById("editCategoryOffer").value=categoryOffer
         });
       });
       

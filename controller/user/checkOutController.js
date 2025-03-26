@@ -9,6 +9,7 @@ const checkOutController={
     loadCheckoutPage: async (req, res) => {
         try {
             const userId = req.session.user?.id
+            console.log(userId)
             if (!userId) {
                 return res.render("user/login");
             }
@@ -23,6 +24,7 @@ const checkOutController={
             
 
             const user = await userSchema.findById(userId);
+            const userAddresses = await addressSchema.find({ userId: userId, isDeleted: false });
             
             // Get cart with populated product data
             const cart = await cartSchema.findOne({ userId })
@@ -42,7 +44,8 @@ const checkOutController={
                     user, 
                     shippingCharge: 0,
                     finalTotal: 0,
-                    Coupon: [] // Add empty coupon array
+                    Coupon: [] ,
+                    userAddresses: userAddresses || [] // Add empty coupon array
                 });
             }
             
@@ -58,9 +61,17 @@ const checkOutController={
                     console.warn(`No variant found for product ${product.name} with size ${item.size}`);
                     return null;
                 }
+
+                const productOffer=product.offer
+                console.log("This is product Offer in load checkout page : ",productOffer)
+                const categoryOffer=product.categoryId?.offer
+                console.log("This is categry offer in LoadCheckout page : ",categoryOffer)
+
+                const maxOffer=Math.max(productOffer,categoryOffer)
+                console.log("THIS IS MAX OFFER>>>>>>>>>>>>",maxOffer)
     
                 const regularPrice = variant.regularPrice;
-                const offerPercentage = variant.offer || 0;
+                const offerPercentage = maxOffer|| 0;
                 const salePrice = regularPrice - (regularPrice * offerPercentage / 100);
                 const discount = regularPrice - salePrice;
     
@@ -92,15 +103,19 @@ const checkOutController={
             }
     
             let shippingCharge = grandTotal >= 1000 ? 0 : 50;
-            let finalTotal = grandTotal - additionalDiscount + shippingCharge;
+            let finalTotal = grandTotal + shippingCharge;
             
             // Fetch user addresses
-            const userAddresses = await addressSchema.find({ userId: userId, isDeleted: false });
+            console.log("here reachess for find userId",userId)
+        
+            console.log("user addresss : ",userAddresses)
+            console.log("ueser address found..")
             
             // Fetch available coupons (you'll need to implement this)
             // const availableCoupons = await couponSchema.find({ isActive: true });
             
             // Mock coupons for now - replace with actual coupon data
+            console.log("this is shipping charge : ",shippingCharge,"this is grandTOtal : ",grandTotal,"this is final total : ",finalTotal,"this is actual total : ",actualTotal)
            
             console.log("user addresss",userAddresses)
             res.render("user/checkoutpage", { 
@@ -115,7 +130,7 @@ const checkOutController={
                 finalTotal, 
                 actualTotal, 
                 user,
-                userAddresses,
+                userAddresses:userAddresses,
                 discount: additionalDiscount // Pass as separate variable
             });
         } catch (error) {

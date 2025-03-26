@@ -88,6 +88,10 @@
                              <select class="form-select border" name="categoryId" id="categoryId"></select>
                          </div>
                          <div class="mb-4">
+                            <label class="form-label">Offer(%)</label>
+                            <input type="number" id="offer" name="offer" class="form-control border" >
+                        </div>
+                         <div class="mb-4">
                              <label class="form-label">Full description</label>
                              <textarea name="description" class="form-control border" rows="4" required></textarea>
                          </div>
@@ -104,11 +108,11 @@
                                      <input type="number" name="regularPrice[]" class="form-control border" required>
                                      <p id="regularPriceError" class="text-red-500 text-sm mt-1 hidden" style="color: red;"></p>
                                  </div>
-                                 <div class="mb-2">
+                                 <!-- <div class="mb-2">
                                      <label class="form-label">Offer (%)</label>
                                      <input type="number" name="offer[]" class="form-control border" min="0" max="100">
                                      <p id="offerError" class="text-red-500 text-sm mt-1 hidden"  style="color: red;"></p>
-                                 </div>
+                                 </div> -->
                                  <div class="mb-2">
                                      <label class="form-label">Quantity</label>
                                      <input type="number" name="quantity[]" class="form-control border" required>
@@ -178,11 +182,7 @@ function addVariant() {
                 <input type="number" name="regularPrice[]" class="form-control border" required>
                 <p id="regularPriceError" class="text-red-500 text-sm mt-1 hidden"></p>
             </div>
-            <div class="mb-2">
-                <label class="form-label">Offer (%)</label>
-                <input type="number" name="offer[]" class="form-control border" min="0" max="100">
-                <p id="offerError" class="text-red-500 text-sm mt-1 hidden"></p>
-            </div>
+            
             <div class="mb-2">
                 <label class="form-label">Quantity</label>
                 <input type="number" name="quantity[]" class="form-control border" required>
@@ -313,6 +313,7 @@ function addVariant() {
             console.error(`General cropper error: ${error.message}`);
         }
     }
+    
     cropAndSaveBtn.addEventListener("click", function() {
         if (!cropper) return;
         console.log("heii")
@@ -408,6 +409,7 @@ function addVariant() {
 
         let brands = await brandRes.json();
         let categories = await categoryRes.json();
+        console.log("brands",brands)
 
         let brandSelect = document.getElementById("brand");
         brands.forEach(brand => {
@@ -461,27 +463,27 @@ document.querySelectorAll("#variantsContainer .variant").forEach(variantDiv => {
     const size = variantDiv.querySelector("input[name='size[]']").value;
     const regularPrice = variantDiv.querySelector("input[name='regularPrice[]']").value;
     const quantity = variantDiv.querySelector("input[name='quantity[]']").value;
-    const offer = variantDiv.querySelector("input[name='offer[]']").value;
+    // const offer = variantDiv.querySelector("input[name='offer[]']").value;
     const productName = document.getElementById("productName").value;
 
     // Select error elements within this specific variant
     const sizeError = variantDiv.querySelector("#sizeError");
     const regularPriceError = variantDiv.querySelector("#regularPriceError");
     const quantityError = variantDiv.querySelector("#quantityError");
-    const offerError = variantDiv.querySelector("#offerError");
+    // const offerError = variantDiv.querySelector("#offerError");
     const productNameError = document.getElementById("productNameError");
 
     // Reset error messages
     sizeError.textContent = "";
     regularPriceError.textContent = "";
     quantityError.textContent = "";
-    offerError.textContent = "";
+    // offerError.textContent = "";
     productNameError.textContent = "";
 
     sizeError.classList.add("hidden");
     regularPriceError.classList.add("hidden");
     quantityError.classList.add("hidden");
-    offerError.classList.add("hidden");
+    // offerError.classList.add("hidden");
     productNameError.classList.add("hidden");
     
     let isValid = true;
@@ -531,16 +533,16 @@ document.querySelectorAll("#variantsContainer .variant").forEach(variantDiv => {
                 isValid = false;
             }
 
-            offerRegex=/^(100|[1-9][0-9]?)$/
-            if(!offer.trim()){
-                offerError.textContent = "offer required!";
-                offerError.classList.remove("hidden");
-                isValid = false;
-            }else if(!offerRegex.test(offer)){
-                offerError.textContent = "Enter valid offer";
-                offerError.classList.remove("hidden");
-                isValid = false;
-            }
+            // offerRegex=/^(100|[1-9][0-9]?)$/
+            // if(!offer.trim()){
+            //     offerError.textContent = "offer required!";
+            //     offerError.classList.remove("hidden");
+            //     isValid = false;
+            // }else if(!offerRegex.test(offer)){
+            //     offerError.textContent = "Enter valid offer";
+            //     offerError.classList.remove("hidden");
+            //     isValid = false;
+            // }
 
 
             if (size && regularPrice && quantity && offer) {
@@ -548,7 +550,7 @@ document.querySelectorAll("#variantsContainer .variant").forEach(variantDiv => {
                     size: size,
                     regularPrice: parseFloat(regularPrice),
                     quantity: parseInt(quantity),
-                    offer: parseInt(offer)
+                    // offer: parseInt(offer)
                 });
             }
         });

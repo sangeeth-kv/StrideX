@@ -2,6 +2,7 @@ const cartSchema=require("../../model/cartModel")
 const productSchema=require("../../model/productModel")
 const userSchema=require("../../model/userModel")
 const brandSchema=require("../../model/brandModel")
+const categorySchema=require("../../model/categoryModel")
 
 const cartController={
 
@@ -167,6 +168,15 @@ const cartController={
             const cartData = cart.items.map(item => {
                 const product = item.productId;
                 const variant = product.variants?.find(v => v.size === item.size); 
+                const categoryId=item.productId.categoryId
+                // const category=await categoryS
+                console.log('this is category id from loadCart page : ',categoryId )
+                console.log("category Id in loadCart page : ",categoryId.offer,"this is product offer : ",product.offer)///////////////
+                const categoryOffer=categoryId.offer
+                const productOffer=product.offer
+
+                const maxOffer=Math.max(categoryOffer,productOffer)
+                console.log("MAX OFFER IN THE LOADCARTPAGE : ",maxOffer)
 
 
                  if (!variant) {
@@ -175,7 +185,7 @@ const cartController={
                 }
 
                 const regularPrice = variant.regularPrice;
-                const offerPercentage = variant.offer || 0;
+                const offerPercentage = maxOffer || 0;
                 // Calculate sale price after applying the product-specific offer
                 const salePrice = regularPrice - (regularPrice * offerPercentage / 100);
                 // Calculate discount on the product

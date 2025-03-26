@@ -43,6 +43,7 @@
                 <th scope="col"><b>Category</b></th>
                 <th scope="col"><b>variants(SIZE)</b></th>
                 <th scope="col"><b>Image</b></th>
+                <th scope="col"><b>Offer</b></th>
                 <th scope="col"><b>Action</b></th>
                 <th scope="col"><b>Edit</b></th>
             </tr>
@@ -63,6 +64,7 @@
                 <td><%= (product.categoryId && product.categoryId.name) ? product.categoryId.name : "N/A" %></td>
                 <td><%= product.variants.map(x=>x.size)%></td>
                 <td><img src="<%= product.images[1] %>" style="width: 80px; height: 80px; object-fit: cover;"></td>
+                <td><%= product.offer %></td>
                 <td>
                     <% if(product.isActive) { %>
                         <button class="btn btn-danger" style="width: 80px;" onclick="changeProductStatus('<%= product._id %>', '<%= product.isActive %>')">Unlist</button> 

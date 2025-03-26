@@ -1,0 +1,57 @@
+<%- include("partials/header") %>
+<body class="bg-gray-100">
+
+    <div class="max-w-3xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Transaction Details</h2>
+
+        <!-- User Information -->
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-800">User Details</h3>
+            <p class="text-gray-600"><strong>Name:</strong><%=user.fullname %> </p>
+            <p class="text-gray-600"><strong>Email:</strong><%=user.email %></p>
+        </div>
+
+        <!-- Transaction Information -->
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-800">Transaction Info</h3>
+            <p class="text-gray-600"><strong>Transaction ID:</strong><%=transaction.transactionId %></p>
+            <p class="text-gray-600">
+                <strong>Date:</strong> 
+                <%= new Date(transaction.date).toLocaleString("en-US", { 
+                      weekday: 'long', 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric', 
+                      hour: '2-digit', 
+                      minute: '2-digit', 
+                      second: '2-digit', 
+                      hour12: true 
+                }) %>
+              </p>
+              
+            <p class="text-gray-600">
+                <strong>Type:</strong> 
+                <span class="<%= transaction.type === 'credit' ? 'text-danger' : 'text-success' %>"><%=transaction.type=='credit'?'debit':'credit' %></span>
+            </p>
+            <p class="text-gray-600"><strong>Amount:</strong> Rs:<%=transaction.amount %></p>
+        </div>
+
+        <!-- Transaction Source -->
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-800">Source of Transaction</h3>
+            <p class="text-gray-600"><%=transaction.reason %></p>
+            <a href="/admin/order-details/<%=transaction.orderId %>" class="mt-4 inline-block px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                View Order Details
+            </a>
+        </div>
+
+        <!-- Back Button -->
+        <div class="text-center mt-6">
+            <a href="/admin/wallet-management" class="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">
+                Back to Wallet
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

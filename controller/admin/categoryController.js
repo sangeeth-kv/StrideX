@@ -46,7 +46,7 @@ const categoryController={
             const imageUrl=req.file ? `/uploads/${req.file.filename}`:"";
             console.log(req.body)
 
-        const { name, description } = req.body;
+        const { name, description,offer } = req.body;
         if(!name?.trim() || !description?.trim()){
             return res.status(401).json({
                 message: 'Must fill all fields!',
@@ -66,7 +66,7 @@ const categoryController={
             });
         }
 
-         await categorySchema.findByIdAndUpdate(id, { name:name.trim(), description:description ,image:imageUrl});
+         await categorySchema.findByIdAndUpdate(id, { name:name.trim(),offer:offer, description:description ,image:imageUrl});
 
         res.status(200).json({ success: true, message: "Category updated successfully" ,imageUrl});
         } catch (error) {
@@ -76,7 +76,8 @@ const categoryController={
     },
     addCategory:async (req,res) => {
         try {
-            const {name,description}=req.body
+            console.log("req body of add category : ",req.body)
+            const {name,description,offer}=req.body
             const imageUrl=req.file ? `/uploads/${req.file.filename}`:"";
             console.log("this is name of product"+name )
             console.log("this is descro"+description)
@@ -96,8 +97,10 @@ const categoryController={
 
             const newcategory=new categorySchema({
                 name,
+                offer,
                 description,
-                image:imageUrl
+                image:imageUrl,
+                
             })
 
             await newcategory.save();

@@ -1,6 +1,8 @@
 const orderSchema=require("../../model/orderModel")
 const productSchema=require("../../model/productModel")
 const walletSchema=require("../../model/walletModel")
+const { v4: uuidv4 } = require("uuid"); // Import UUID
+
 const orderController={
     loadOrderPage:async (req,res) => {
 
@@ -123,14 +125,19 @@ const orderController={
                     wallet = await walletSchema.create({ userId, balance: 0, transactions: [] });
                 }
                 console.log(orderId)
+
+                if(order.total>0){
                 wallet.transactions.push({
                     type: "credit",
+                    transactionId:uuidv4(),
                     amount: order.total,
                     reason: `Refund for Order #${orderId}`,
+                    orderId:order._id
                 });
                  
                 wallet.balance += order.total
                 await wallet.save();
+              }
                 console.log("Refund processed successfully!");
 
                 order.items.forEach((itm)=>{
@@ -207,17 +214,35 @@ const orderController={
                 wallet = await walletSchema.create({ userId, balance: 0, transactions: [] });
             }
 
+            if(item.itemSalePrice*item.quantity>0){
             
                 wallet.transactions.push({
                     type: "credit",
-                    amount: salePrice*item.quantity,
-                    reason: `Refund for Order #${orderId}`,
+                    transactionId:uuidv4(),
+                    amount: item.itemSalePrice*item.quantity,
+                    reason: `Refund for Order #${orderId} of item ${product.name}`,
+                    orderId:order._id
                 });
                  
-                wallet.balance += salePrice
+                wallet.balance += item.itemSalePrice * item.quantity;
                 await wallet.save();
 
-                order.total=order.total-salePrice
+                order.total-=item.itemSalePrice*item.quantity
+                await order.save()
+            }
+
+                 // Check if all items are cancelled or returned
+        const allItemsCancelledOrReturned = order.items.every(item =>
+            item.itemStatus === "cancelled" || item.itemStatus === "returned"
+        );
+
+        if (allItemsCancelledOrReturned) {
+            order.status = "cancelled"; // Cancel the entire order
+        }
+       
+
+
+                order.total -= item.itemSalePrice * item.quantity;
 
                 await order.save()
 

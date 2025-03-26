@@ -5,6 +5,8 @@ const cartSchema=require("../../model/cartModel")
 const bcrypt=require("bcrypt")
 const crypto = require("crypto");
 const {sendOTPByEmail}=require("../../controller/user/otpverification")
+const productController = require("../admin/productController")
+const reviewSchema=require("../../model/reviewModel")
 const saltRounds=10;
 
 const generateOTP=()=>crypto.randomInt(100000, 999999).toString();
@@ -13,6 +15,9 @@ const generateOTP=()=>crypto.randomInt(100000, 999999).toString();
 const userController={
         loadLogin:async (req,res) => {
         try {
+            if (req.session.user) {
+                return res.redirect("/user/home"); // Redirect if already logged in
+            }
             res.render("user/login", { messages:"you have to enter.."});
         } catch (error) {
             console.log(error)
@@ -337,7 +342,8 @@ const userController={
          req.session.user={
             id: user._id,
             name: user.fullname,
-            email: user.email
+            email: user.email,
+            isActive:user.isActive
          }
         
          
@@ -358,20 +364,59 @@ const userController={
      },
     loadHome:async (req,res) => {
         try {
-            console.log("working")
-            
-            
-            
-            const products = await productSchema.find({ isActive: true }).sort({ createdAt: -1 });
-            const categories=await categorySchema.find({ isListed: true })
-            
-            console.log(products);
-            
-            res.render("user/home",{products,categories})
+            console.log("working");
+    
+            // Fetch products and categories
+            const products = await productSchema
+                .find({ isActive: true })
+                .sort({ createdAt: -1 })
+                .populate('categoryId', 'name offer');
+    
+            const categories = await categorySchema.find({ isListed: true });
+    
+            let globalMaxOffer = 0; // Track the highest offer across all products
+    
+            // Transform products with calculated max offer and sale price
+            const updatedProducts = await Promise.all(products.map(async (product) => {
+                const productOffer = product.offer || 0;
+                const categoryOffer = product.categoryId?.offer || 0;
+                const maxOffer = Math.max(productOffer, categoryOffer);
+    
+                // Update global max offer
+                globalMaxOffer = Math.max(globalMaxOffer, maxOffer);
+    
+                // Calculate sale price for each variant
+                const updatedVariants = product.variants.map(variant => ({
+                    ...variant.toObject(),
+                    salePrice: variant.regularPrice - (variant.regularPrice * maxOffer / 100),
+                }));
+    
+                // 🔹 Fetch average rating for each product
+                const reviews = await reviewSchema.aggregate([
+                    { $match: { productId: product._id } },
+                    { $group: { _id: "$productId", avgRating: { $avg: "$rating" }, totalReviews: { $sum: 1 } } }
+                ]);
+    
+                const avgRating = reviews.length > 0 ? reviews[0].avgRating.toFixed(1) : "0.0"; // Format to 1 decimal
+                const totalReviews = reviews.length > 0 ? reviews[0].totalReviews : 0;
+    
+                return {
+                    ...product.toObject(),
+                    maximumOffer: maxOffer,
+                    variants: updatedVariants,
+                    avgRating, // ⭐ Add average rating
+                    totalReviews, // 📝 Add total review count
+                };
+            }));
+    
+    
+            console.log("Updated Products:", updatedProducts);
+            console.log("Global Maximum Offer:", globalMaxOffer);
+    
+            res.render("user/home", { products: updatedProducts, categories,});
         } catch (error) {
             console.log(error);
         }
-        
         
     },
     logout:async (req,res) => {
