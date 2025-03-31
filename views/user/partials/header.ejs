@@ -11,31 +11,49 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
-  header {
-    height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between; /* Ensures even spacing */
-    padding: 10px 20px;
-}
+        header {
+            height: auto;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+        }
+        
+        .mobile-menu-items {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .mobile-menu-items.active {
+            max-height: 300px;
+        }
     </style>
 </head>
-</head>
-
 
 <body class="font-['Nunito_Sans']">
     <!-- Header -->
-    <header class="sticky top-0 bg-white shadow-md z-50">
+    <header class="sticky top-0 bg-white shadow-md z-50 w-full">
         <div class="container mx-auto px-4">
-            <div class="flex items-center justify-between py-4">
+            <div class="flex flex-wrap items-center justify-between py-2">
                 <!-- Logo -->
-                <div class="w-1/4">
+                <div class="flex items-center">
                     <a href="/user/home">
-                        <img src="/admin-assets/imgs/logos/logo-transparent-png.png" alt="Logo" class="h-11">
+                        <img src="/admin-assets/imgs/logos/logo-transparent-png.png" alt="Logo" class="h-8 md:h-11">
                     </a>
                 </div>
-                <div class="col-lg-6 col-md-6 flex justify-center">
-                    <nav class="header__menu mobile-menu">
+                
+                <!-- Mobile Menu Button -->
+                <div class="flex md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-700 focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex justify-center">
+                    <nav class="header__menu">
                         <ul class="flex space-x-6">
                             <li class="active"><a href="/user/home">Home</a></li>
                             <li><a href="/user/shop">Shop</a></li>
@@ -43,8 +61,8 @@
                     </nav>
                 </div>
 
-                <!-- Navigation -->
-                <div class="flex items-center space-x-6">
+                <!-- Desktop User Controls -->
+                <div class="hidden md:flex items-center space-x-6">
                     <% if (user) { %>
                         <div class="relative">
                             <button id="user-button" class="sign-in-link focus:outline-none">
@@ -72,30 +90,99 @@
                     </a>
                 </div>
             </div>
+            
+            <!-- Mobile Menu Items -->
+            <div id="mobile-menu-items" class="mobile-menu-items w-full md:hidden">
+                <nav class="py-2">
+                    <ul class="space-y-3 pb-3">
+                        <li class="active"><a href="/user/home" class="block py-2">Home</a></li>
+                        <li><a href="/user/shop" class="block py-2">Shop</a></li>
+                    </ul>
+                </nav>
+                
+                <div class="flex items-center justify-between py-3 border-t border-gray-200">
+                    <div>
+                        <% if (user) { %>
+                            <div class="relative">
+                                <button id="mobile-user-button" class="sign-in-link focus:outline-none">
+                                    <%= user.name %>
+                                </button>
+                                <div id="mobile-user-dropdown" class="absolute left-0 mt-2 w-40 bg-white shadow-md rounded-md hidden">
+                                    <a href="/user/view-Profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profile</a>
+                                    <a href="/user/logout" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Logout</a>
+                                </div>
+                            </div>
+                        <% } else { %>
+                            <div class="space-x-4">
+                                <a href="/user/signup" class="sign-in-link">Sign Up</a>
+                                <a href="/user/login" class="sign-in-link">Log in</a>
+                            </div>
+                        <% } %>
+                    </div>
+                    
+                    <div class="flex items-center space-x-6">
+                        <!-- Wishlist Icon -->
+                        <a href="/user/wishlist" class="relative">
+                            <i class="fas fa-heart text-xl text-gray-700"></i>
+                        </a>
+                        
+                        <!-- Cart Icon -->
+                        <a href="/user/cart" class="relative">
+                            <i class="fas fa-shopping-cart text-xl text-gray-700"></i>
+                            <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
     <script>
-
         document.addEventListener("DOMContentLoaded", function () {
+            // Desktop user dropdown
             const userButton = document.getElementById("user-button");
             const dropdownMenu = document.getElementById("user-dropdown");
 
             if (userButton) {
                 userButton.addEventListener("click", function (event) {
-                    event.stopPropagation(); // Prevent event from bubbling
-                    dropdownMenu.classList.toggle("hidden"); // Toggle visibility
+                    event.stopPropagation();
+                    dropdownMenu.classList.toggle("hidden");
                 });
 
-                // Close dropdown when clicking outside
                 document.addEventListener("click", function (event) {
                     if (!userButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
                         dropdownMenu.classList.add("hidden");
                     }
                 });
             }
-        });
+            
+            // Mobile user dropdown
+            const mobileUserButton = document.getElementById("mobile-user-button");
+            const mobileDropdownMenu = document.getElementById("mobile-user-dropdown");
 
+            if (mobileUserButton) {
+                mobileUserButton.addEventListener("click", function (event) {
+                    event.stopPropagation();
+                    mobileDropdownMenu.classList.toggle("hidden");
+                });
+
+                document.addEventListener("click", function (event) {
+                    if (!mobileUserButton.contains(event.target) && !mobileDropdownMenu.contains(event.target)) {
+                        mobileDropdownMenu.classList.add("hidden");
+                    }
+                });
+            }
+            
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById("mobile-menu-button");
+            const mobileMenuItems = document.getElementById("mobile-menu-items");
+
+            if (mobileMenuButton) {
+                mobileMenuButton.addEventListener("click", function () {
+                    mobileMenuItems.classList.toggle("active");
+                });
+            }
+        });
     </script>
 </body>
 </html>
