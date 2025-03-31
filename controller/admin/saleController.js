@@ -9,6 +9,12 @@ const saleController={
             try {
                 let { day, startDate, endDate } = req.query;
                 console.log("daya",day)
+                let page=parseInt(req.query.page)||1
+        let limit=5;
+        let skip=(page-1)*limit;
+        
+                    const totalProducts= await orderSchema.countDocuments(); // Total count
+                    const totalPages = Math.ceil(totalProducts/ limit);
 
                 let filter = {};
         
@@ -38,7 +44,11 @@ const saleController={
     .populate("userId", "name")
     .populate("items.productId", "name price") // ✅ Ensure products are populated
     .populate("couponId", "offerPrice")
-    .populate("address").lean();
+    .populate("address")
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit)
+    .lean();  
 
 
         
@@ -57,7 +67,7 @@ const saleController={
                     overallDiscount,
                     selectedDay: day,
                     startDate,
-                    endDate,
+                    endDate,currentPage: page,totalPages
                 });
             } catch (err) {
                 console.error(err);

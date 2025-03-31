@@ -7,6 +7,8 @@ const cartSchema = require("../../model/cartModel");
 const orderSchema = require("../../model/orderModel");
 const productSchema = require("../../model/productModel");
 const addressSchema = require("../../model/addressModel");
+const adminSchema=require("../../model/adminModel")
+const walletSchema=require("../../model/walletModel")
 const couponSchema = require("../../model/coupenModel");
 const { v4: uuidv4 } = require("uuid"); // Import UUID
 // Load environment variables
@@ -237,6 +239,34 @@ const paymentContoller = {
       order.paymentStatus = "Paid";
 
       await order.save();
+//////////////////////////////////////////////////////////////
+      const adminEmail=process.env.ADMIN_WALLET_EMAIL
+      console.log("admin email : ",adminEmail)
+      const admin=await adminSchema.findOne({email:adminEmail})
+
+      console.log("admin email : ",adminEmail)
+
+      let adminWallet=await walletSchema.findOne({adminId:admin?._id})
+      console.log("tis is admin wallet",adminWallet)
+      if(!adminWallet){
+        adminWallet = new walletSchema({
+          adminId: admin?._id,
+          balance: 0,
+          transactions: [],
+      });
+      await adminWallet.save();
+      }
+
+       adminWallet.transactions.push({
+        type: "credit",
+        transactionId:uuidv4(),
+        amount: order.amountPaid,
+        reason: `User purchased for order #${order.orderId} `,
+        orderId:order._id
+      });
+
+      adminWallet.balance += order.amountPaid;
+      await adminWallet.save();
 
       console.log("order id is here : ", order);
 
@@ -293,6 +323,8 @@ const paymentContoller = {
       const orderId = req.params.id;
 
       const order = await orderSchema.findById(orderId);
+      order.paymentStatus="failed"
+     await order.save()
       res.render("user/orderfailure", { orderId: order._id });
     } catch (error) {
       console.log(error);
@@ -317,7 +349,7 @@ const paymentContoller = {
 
       // Create a new payment order on Razorpay
       const options = {
-        amount: order.total * 100, // Convert to paise
+        amount: Math.round(order.total * 100), // Convert to paise
         currency: "INR",
         receipt: `retry_${order.orderId}`,
       };

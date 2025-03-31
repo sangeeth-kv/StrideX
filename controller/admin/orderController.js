@@ -110,6 +110,14 @@ const orderController={
                 return res.status(404).json({ message: "Order not found." });
             }
             console.log("this is statysss:" ,status)
+
+            if(status==="delivered"){
+                if(order.paymentMethod==="COD"){
+                    order.paymentStatus="paid"
+                    await order.save()
+                }
+            }
+
             if( status==="returned"){
                 for (const item of order.items) {
                     await productSchema.updateOne(
@@ -143,6 +151,10 @@ const orderController={
                 order.items.forEach((itm)=>{
                     itm.itemStatus="returned"
                 })
+                 
+                order.paymentStatus="refund"
+
+                await order.save();
 
             }
 
@@ -244,6 +256,8 @@ const orderController={
 
                 order.total -= item.itemSalePrice * item.quantity;
 
+                order.paymentStatus="refund"
+
                 await order.save()
 
         }
@@ -251,6 +265,8 @@ const orderController={
         console.log("here 4");
         // Save the updated order
         await order.save();
+
+       
 
         return res.status(200).json({ success: true, message: "Item status updated successfully." });
         } catch (error) {

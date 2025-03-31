@@ -50,13 +50,13 @@
                                     <td class="px-6 py-4 text-center"><%= data[i].quantity %></td>
                                     <td class="px-6 py-4 text-right font-medium">₹<%= data[i].subtotal %></td>
                                     <td class="px-6 py-4 text-center">
-                                        <a href="/deleteItem?id=<%= data[i].productId %>" 
-                                           onclick="return confirm('Are you sure you want remove this product from cart?')"
-                                           class="text-red-500 hover:text-red-700 transition-colors">
+                                       <button onclick="removeFromCart('<%= data[i].productId %>')"
+                                       class="text-red-500 hover:text-red-700 transition-colors"> 
+                                           
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
-                                        </a>
+                                        </button>
                                     </td>
                                 </tr>
                             <% } %>
@@ -163,15 +163,7 @@
                             </div>
                         </div>
                         
-                        <div class="relative border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                            <input class="payment absolute h-5 w-5 left-4 top-1/2 -translate-y-1/2 text-indigo-600 border-gray-300 focus:ring-indigo-500" 
-                                   type="radio" value="wallet" name="payment_option" id="wallet">
-                            <div class="pl-8">
-                                <label class="font-medium text-gray-900" for="wallet">
-                                    Pay from Wallet
-                                </label>
-                            </div>
-                        </div>
+                        
                     </div>
                 </div>
                 
@@ -563,11 +555,14 @@ document.getElementById("confirmDeleteBtn").addEventListener("click", async () =
             });
 
             const result = await response.json();
+            
             console.log(result)
-            let orderId = result.order._id;
+            
+            let orderId = result.order?._id;
 
-            if (result.method === "cod") {
-                // let audio = new Audio('/audios/success-sound.mp3');
+            if(result.success){
+                if (result.method === "cod") {
+                let audio = new Audio('/audios/success-sound.mp3');
                 // audio.play();
                 // Swal.fire({
                 //     title: "Order Placed",
@@ -586,6 +581,19 @@ document.getElementById("confirmDeleteBtn").addEventListener("click", async () =
                 // });
                 location.href = `/user/payment-success-page?id=${orderId}`;
             }
+            }else{
+                Toastify({
+        text: result.message,
+        duration: 3000,
+        gravity: "top",
+        position: "right",
+        backgroundColor: "#ff4d4d",
+        className: "custom-toast",
+        stopOnFocus: true
+    }).showToast();
+            }
+
+          
         } 
         // Handle Wallet Payment
         else if (payment === "wallet") {
@@ -636,8 +644,22 @@ document.getElementById("confirmDeleteBtn").addEventListener("click", async () =
             });
 
             const order = await response.json();
+
+            if(!order.newOrder){
+                Toastify({
+        text: order.message,
+        duration: 3000,
+        gravity: "top",
+        position: "right",
+        backgroundColor: "#ff4d4d",
+        className: "custom-toast",
+        stopOnFocus: true
+    }).showToast();
+                return;
+            }
             console.log("resposne of create order : ",order)
 
+        
             var globalOrderId;
             globalOrderId = order.newOrder._id
             
@@ -748,6 +770,25 @@ rzp1.open();
         });
       
     }
+}
+
+async function removeFromCart(productId) {
+  try {
+    const response = await fetch(`/user/delete-item/${productId}`, {
+      method: "POST", 
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.statusText}`);
+    }
+
+    console.log("Item removed successfully");
+
+    // Optionally, refresh the cart UI
+    location.reload(); // Reload the page to update the cart
+  } catch (error) {
+    console.error("Failed to remove item:", error);
+  }
 }
 
 </script>

@@ -84,11 +84,13 @@
                                     <td class="border border-gray-300 px-4 py-2"><%= item.size %></td>
                                     <td class="border border-gray-300 px-4 py-2"><%= item.quantity %></td>
                                     <td class="border border-gray-300 px-4 py-2">₹<%= item.itemSalePrice %></td>
-                                    <td class="border border-gray-300 px-4 py-2">₹<%= orders.total %></td>
+                                    <td class="border border-gray-300 px-4 py-2">₹<%= item.itemSalePrice * item.quantity %></td>
                                     <td class="border border-gray-300 px-4 py-2 font-semibold">
+                                        <% let disabledStatuses = ["delivered", "returned"]; %>
                                         <select 
                                             class="border px-2 py-1 rounded text-sm"
                                             onchange="updateItemStatus('<%= orders.orderId %>', '<%= item.productId._id %>', this.value)"
+                                            <%= disabledStatuses.includes(item.itemStatus) ? "disabled" : "" %>
                                         >
                                             <% let statuses = ["pending", "processing", "shipped", "delivered", "cancelled", "return request", "returned"]; %>
                                             <% statuses.forEach(status => { %>
@@ -97,9 +99,11 @@
                                                 </option>
                                             <% }); %>
                                         </select>
-                                    </td>                                    
+                                    </td>                                                                      
                                 </tr>
                             <% }); %>
+                    
+                        
                         <% } else { %>
                             <tr>
                                 <td colspan="6" class="text-red-500 text-center py-4">No items in this order</td>
@@ -114,20 +118,28 @@
             <form id="statusForm" class="mt-4">
                 <input type="hidden" name="orderId" id="orderId" value="<%= orders.orderId %>">
                 <input type="hidden" name="userId" id="userId" value="<%= orders.userId %>">
+                
                 <label for="status" class="block text-sm font-medium text-gray-700">Select Status:</label>
-                <select name="status" id="status" class="mt-1 p-2 border rounded-md w-full">
+                
+                <% let disableFields = orders.status === "delivered" || orders.status === "returned"; %>
+            
+                <select name="status" id="status" class="mt-1 p-2 border rounded-md w-full" 
+                    <%= disableFields ? "disabled class='bg-gray-200 cursor-not-allowed'" : "" %>>
                     <option value="pending" <% if(orders.status === "pending") { %> selected <% } %>>Pending</option>
                     <option value="processing" <% if(orders.status === "processing") { %> selected <% } %>>Processing</option>
                     <option value="shipped" <% if(orders.status === "shipped") { %> selected <% } %>>Shipped</option>
                     <option value="delivered" <% if(orders.status === "delivered") { %> selected <% } %>>Delivered</option>
                     <option value="cancelled" <% if(orders.status === "cancelled") { %> selected <% } %>>Cancelled</option>
-                    <option value="returned" <% if(orders.status === "return request") { %> selected <% } %>>Requested for return</option>
+                    <option value="return request" <% if(orders.status === "return request") { %> selected <% } %>>Requested for return</option>
                     <option value="returned" <% if(orders.status === "returned") { %> selected <% } %>>Returned</option>
                 </select>
-                <button type="submit" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+            
+                <button type="submit" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                    <%= disableFields ? "disabled class='bg-gray-400 cursor-not-allowed'" : "" %>>
                     Update Status
                 </button>
             </form>
+            
 
             <a href="/admin/orderList" class="block mt-6 text-blue-600 hover:underline">Back to Order List</a>
         </div>

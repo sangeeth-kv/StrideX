@@ -84,6 +84,7 @@ router.post("/downloadExcel",saleController.generateExecl)
 //for wallet managemenmt
 router.get("/wallet-management",adminEnsure,adminMiddleware.isLogin,adminWalletController.loadWalletPage)
 router.get("/transaction-details/:id",adminWalletController.loadTransactionPage)
+router.get("/view/credits",adminWalletController.loadCreditsPage)
 
 //for dahsboard
 router.get("/dashboard",adminEnsure,adminMiddleware.isLogin,dashboardController.loadDashboard)

@@ -418,7 +418,9 @@ function togglePassword(inputId, iconId) {
                 });
 
                 if (data.status === "success") {
+                   setTimeout(()=>{
                     window.location.href = "/user/login";
+                   },1000)
                 }
             } catch (error) {
                 Swal.fire({ 

@@ -1,12 +1,14 @@
 const userSchema=require("../../model/userModel")
 const productSchema=require("../../model/productModel")
 const categorySchema=require("../../model/categoryModel")
+const wishlistSchema=require("../../model/wishlistmodel")
 const cartSchema=require("../../model/cartModel")
 const bcrypt=require("bcrypt")
 const crypto = require("crypto");
 const {sendOTPByEmail}=require("../../controller/user/otpverification")
 const productController = require("../admin/productController")
 const reviewSchema=require("../../model/reviewModel")
+const couponSchema=require("../../model/coupenModel")
 const saltRounds=10;
 
 const generateOTP=()=>crypto.randomInt(100000, 999999).toString();
@@ -378,6 +380,18 @@ const userController={
                 .populate('categoryId', 'name offer');
     
             const categories = await categorySchema.find({ isListed: true });
+
+            let itemCount=0;
+            if(req.session.user?.id){
+                const cart = await cartSchema.findOne({ userId: req.session.user?.id });
+                itemCount = cart ? cart.items.length : 0;
+                console.log("Total items in cart:", itemCount);
+                  
+               
+            }
+            console.log("dthis is cart totoal : ",itemCount)
+
+            
     
             let globalMaxOffer = 0; // Track the highest offer across all products
     
@@ -395,6 +409,9 @@ const userController={
                     ...variant.toObject(),
                     salePrice: variant.regularPrice - (variant.regularPrice * maxOffer / 100),
                 }));
+
+                console.log("gloabal max offer : ".globalMaxOffer)
+                
     
                 // 🔹 Fetch average rating for each product
                 const reviews = await reviewSchema.aggregate([
@@ -413,12 +430,30 @@ const userController={
                     totalReviews, // 📝 Add total review count
                 };
             }));
-    
+
+            const reviews=await reviewSchema.find().populate("userId","fullname image").populate("productId").limit(3)
+            console.log("this is reviews for reviews : ",reviews)
+
+            let wishlistItems = [];
+            if (req.session.user?.id) {
+                const wishlist = await wishlistSchema.findOne({ userId: req.session.user?.id }).populate("items.productId"); // changed to optional
+                wishlistItems = wishlist ? wishlist.items.map(item => item.productId?._id.toString()) : [];
+            }
+
+            const maxOfferCoupon = await couponSchema.findOne().sort({ offerPrice: -1 }).select("name offerPrice expireOn minimumPrice");
+
+            if (maxOfferCoupon) {
+                console.log("Highest Offer Coupon:", maxOfferCoupon);
+            } else {
+                console.log("No coupons found.");
+            }
+            
+              
     
             console.log("Updated Products:", updatedProducts);
             console.log("Global Maximum Offer:", globalMaxOffer);
     
-            res.render("user/home", { products: updatedProducts, categories,});
+            res.render("user/home", { products: updatedProducts, categories,reviews,wishlist:wishlistItems,maxOfferCoupon});
         } catch (error) {
             console.log(error);
         }

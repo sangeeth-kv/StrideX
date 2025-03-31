@@ -1,0 +1,89 @@
+<%- include("partials/header") %>
+
+<body class="bg-gray-50 font-sans">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Wallet Management - Transactions</h2>
+        
+        <!-- Transaction Table -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4 flex justify-between items-center">
+                <h5 class="text-white font-semibold text-lg">Transaction List</h5>
+            </div>
+            
+            <div class="flex justify-end px-6 py-2 bg-gray-50">
+                <a href="/admin/wallet-management" class="text-indigo-600 hover:text-indigo-800 transition-colors duration-200 font-medium flex items-center">
+                    <span>View All Debits</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </a>
+            </div>
+            
+            <div class="p-6">
+                <div class="overflow-x-auto rounded-lg border border-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead>
+                            <tr class="bg-gray-800 text-white">
+                                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Transaction ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Date</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">User</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Type</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Amount</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <% if (wallet.length > 0) { %>
+                                <% wallet.forEach(wal=> { %>
+                                    <tr class="hover:bg-gray-50 transition-colors duration-150 even:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= wal.transactions.transactionId %></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600"><%= wal.transactions.date.toISOString().split('T')[0] %></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600"><%=wal.transactions.userFullname %></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <% if (wal.transactions.type === 'credit') { %>
+                                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                    <%= wal.transactions.type %>
+                                                </span>
+                                            <% } else { %>
+                                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                                    <%= wal.transactions.type %>
+                                                </span>
+                                            <% } %>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium <%= wal.transactions.type === 'credit' ? 'text-green-600' : 'text-red-600' %>">
+                                            ₹<%= wal.transactions.amount.toFixed(2) %>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <a href="/admin/order-details/<%= wal.transactions.orderId %>" 
+                                               class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-150 shadow-sm">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </svg>
+                                                View Order Details
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="6" class="px-6 py-12 text-center text-sm text-gray-500 bg-gray-50">
+                                        <div class="flex flex-col items-center">
+                                            <svg class="w-16 h-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                            </svg>
+                                            <p class="text-lg font-medium">No transactions found.</p>
+                                            <p class="text-gray-400 mt-1">Transaction records will appear here when available.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

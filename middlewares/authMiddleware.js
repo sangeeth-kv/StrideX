@@ -3,7 +3,7 @@
 const userSchema=require("../model/userModel")
 const authMiddlewire={
     isAuthenticated:(req,res,next)=>{
-        if(req.session.user){
+        if(req.session.user ){
             next();
         }else{
             res.redirect("/user/login")

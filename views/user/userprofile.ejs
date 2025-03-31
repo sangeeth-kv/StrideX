@@ -80,7 +80,7 @@
                         </div>
 
                         <div class="mt-6 pt-6 border-t border-gray-100">
-                            <a href="/logout" class="flex items-center gap-3 px-5 py-3.5 rounded-xl text-red-600 hover:bg-red-50 transition-all duration-200 group">
+                            <a href="/user/logout" class="flex items-center gap-3 px-5 py-3.5 rounded-xl text-red-600 hover:bg-red-50 transition-all duration-200 group">
                                 <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center group-hover:bg-red-200 transition-colors">
                                     <i class="fas fa-sign-out-alt text-red-600"></i>
                                 </div>
@@ -250,8 +250,9 @@
                                 </tr>
                             </thead>
                             <tbody id="orderTableBody" class="divide-y divide-gray-100">
-                                <% if (orders.length > 0) { %>
+                                <% if (orders.length > 0 ) { %>
                                     <% orders.forEach((order, index) => { %>
+                                        <%if(order.paymentStatus!="failed") {%>
                                         <tr class="hover:bg-gray-50 transition-colors order-row <%= index >= 5 ? 'hidden extra-order' : '' %>">
                                             <td class="px-8 py-5 text-sm text-gray-600 font-medium">Order #<%= order._id %></td>
                                             <td class="px-8 py-5 text-sm text-gray-600">
@@ -300,13 +301,14 @@
                                                     </span>
                                                 <% } %>
                                             </td>
-                                            <td class="px-8 py-5 text-sm font-medium text-gray-800">₹<%= order.total.toLocaleString() %></td>
+                                            <td class="px-8 py-5 text-sm font-medium text-gray-800">₹<%= order.amountPaid.toLocaleString() %></td>
                                             <td class="px-8 py-5 text-right">
                                                 <a href="/user/orderdetails?id=<%= order._id %>" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-xl hover:bg-emerald-200 transition-colors text-sm shadow-sm">
                                                     <i class="fas fa-eye"></i> View Details
                                                 </a>
                                             </td>
                                         </tr>
+                                        <% } %>
                                     <% }); %>
                                     
                                     <% if (orders.length > 5) { %>
@@ -324,6 +326,7 @@
                                                 </button>
                                             </td>
                                         </tr>
+                                       
                                     <% } %>
                                 <% } else { %>
                                     <tr>
@@ -414,6 +417,7 @@
                                         <p class="text-orange-100 mb-2">Your Referral Code</p>
                                         <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 flex items-center justify-between">
                                             <code id="refIdDisplay" class="text-lg font-mono font-bold"><%= user.referralCode %></code>
+                                           
                                             <input type="text" id="refId" value="<%= user.referralCode %>" readonly class="hidden">
                                             <button onclick="copyReferral()" class="p-2 hover:bg-white/20 rounded-lg transition-colors">
                                                 <i class="fas fa-copy"></i>
@@ -423,17 +427,15 @@
                                     </div>
 
                                     <div class="flex items-center gap-6 mt-4">
+                                        
                                         <div class="flex-1 bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-                                            <p class="text-orange-100 text-sm mb-1">Total Earned</p>
-                                            <p class="text-2xl font-bold">₹0.00</p>
-                                        </div>
-                                        <div class="flex-1 bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-                                            <p class="text-orange-100 text-sm mb-1">Referrals</p>
-                                            <p class="text-2xl font-bold">0</p>
+                                            <p class="text-orange-100 text-sm mb-1">Total Referrals</p>
+                                            <p class="text-2xl font-bold"><%=totalReferaal %></p>
                                         </div>
                                     </div>
                                     
                                     <!-- Others' Referral Code Input -->
+                                    <%if(hasUsedReferral==false) { %>
                                     <div class="mt-6 pt-6 border-t border-white/20">
                                         <label class="block mb-2 text-orange-100">Enter Referral Code</label>
                                         <div class="flex gap-2">
@@ -446,6 +448,9 @@
                                         </div>
                                         <p id="referralResponse" class="text-sm mt-2"></p>
                                     </div>
+                                    <% } else { %>
+                                        <label class="block mb-2 text-orange-100">You already used referal</label>
+                                        <% } %>
                                 </div>
                             </div>
                         </div>
@@ -599,6 +604,9 @@ function submitReferralCode() {
                 responsePara.textContent = 'Referral code applied successfully!';
                 responsePara.classList.remove('text-red-500');
                 responsePara.classList.add('text-green-500');
+                setTimeout(()=>{
+                    location.reload()
+                },1000)
             } else {
                 responsePara.textContent = data.message || 'Failed to apply referral code.';
                 responsePara.classList.remove('text-green-500');

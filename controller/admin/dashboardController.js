@@ -4,6 +4,7 @@ const productSchema = require("../../model/productModel");
 const cateegorySchema = require("../../model/categoryModel");
 const brandSchema = require("../../model/brandModel");
 const walletSchema = require("../../model/walletModel");
+const userSchema=require("../../model/userModel")
 
 // Helper function to determine date range
 const getDateRange = (period) => {
@@ -21,6 +22,17 @@ const getDateRange = (period) => {
     
     return { startDate, endDate: new Date() };
 };
+
+const calculateConversionRate=async()=>{
+    const userCount=await userSchema.countDocuments()
+    const orderCount=await orderSchema.countDocuments({status:"delivered"})
+    if(userCount==0){
+        return 0
+    }
+
+    conversionRate=(orderCount/userCount)*100
+    return conversionRate.toFixed(2)
+}
 
 function getGroupingField(timeFilter) {
     switch(timeFilter) {
@@ -46,7 +58,7 @@ const dashboardController = {
             console.log("Loading Admin Dashboard...");
             const timeFilter = req.query.timeFilter || 'monthly';
             console.log("timeFilter :",timeFilter)
-            const { startDate, endDate } = getDateRange(timeFilter);
+            const { startDate, endDate } = await getDateRange(timeFilter);
             console.log("start date : ",startDate," end date : ",endDate)
 
             // Get total orders, revenue, and average order value
@@ -186,6 +198,10 @@ const dashboardController = {
 
             const salesLabels = salesData.map(s =>` Month ${s._id}`);
             const salesValues = salesData.map(s => s.count);
+
+            const conversionRate= await calculateConversionRate()
+            
+            console.log("conversion rate : ",conversionRate)
             
             console.log("sales laels : ",salesLabels);
             console.log("sales vlaues : ",salesValues)
@@ -200,6 +216,7 @@ const dashboardController = {
                 topproductSchemas,
                 topCategories,
                 topbrandSchemas,
+                conversionRate,
                 ordersData: { labels: salesLabels, values: salesValues }
             });
 

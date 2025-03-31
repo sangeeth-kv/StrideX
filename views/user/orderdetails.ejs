@@ -116,7 +116,7 @@
                                 <span class="block mt-1">Confirmed</span>
                                 <% if (orders.status === 'processing' || orders.status === 'shipped' || orders.status === 'delivered') { %>
                                     <span class="text-xs text-gray-500 block">
-                                        <%= new Date(orders.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %>
+                                        <%= new Date(orders.orderDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %>
                                     </span>
                                 <% } %>
                             </div>
@@ -130,7 +130,7 @@
                                 <span class="block mt-1">Shipped</span>
                                 <% if (orders.status === 'shipped' || orders.status === 'delivered') { %>
                                     <span class="text-xs text-gray-500 block">
-                                        <%= new Date(Date.now() - 2*24*60*60*1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %>
+                                        <!-- <%= new Date(Date.now() - 2*24*60*60*1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %> -->
                                     </span>
                                 <% } %>
                             </div>
@@ -143,7 +143,7 @@
                                 <span class="block mt-1">Delivered</span>
                                 <% if (orders.status === 'delivered') { %>
                                     <span class="text-xs text-gray-500 block">
-                                        <%= new Date(Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %>
+                                        <!-- <%= new Date(Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %> -->
                                     </span>
                                 <% } %>
                             </div>
@@ -308,8 +308,12 @@
                                     <% } %>
                                 </div>
                                 
+                                <div class="text-gray-500">Payment Status:</div>
+                                <div class="text-gray-900 font-medium"><%= orders.paymentStatus %></div>
+
                                 <div class="text-gray-500">Amount Paid:</div>
                                 <div class="text-gray-900 font-medium">₹<%= orders.amountPaid.toLocaleString() %></div>
+
                                 
                                 <div class="text-gray-500">Order Date:</div>
                                 <div class="text-gray-900 font-medium">

@@ -2,10 +2,12 @@ const addressSchema=require("../../model/addressModel")
 const userSchema=require("../../model/userModel")
 const orderSchema=require("../../model/orderModel")
 const walletSchema=require("../../model/walletModel")
+const couponSchema=require("../../model/coupenModel")
 const crypto = require("crypto");
 const {sendOTPByEmail}=require("../../controller/user/otpverification")
 const saltRounds=10;
-const bcrypt=require("bcrypt")
+const bcrypt=require("bcrypt");
+const { findById, countDocuments } = require("../../model/adminModel");
 
 const generateOTP=()=>crypto.randomInt(100000, 999999).toString();
 
@@ -14,27 +16,41 @@ const userProfileController={
         try {
             const userId=req.session.user?.id
            
-
+            console.log("req.sessioj ",req.session.user.id)
             const user=await userSchema.findById(userId)
             if(!user){
                 return res.redirect("/user/login?error=User not found");
             }
+            console.log("here 1")
            
 
              let wallet=await walletSchema.findOne({userId})
+             console.log("wallet found by:",wallet)
+             console.log("here 2")
             
                 if (!wallet) {
                 // If wallet doesn't exist, create one
                 wallet = await walletSchema.create({ userId, balance: 0, transactions: [] });
                 }
-
+                console.log("here 3")
             const addresses = await addressSchema.find({ userId, isDeleted: false });
             const orders = await orderSchema
             .find({ userId }) 
             .populate('items.productId', 'name');
+            console.log("here 4")
+
+            const usedReferralCoupon = await couponSchema.findOne({ userId: { $in: [userId] } });
+
+            const totalReferaal=await couponSchema.countDocuments({ referedBy: { $in: [userId] } })
+            console.log("user refreal coupon : ",usedReferralCoupon)
+                console.log("total referal : ",totalReferaal)
+            const hasUsedReferral = !!usedReferralCoupon; 
+            console.log("has user : ",hasUsedReferral)
+           
+
 
             console.log(wallet)
-            res.render("user/userprofile",{user,addresses,orders,wallet})
+            res.render("user/userprofile",{user,addresses,orders,wallet,hasUsedReferral,totalReferaal})
         } catch (error) {
             console.log(error)
         }

@@ -182,7 +182,8 @@
                         <span class="text-gray-600 font-medium">Availability:</span>
                         <span id="availabilityStatus" 
                               class="font-medium <%= product.stock > 0 ? 'text-green-600' : 'text-red-500' %>">
-                            <%= product.stock > 0 ? "In Stock" : "Select a size" %>
+                            <%= product.stock > 0 ? "In Stock"  : "Select a size" %> 
+            
                         </span>
                     </div>
 
@@ -403,7 +404,7 @@
                         <div class="group relative bg-white rounded-xl border overflow-hidden transition-all duration-300 hover:shadow-lg">
                             <!-- Product Image -->
                             <a href="/user/view-product/<%= relatedProduct._id %>" class="block aspect-w-1 aspect-h-1 overflow-hidden bg-gray-100">
-                                <img src="<%= relatedProduct.images[0] %>" alt="<%= relatedProduct.name %>" 
+                                <img src="<%= relatedProduct.images[3] %>" alt="<%= relatedProduct.name %>" 
                                      class="w-full h-64 object-cover object-center group-hover:scale-105 transition-transform duration-300">
                                 <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300"></div>
                             </a>
@@ -412,6 +413,7 @@
                             <div class="p-4">
                                 <!-- Brand -->
                                 <p class="text-sm text-gray-500 mb-1"><%= relatedProduct.brand.name %></p>
+                                
                                 
                                 <!-- Product Name -->
                                 <h3 class="text-lg font-medium text-gray-900 mb-2 line-clamp-2">
@@ -802,6 +804,7 @@ document.querySelectorAll(".wishlist-btn").forEach(button => {
     let qty = document.getElementById('quantity');
     let selectedSize = document.getElementById('selectedSize').value;
     let productId = "<%= product._id %>";
+    console.log("qtry : ",qty,"selected size :",selectedSize,"prodct id :",productId)
 
     if (parseInt(qty.innerText) > 1) {
         qty.innerText = parseInt(qty.innerText) - 1;
@@ -818,31 +821,6 @@ document.querySelectorAll(".wishlist-btn").forEach(button => {
     // updateCartQuantity(productId, selectedSize, parseInt(qty.innerText));
     }
 
-
-    function updateCartQuantity(productId, selectedSize, quantity) {
-    fetch("/user/update-cart-quantity", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            productId: productId,
-            size: selectedSize,
-            // quantity: quantity
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            console.log("Cart updated successfully!");
-        } else {
-            console.error("Failed to update cart:", data.message);
-        }
-    })
-    .catch(error => {
-        console.error("Error updating cart:", error);
-    });
-    }
 
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -891,6 +869,10 @@ document.querySelectorAll(".wishlist-btn").forEach(button => {
     addtocartError.textContent = "";
     addtocartError.classList.add("hidden");
 
+    let quantityElement = document.getElementById("quantity");
+let quantity = parseInt(quantityElement.textContent); 
+console.log("Current Quantity:", quantity);
+
     if (!selectedSize) {
         addtocartError.textContent = "Please select a size before adding to cart!";
         addtocartError.classList.remove("hidden");
@@ -907,7 +889,8 @@ document.querySelectorAll(".wishlist-btn").forEach(button => {
             },
             body: JSON.stringify({
                 productId: productId,
-                size: selectedSize
+                size: selectedSize,
+                quantity:quantity
             })
         });
 

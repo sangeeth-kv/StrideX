@@ -63,7 +63,7 @@ router.get("/login",userController.loadLogin)
 router.post("/signup",userController.signUp)
 router.get("/signup",userController.loadSignup)
 router.post("/login",userController.signIn)
-router.get("/home",userController.loadHome)
+router.get("/home",authMiddlewire.isBlocked,userController.loadHome)
 // router.get("/verify-otp",userController.loadOTPPage)
 router.post("/verify-otp", userController.verifyOTP);
 router.post("/resend-otp", userController.resendOTP);
@@ -104,7 +104,7 @@ router.delete("/delete-address/:id",userAddressController.deleteUserAddress)
 //add to cart
 router.post("/add-to-cart",cartController.addToCart)
 router.post("/update-cart-quantity",cartController.updateCartQuantity)
-router.get("/cart",userEnsure,authMiddlewire.isAuthenticated,authMiddlewire.isBlocked,cartController.loadCartPage)
+router.get("/cart",authMiddlewire.isAuthenticated,authMiddlewire.isBlocked,cartController.loadCartPage)
 router.post("/delete-item/:id",cartController.deleteItem)
 
 

@@ -26,22 +26,22 @@
 //     limits:{fileSize: 5*1024*1024} //lm 5mb
 // })
 
-// module.exports=upload
 const multer = require("multer");
 const path = require("path");
 
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {  // Change 'res' to 'file' (correct parameter)
-        cb(null, "public/uploads/");  // ✅ Correct path
+    destination: (req, file, cb) => {
+        cb(null, "public/uploads/");
     },
-    filename: (req, file, cb) => {  // Fix 'file' reference
-        cb(null, Date.now() + path.extname(file.originalname));
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
     }
 });
 
-const fileFilter = (req, file, cb) => {  // Fix parameter names
+const fileFilter = (req, file, cb) => {
     const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
-    if (allowedTypes.includes(file.mimetype)) {  // Fix 'file' reference
+    if (allowedTypes.includes(file.mimetype)) {
         cb(null, true);
     } else {
         cb(new Error("Only images are allowed!"), false);

@@ -38,6 +38,10 @@ const couponSchema= new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
       }],  
+      referedBy:[{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+      }]
 
 })
 

@@ -51,7 +51,7 @@ const wishlistController={
             const productId=req.body.productId
             
             const userId=req.session.user?.id
-            if(userId){
+            if(!userId){
                 return res.status(404).json({message:"You need to log in to add items to your wishlist."})
             }
             console.log("product id : ",productId,"user id : ",userId)

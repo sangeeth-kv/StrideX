@@ -4,18 +4,24 @@ const userSchema=require("../../model/userModel")
 const brandSchema=require("../../model/brandModel")
 const categorySchema=require("../../model/categoryModel")
 
+
 const cartController={
 
     addToCart:async (req,res) => {
         try {
             console.log("works for two..")
             const {productId,size}=req.body
+            const quantity=req.body.quantity || 1
             console.log(productId,"hi",size,"sizeee")
+
+            if(quantity>6){
+                return res.status(400).json({message:"You can add upto 6 items"})
+            }
 
             const userId = req.session.user?.id; 
 
             if (!userId) {
-                return res.status(401).json({ message: "User not authenticated" });
+                return res.status(401).json({ message: "You need to login first for add items to cart" });
             }
 
             const product = await productSchema.findById(productId);
@@ -46,13 +52,13 @@ const cartController={
                 if(existingItem.quantity > 5){
                     return res.status(400).json({message:"You can add upto 6 items"})
                 }else{
-                    if (existingItem.quantity + 1 > variant.quantity) {
+                    if (existingItem.quantity + quantity > variant.quantity) {
                         return res.status(400).json({ message: "Not enough stock available" });
                     }
                 }
                 
 
-                existingItem.quantity += 1;
+                existingItem.quantity += quantity;
             } else {
                 // Ensure we do not add more than available stock**
                 if (variant.quantity < 1) {
@@ -60,7 +66,7 @@ const cartController={
                 }
 
                 // Add the new product with the selected size to cart
-                cart.items.push({ productId, size, quantity: 1 });
+                cart.items.push({ productId, size, quantity: quantity });
             }
 
             await cart.save();
@@ -143,6 +149,10 @@ const cartController={
     },loadCartPage:async (req,res) => {
         try {
             const userId = req.session.user?.id// Assuming user is authenticated
+
+            if(!userId){
+                return res.redirect("/user/login")
+            }
             const user=await userSchema.findById(userId)
 
             
@@ -165,9 +175,13 @@ const cartController={
             let grandTotal = 0;
 
 
+          
+
             const cartData = cart.items.map(item => {
                 const product = item.productId;
-                const variant = product.variants?.find(v => v.size === item.size); 
+                console.log("product in map : ",product)
+                const variant = product.variants?.find(v => v.size === item.size);
+                console.log("variants in map: ",variant) 
                 const categoryId=item.productId.categoryId
                 // const category=await categoryS
                 console.log('this is category id from loadCart page : ',categoryId )
@@ -270,7 +284,7 @@ console.log("here 1")
             console.log(error)
             return res.status(500).json({ message: "Internal server error" });
         }
-    }
+    },
 }
 
 module.exports=cartController

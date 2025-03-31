@@ -46,7 +46,7 @@ const userProductController={
 
             const relatedProducts = await productSchema.find({
                 _id: { $ne: id }, // Not equal to current product
-                categoryId: product.categoryId._id // Same category
+                categoryId: product.categoryId?._id // Same category
             })
             .limit(4) // Limit to 4 related products
             .populate('brand', 'name');
@@ -130,7 +130,7 @@ const userProductController={
             // 
             //  Fetch Categories and Brands
             const categories = await categorySchema.find({ isListed: true });
-            const brands = await brandSchema.find({}, 'name logo');
+            const brands = await brandSchema.find({isListed:true}, 'name logo');
     
             //  Get Total Pages for Pagination
             const totalProducts = await productSchema.countDocuments(filter); // Use same `filter` for accurate count
@@ -139,7 +139,7 @@ const userProductController={
             ///////////////////////////////////////////////////////////////////////////////
             const updatedProducts = product.map((product) => {
                 console.log("product offer : ",product.offer)
-                console.log("product category offers : ",product.categoryId.offer)
+                console.log("product category offers : ",product.categoryId?.offer)
                 const productOffer = product.offer || 0; // Ensure product offer is a valid number
                 const categoryOffer = product.categoryId?.offer ?? 0; // Ensure category offer is a valid number
                 const maxOffer = Math.max(productOffer, categoryOffer); // Get max offer

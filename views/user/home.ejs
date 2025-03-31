@@ -1,5 +1,7 @@
 <%- include("partials/header") %>
-
+<head><!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    </head>
 <!-- Enhanced Hero Section -->
 <section class="relative h-[700px] bg-cover bg-center flex items-center" style="background-image: url('/user-assets/img/banner/bannererrrr.webp')">
     <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent"></div>
@@ -23,7 +25,7 @@
                     <i class="fas fa-truck text-green-700 text-xl"></i>
                 </div>
                 <h3 class="font-semibold">Free Shipping</h3>
-                <p class="text-sm text-gray-600">On orders over ₹499</p>
+                <p class="text-sm text-gray-600">On orders over ₹1000</p>
             </div>
             <div class="p-4 flex flex-col items-center">
                 <div class="bg-green-100 p-3 rounded-full mb-3">
@@ -85,46 +87,58 @@
 </section>
 
 <!-- Promotional Banner -->
-<section class="py-12 bg-gradient-to-r from-green-700 to-green-900 text-white">
-    <div class="container mx-auto px-4">
-        <div class="flex flex-col md:flex-row items-center justify-between">
-            <div class="mb-6 md:mb-0 md:w-1/2">
-                <h2 class="text-3xl font-bold mb-4">Special Offer This Week</h2>
-                <p class="text-white/80 mb-6">Get 20% off on selected items. Limited time offer!</p>
-                <a href="/user/shop" class="bg-white text-green-700 hover:bg-gray-100 px-6 py-3 rounded-full inline-flex items-center font-medium transition-colors">
-                    View Offers <i class="fas fa-arrow-right ml-2"></i>
-                </a>
-            </div>
-            <div class="md:w-1/2 flex justify-center">
-                <div class="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
-                    <div class="text-center">
-                        <div class="text-5xl font-bold mb-2">20% OFF</div>
-                        <p class="mb-4">Use code: <span class="font-semibold">FRESH20</span></p>
-                        <div class="flex justify-center gap-4">
-                            <div class="bg-white/20 p-3 rounded-lg">
-                                <div class="text-2xl font-bold">00</div>
-                                <div class="text-xs">Days</div>
-                            </div>
-                            <div class="bg-white/20 p-3 rounded-lg">
-                                <div class="text-2xl font-bold">12</div>
-                                <div class="text-xs">Hours</div>
-                            </div>
-                            <div class="bg-white/20 p-3 rounded-lg">
-                                <div class="text-2xl font-bold">45</div>
-                                <div class="text-xs">Minutes</div>
-                            </div>
-                            <div class="bg-white/20 p-3 rounded-lg">
-                                <div class="text-2xl font-bold">30</div>
-                                <div class="text-xs">Seconds</div>
+<% if(maxOfferCoupon){ %>
+    <section class="py-12 bg-gradient-to-r from-green-700 to-green-900 text-white">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="mb-6 md:mb-0 md:w-1/2">
+                    <h2 class="text-3xl font-bold mb-4">Special Offer This Week</h2>
+                    <p class="text-white/80 mb-6">Get <%=maxOfferCoupon.offerPrice %> off for purchase <%=maxOfferCoupon.minimumPrice %>. Limited time offer!</p>
+                    <a href="/user/shop" class="bg-white text-green-700 hover:bg-gray-100 px-6 py-3 rounded-full inline-flex items-center font-medium transition-colors">
+                        View Offers <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+                <div class="md:w-1/2 flex justify-center">
+                    <div class="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
+                        <div class="text-center">
+                            <div class="text-5xl font-bold mb-2"><%=maxOfferCoupon.offerPrice %> OFF</div>
+                            <p class="mb-4">Use code: <span class="font-semibold"><%=maxOfferCoupon.name %></span></p>
+                            <div class="flex justify-center gap-4" id="countdown" data-expiry="<%= maxOfferCoupon.expireOn.toISOString() %>">
+                                <div class="bg-white/20 p-3 rounded-lg">
+                                    <div class="text-2xl font-bold" id="days">00</div>
+                                    <div class="text-xs">Days</div>
+                                </div>
+                                <div class="bg-white/20 p-3 rounded-lg">
+                                    <div class="text-2xl font-bold" id="hours">00</div>
+                                    <div class="text-xs">Hours</div>
+                                </div>
+                                <div class="bg-white/20 p-3 rounded-lg">
+                                    <div class="text-2xl font-bold" id="minutes">00</div>
+                                    <div class="text-xs">Minutes</div>
+                                </div>
+                                <div class="bg-white/20 p-3 rounded-lg">
+                                    <div class="text-2xl font-bold" id="seconds">00</div>
+                                    <div class="text-xs">Seconds</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
-
+    </section>
+    <% } else { %>
+    <section class="py-12 bg-gray-100 text-gray-700">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-2xl font-bold mb-4">No Offers Available</h2>
+            <p class="mb-6">Check back later for exciting discounts and special deals.</p>
+            <a href="/user/shop" class="bg-green-700 text-white hover:bg-green-800 px-6 py-3 rounded-full inline-flex items-center font-medium transition-colors">
+                Shop Now <i class="fas fa-shopping-cart ml-2"></i>
+            </a>
+        </div>
+    </section>
+    <% } %>
+    
 <!-- Enhanced Products Section -->
 <section class="py-16">
     <div class="container mx-auto px-4">
@@ -141,14 +155,29 @@
                     <div class="relative">
                         <a href="/user/view-product/<%= product._id %>">
                             <div class="overflow-hidden">
-                                <img src="<%= product.images[1] %>" alt="<%= product.name %>" 
+                                <img src="<%= product.images[3] %>" alt="<%= product.name %>" 
                                     class="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500">
                             </div>
                             <div class="absolute top-0 left-0 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-br-lg">NEW</div>
                         </a>
-                        <a href="/wishlist/add/<%= product._id %>" class="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md hover:text-red-500 transition-colors">
-                            <i class="fas fa-heart"></i>
-                        </a>
+                        <a href="javascript:void(0);" 
+   class="wishlist-btn absolute top-3 right-3 bg-white p-2 rounded-full shadow-md transition-colors"
+   data-product-id="<%= product._id %>"
+   data-wishlist-url="<%= wishlist && wishlist.includes(product._id.toString()) ? '/user/remove-from-wishlist' : '/user/add-to-wishlist' %>">
+
+    <% if (wishlist && wishlist.includes(product._id.toString())) { %>
+        <!-- If in wishlist, show filled heart (red) -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5A5.5 5.5 0 0112 3a5.5 5.5 0 0110 5.5c0 3.78-3.4 6.86-8.55 11.18L12 21z" />
+        </svg>
+    <% } else { %>
+        <!-- If not in wishlist, show outlined heart (gray, hover red) -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 hover:text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+    <% } %>
+</a>
+                          
                     </div>
                     <div class="p-5">
                         <h3 class="font-semibold text-lg mb-2 group-hover:text-green-700 transition-colors"><%= product.name %></h3>
@@ -207,87 +236,40 @@
             <h2 class="text-3xl md:text-4xl font-bold mt-2 mb-4">What Our Customers Say</h2>
             <div class="w-24 h-1 bg-green-600 mx-auto rounded-full"></div>
         </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="bg-white p-6 rounded-xl shadow-md">
-                <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 bg-gray-200 rounded-full overflow-hidden mr-4">
-                        <img src="/placeholder.svg?height=48&width=48" alt="Customer" class="w-full h-full object-cover">
-                    </div>
-                    <div>
-                        <h4 class="font-semibold">Priya Sharma</h4>
-                        <div class="flex text-yellow-400 text-sm">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
+        <% if(reviews && reviews.length>0) { %>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <% reviews.forEach(itm=>{%>
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gray-200 rounded-full overflow-hidden mr-4">
+                            <img src="<%=itm.userId.image %>" alt="Customer" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h4 class="font-semibold"><%=itm.userId.fullname %></h4>
+                            <div class="flex text-yellow-400 text-sm">
+                                <% for (let i = 1; i <= 5; i++) { %>
+                                    <% if (i <= itm.rating) { %>
+                                        <i class="fas fa-star"></i>  <!-- Filled star -->
+                                    <% } else { %>
+                                        <i class="far fa-star"></i>  <!-- Empty star -->
+                                    <% } %>
+                                <% } %>
+                            </div>
+                            <p    class="text-gray-600 italic"><a  href="/user/view-product/<%= itm.productId?._id %>">Review for product : <%=itm.productId?.name %></a></p>
                         </div>
                     </div>
+                    <p class="text-gray-600 italic"><%=itm.review %></p>
                 </div>
-                <p class="text-gray-600 italic">"The quality of products is exceptional. I've been a regular customer for over a year now and have never been disappointed!"</p>
-            </div>
-            
-            <div class="bg-white p-6 rounded-xl shadow-md">
-                <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 bg-gray-200 rounded-full overflow-hidden mr-4">
-                        <img src="/placeholder.svg?height=48&width=48" alt="Customer" class="w-full h-full object-cover">
-                    </div>
-                    <div>
-                        <h4 class="font-semibold">Rahul Patel</h4>
-                        <div class="flex text-yellow-400 text-sm">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
-                        </div>
-                    </div>
-                </div>
-                <p class="text-gray-600 italic">"Fast delivery and excellent customer service. The products are fresh and the packaging is eco-friendly. Highly recommend!"</p>
-            </div>
-            
-            <div class="bg-white p-6 rounded-xl shadow-md">
-                <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 bg-gray-200 rounded-full overflow-hidden mr-4">
-                        <img src="/placeholder.svg?height=48&width=48" alt="Customer" class="w-full h-full object-cover">
-                    </div>
-                    <div>
-                        <h4 class="font-semibold">Ananya Gupta</h4>
-                        <div class="flex text-yellow-400 text-sm">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                    </div>
-                </div>
-                <p class="text-gray-600 italic">"I love the variety of organic products available. Everything I've tried has been amazing. This is now my go-to shop for all my needs!"</p>
-            </div>
+           <% }) %>
         </div>
     </div>
+    <% }else{%>
+        <p class="text-gray-600 italic">"No reviews yet."</p>
+    <%} %>
 </section>
 
 <!-- Newsletter Section -->
-<section class="py-12 bg-green-700 text-white">
-    <div class="container mx-auto px-4">
-        <div class="flex flex-col md:flex-row items-center justify-between">
-            <div class="mb-6 md:mb-0 md:w-1/2">
-                <h2 class="text-2xl font-bold mb-2">Subscribe to Our Newsletter</h2>
-                <p class="text-white/80">Stay updated with our latest products and exclusive offers</p>
-            </div>
-            <div class="md:w-1/2">
-                <form class="flex flex-col sm:flex-row gap-3">
-                    <input type="email" placeholder="Your email address" class="px-4 py-3 rounded-full flex-grow focus:outline-none text-gray-800">
-                    <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-full font-medium transition-colors">
-                        Subscribe
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-</section>
+
 
 <%- include("partials/footer") %>
 
@@ -306,5 +288,92 @@
 </style>
 
 </body>
-</html>
+<script>
+
+
+    document.querySelectorAll(".wishlist-btn").forEach(button => { 
+    button.addEventListener("click", async function () {
+        const productId = this.getAttribute("data-product-id");
+        let url = this.getAttribute("data-wishlist-url"); // Read the correct URL
+        console.log("url : ",url)
+        console.log("Wishlist URL: ", url);
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                const icon = this.querySelector("svg");
+                if (url === "/user/remove-from-wishlist") {
+                    // Change to unliked heart
+                    icon.classList.remove("text-red-500");
+                    icon.classList.add("text-gray-400");
+                    this.setAttribute("data-wishlist-url", "/user/add-to-wishlist"); // Update URL
+                } else {
+                    // Change to liked heart
+                    icon.classList.remove("text-gray-400");
+                    icon.classList.add("text-red-500");
+                    this.setAttribute("data-wishlist-url", "/user/remove-from-wishlist"); // Update URL
+                }
+            } else {
+                Swal.fire({
+                title: "Login Required!",
+                text: "You need to log in to add items to your wishlist.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Login Now",
+                cancelButtonText: "Cancel",
+                reverseButtons: true,
+                confirmButtonColor: "#007bff",
+                cancelButtonColor: "#6c757d"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "/user/login"; // Redirect to login page
+                }
+            });
+            }
+        } catch (error) {
+            console.error("Error updating wishlist", error);
+        }
+    });
+});
+
+function startCountdown() {
+      const countdownElement = document.getElementById("countdown");
+      if (!countdownElement) return;
+
+      const expiryTime = new Date(countdownElement.dataset.expiry).getTime();
+
+      function updateCountdown() {
+          const now = new Date().getTime();
+          const timeLeft = expiryTime - now;
+
+          if (timeLeft <= 0) {
+              document.getElementById("countdown").innerHTML = "<p>Offer Expired!</p>";
+              return;
+          }
+
+          const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+          document.getElementById("days").innerText = days;
+          document.getElementById("hours").innerText = hours;
+          document.getElementById("minutes").innerText = minutes;
+          document.getElementById("seconds").innerText = seconds;
+      }
+
+      setInterval(updateCountdown, 1000);
+      updateCountdown(); // Run immediately to avoid delay
+  }
+
+  document.addEventListener("DOMContentLoaded", startCountdown);
+
+</script>
 

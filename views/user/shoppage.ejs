@@ -20,6 +20,9 @@
 
 </style>
 <head>
+  <!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
@@ -137,7 +140,7 @@
                 <!-- Product Image -->
                 <a href="/user/view-product/<%= product._id %>" class="block overflow-hidden">
                   <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-100">
-                    <img src="<%= product.images[0] %>" alt="<%= product.name %>" class="w-full h-64 object-cover object-center transform transition-transform duration-500 group-hover:scale-105" />
+                    <img src="<%= product.images[3] %>" alt="<%= product.name %>" class="w-full h-64 object-cover object-center transform transition-transform duration-500 group-hover:scale-105" />
                   </div>
                 </a>
                 
@@ -270,7 +273,21 @@ document.querySelectorAll(".wishlist-btn").forEach(button => {
                     this.setAttribute("data-wishlist-url", "/user/remove-from-wishlist"); // Update URL
                 }
             } else {
-                console.error("Failed to update wishlist");
+              Swal.fire({
+                title: "Login Required!",
+                text: "You need to log in to add items to your wishlist.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Login Now",
+                cancelButtonText: "Cancel",
+                reverseButtons: true,
+                confirmButtonColor: "#007bff",
+                cancelButtonColor: "#6c757d"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "/user/login"; // Redirect to login page
+                }
+            });
             }
         } catch (error) {
             console.error("Error updating wishlist", error);
@@ -434,13 +451,14 @@ async function addToCart(productId) {
                 className: "custom-toast",
             }).showToast();
         } else {
-            Toastify({
+          Toastify({
                 text: result.message,
                 duration: 3000,
                 gravity: "bottom",
                 position: "center",
-                backgroundColor: "#FF9800",
+                backgroundColor: "#FF0000",
                 stopOnFocus: true,
+                className: "custom-toast",
             }).showToast();
         }
     } catch (error) {
