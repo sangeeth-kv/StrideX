@@ -359,7 +359,7 @@ const orderController = {
       order.total = order.total - saleAmount;
       await order.save();
       /////////////////////////pyemnt less than 0
-      if (order.paymentMethod == "Razorpay") {
+      if (order.paymentMethod === "Razorpay") {
         let wallet = await walletSchema.findOne({ userId });
         if (!wallet) {
           wallet = await walletSchema.create({

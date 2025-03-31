@@ -91,9 +91,338 @@
         .status-return {
             @apply bg-purple-100 text-purple-800;
         }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .navbar-aside {
+                width: 100%;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100%;
+                z-index: 40;
+            }
+            
+            .navbar-aside.show {
+                transform: translateX(0);
+            }
+            
+            .main-wrap {
+                margin-left: 0 !important;
+                width: 100%;
+            }
+            
+            .menu-aside {
+                padding: 1rem;
+            }
+            
+            .aside-top {
+                padding: 1rem;
+            }
+            
+            .mobile-menu-btn {
+                display: block !important;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .navbar-aside {
+                width: 250px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100%;
+                z-index: 40;
+            }
+            
+            .main-wrap {
+                margin-left: 250px;
+                width: calc(100% - 250px);
+            }
+            
+            .mobile-menu-btn {
+                display: none !important;
+            }
+            
+            .navbar-aside.minimized {
+                width: 80px;
+            }
+            
+            .navbar-aside.minimized .menu-item span.text {
+                display: none;
+            }
+            
+            .navbar-aside.minimized + .main-wrap {
+                margin-left: 80px;
+                width: calc(100% - 80px);
+            }
+        }
+        
+        .screen-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 30;
+            display: none;
+        }
+        
+        .screen-overlay.show {
+            display: block;
+        }
+        
+        .menu-item {
+            margin-bottom: 0.5rem;
+        }
+        
+        .menu-link {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .menu-link i {
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
+    <div class="screen-overlay"></div>
+    <aside class="navbar-aside" id="offcanvas_aside">
+        <div class="aside-top flex justify-between items-center p-4">
+            <a href="#" class="brand-wrap">
+                <img src="/admin-assets/imgs/logos/logo-transparent-png.png" class="logo h-10" alt="Men Fashion Dashboard">
+            </a>
+            <div>
+                <button class="btn-aside-minimize p-2 rounded-full hover:bg-gray-700">
+                    <i class="fas fa-bars text-white"></i>
+                </button>
+            </div>
+        </div>
+        <nav>
+            <ul class="menu-aside p-4">
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/sale-reports">
+                        <i class="fas fa-home"></i>
+                        <span class="text">Sale Reports</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/dashboard">
+                        <i class="fas fa-chart-bar"></i>
+                        <span class="text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/users">
+                        <i class="fas fa-user"></i>
+                        <span class="text">Customers</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/category">
+                        <i class="fas fa-list"></i>
+                        <span class="text">Category</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/brands">
+                        <i class="fas fa-star"></i>
+                        <span class="text">Brands</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/products">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span class="text">Products</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/coupon">
+                        <i class="fas fa-ticket-alt"></i>
+                        <span class="text">Coupon</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/wallet-management">
+                        <i class="fas fa-wallet"></i>
+                        <span class="text">Wallet Management</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/orderList">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="text">Orders</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+    <main class="main-wrap">
+        <header class="main-header navbar flex justify-between items-center p-4">
+            <div class="flex items-center">
+                <button class="mobile-menu-btn mr-4 text-white">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                <div class="col-search">
+                    <!-- Search functionality can be added here -->
+                </div>
+            </div>
+            <div class="logout-container">
+                <a href="/admin/logout" class="logout-btn">
+                    Logout
+                </a>
+            </div>
+        </header>
+        
+        <section class="content-main p-6">
+            <!-- Your main content goes here -->
+            <div class="content-header mb-4">
+                <h2 class="text-2xl font-bold">Dashboard</h2>
+            </div>
+            
+            <!-- Example content - you can replace this with your actual content -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="card bg-white p-4 rounded-lg shadow">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h4 class="text-lg font-semibold">Total Sales</h4>
+                            <span class="text-2xl font-bold">$24,780</span>
+                        </div>
+                        <div class="icon-stat bg-blue-100 p-3 rounded-full">
+                            <i class="fas fa-chart-line text-blue-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card bg-white p-4 rounded-lg shadow">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h4 class="text-lg font-semibold">Total Orders</h4>
+                            <span class="text-2xl font-bold">578</span>
+                        </div>
+                        <div class="icon-stat bg-green-100 p-3 rounded-full">
+                            <i class="fas fa-shopping-cart text-green-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card bg-white p-4 rounded-lg shadow">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h4 class="text-lg font-semibold">Total Products</h4>
+                            <span class="text-2xl font-bold">234</span>
+                        </div>
+                        <div class="icon-stat bg-purple-100 p-3 rounded-full">
+                            <i class="fas fa-box text-purple-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card bg-white p-4 rounded-lg shadow">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h4 class="text-lg font-semibold">Total Customers</h4>
+                            <span class="text-2xl font-bold">892</span>
+                        </div>
+                        <div class="icon-stat bg-yellow-100 p-3 rounded-full">
+                            <i class="fas fa-users text-yellow-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Orders Table -->
+            <div class="card bg-white p-4 rounded-lg shadow mb-6">
+                <div class="card-header mb-4">
+                    <h3 class="text-xl font-bold">Recent Orders</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-full table-auto">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-2 text-left">Order ID</th>
+                                <th class="px-4 py-2 text-left">Customer</th>
+                                <th class="px-4 py-2 text-left">Total</th>
+                                <th class="px-4 py-2 text-left">Status</th>
+                                <th class="px-4 py-2 text-left">Date</th>
+                                <th class="px-4 py-2 text-left">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b">
+                                <td class="px-4 py-2">#ORD-0123</td>
+                                <td class="px-4 py-2">John Smith</td>
+                                <td class="px-4 py-2">$120.00</td>
+                                <td class="px-4 py-2">
+                                    <span class="status-badge status-delivered">Delivered</span>
+                                </td>
+                                <td class="px-4 py-2">Mar 15, 2023</td>
+                                <td class="px-4 py-2">
+                                    <a href="#" class="text-blue-600 hover:underline">Details</a>
+                                </td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="px-4 py-2">#ORD-0124</td>
+                                <td class="px-4 py-2">Sarah Johnson</td>
+                                <td class="px-4 py-2">$85.50</td>
+                                <td class="px-4 py-2">
+                                    <span class="status-badge status-processing">Processing</span>
+                                </td>
+                                <td class="px-4 py-2">Mar 14, 2023</td>
+                                <td class="px-4 py-2">
+                                    <a href="#" class="text-blue-600 hover:underline">Details</a>
+                                </td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="px-4 py-2">#ORD-0125</td>
+                                <td class="px-4 py-2">Michael Brown</td>
+                                <td class="px-4 py-2">$220.75</td>
+                                <td class="px-4 py-2">
+                                    <span class="status-badge status-shipped">Shipped</span>
+                                </td>
+                                <td class="px-4 py-2">Mar 13, 2023</td>
+                                <td class="px-4 py-2">
+                                    <a href="#" class="text-blue-600 hover:underline">Details</a>
+                                </td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="px-4 py-2">#ORD-0126</td>
+                                <td class="px-4 py-2">Emily Davis</td>
+                                <td class="px-4 py-2">$65.20</td>
+                                <td class="px-4 py-2">
+                                    <span class="status-badge status-pending">Pending</span>
+                                </td>
+                                <td class="px-4 py-2">Mar 12, 2023</td>
+                                <td class="px-4 py-2">
+                                    <a href="#" class="text-blue-600 hover:underline">Details</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-2">#ORD-0127</td>
+                                <td class="px-4 py-2">Robert Wilson</td>
+                                <td class="px-4 py-2">$175.30</td>
+                                <td class="px-4 py-2">
+                                    <span class="status-badge status-cancelled">Cancelled</span>
+                                </td>
+                                <td class="px-4 py-2">Mar 11, 2023</td>
+                                <td class="px-4 py-2">
+                                    <a href="#" class="text-blue-600 hover:underline">Details</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
     <script>
         $(document).ready(function () {
             // Get the current URL path
@@ -105,75 +434,38 @@
                     $(this).addClass("active");
                 }
             });
+            
+            // Mobile menu toggle
+            $(".mobile-menu-btn").click(function() {
+                $(".navbar-aside").toggleClass("show");
+                $(".screen-overlay").toggleClass("show");
+            });
+            
+            // Close menu when clicking on overlay
+            $(".screen-overlay").click(function() {
+                $(".navbar-aside").removeClass("show");
+                $(".screen-overlay").removeClass("show");
+            });
+            
+            // Sidebar minimize toggle
+            $(".btn-aside-minimize").click(function() {
+                if ($(window).width() > 768) {
+                    $(".navbar-aside").toggleClass("minimized");
+                    $(".main-wrap").toggleClass("ml-minimal");
+                } else {
+                    $(".navbar-aside").removeClass("show");
+                    $(".screen-overlay").removeClass("show");
+                }
+            });
+            
+            // Close menu on window resize if screen becomes larger
+            $(window).resize(function() {
+                if ($(window).width() > 768) {
+                    $(".navbar-aside").removeClass("show");
+                    $(".screen-overlay").removeClass("show");
+                }
+            });
         });
     </script>
-        
-    <div class="screen-overlay"></div>
-    <aside class="navbar-aside" id="offcanvas_aside">
-        <div class="aside-top">
-            <a href="#" class="brand-wrap">
-                <img src="/admin-assets/imgs/logos/logo-transparent-png.png" class="logo" alt="Men Fashion Dashboard">
-            </a>
-            <div>
-                <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
-            </div>
-        </div>
-        <nav>
-            <ul class="menu-aside">
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/sale-reports"> <i class="icon material-icons md-home"></i>
-                        <span class="text">Sale Reports</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/dashboard">
-                        <i class="icon material-icons md-bar_chart"></i>
-                        <span class="text">Dashboard</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/users"> <i class="icon material-icons md-person"></i>
-                        <span class="text">Customers</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/category"> <i class="icon material-icons md-person"></i>
-                        <span class="text">Category</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/brands"> <i class="icon material-icons md-stars"></i>
-                        <span class="text">Brands</span> </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/products"> <i class="icon material-icons md-shopping_bag"></i>
-                        <span class="text">Products</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/coupon"> <i class="icon material-icons md-class"></i>
-                        <span class="text">Coupon</span> </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/wallet-management">
-                        <i class="icon material-icons md-account_balance_wallet"></i> Wallet Management
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/orderList"> <i class="icon material-icons md-shopping_cart"></i>
-                        <span class="text">Orders</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </aside>
-    <main class="main-wrap">
-        <header class="main-header navbar">
-            <div class="col-search">
-            </div>
-            <div class="logout-container">
-                <a href="/admin/logout" class="logout-btn">
-                    Logout
-                </a>
-            </div>
-        </header>
+</body>
+</html>
