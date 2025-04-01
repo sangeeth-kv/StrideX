@@ -102,8 +102,10 @@ passport.use(new GoogleStrategy(
     async (accessToken, refreshToken, profile, done) => {
         try {
             let user = await User.findOne({ email: profile.emails[0].value });
-
+            console.log("access token and refresh token : ".accessToken ,"refresh token : ",refreshToken,"profile : ",profile,"done :",done)
             if (user) {
+
+                console.log("user in google : ",user)
                 if (user.googleId) {
                     // If user already has a Google ID, they can log in
                     return done(null, user);

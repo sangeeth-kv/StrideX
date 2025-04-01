@@ -103,6 +103,7 @@
                 left: 0;
                 height: 100%;
                 z-index: 40;
+                overflow-y: auto;
             }
             
             .navbar-aside.show {
@@ -135,11 +136,13 @@
                 left: 0;
                 height: 100%;
                 z-index: 40;
+                overflow-y: auto;
             }
             
             .main-wrap {
                 margin-left: 250px;
                 width: calc(100% - 250px);
+                transition: margin-left 0.3s ease, width 0.3s ease;
             }
             
             .mobile-menu-btn {
@@ -190,9 +193,135 @@
         .menu-link i {
             margin-right: 10px;
         }
+
+        /* Additional responsive fixes for very small screens */
+        @media (max-width: 480px) {
+            .main-header {
+                padding: 0.5rem !important;
+            }
+            
+            .logout-btn {
+                padding: 8px 12px;
+                font-size: 0.875rem;
+            }
+            
+            .mobile-menu-btn {
+                margin-right: 0.5rem !important;
+            }
+        }
+
+        /* Fix for fixed positioning issues on iOS */
+        @supports (-webkit-overflow-scrolling: touch) {
+            .navbar-aside {
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+
+        /* Ensure the menu button is always visible and accessible */
+        .mobile-menu-btn {
+            z-index: 35;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: background-color 0.3s;
+        }
+        
+        .mobile-menu-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Fix for menu scrolling on long menus */
+        .menu-aside {
+            max-height: calc(100vh - 70px);
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
+    <!-- This script should be included at the top to ensure the menu functionality is available immediately -->
+    <script>
+        // Store menu state in localStorage to persist across pages
+        function initMenuState() {
+            // Check if menu was minimized on desktop
+            if (localStorage.getItem('menuMinimized') === 'true' && window.innerWidth > 768) {
+                document.querySelector('.navbar-aside').classList.add('minimized');
+                document.querySelector('.main-wrap').classList.add('ml-minimal');
+            }
+            
+            // Add event listeners for menu interactions
+            document.addEventListener('DOMContentLoaded', function() {
+                // Mobile menu toggle
+                const mobileMenuBtns = document.querySelectorAll('.mobile-menu-btn');
+                mobileMenuBtns.forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        document.querySelector('.navbar-aside').classList.toggle('show');
+                        document.querySelector('.screen-overlay').classList.toggle('show');
+                    });
+                });
+                
+                // Close menu when clicking on overlay
+                const screenOverlay = document.querySelector('.screen-overlay');
+                if (screenOverlay) {
+                    screenOverlay.addEventListener('click', function() {
+                        document.querySelector('.navbar-aside').classList.remove('show');
+                        document.querySelector('.screen-overlay').classList.remove('show');
+                    });
+                }
+                
+                // Sidebar minimize toggle
+                const minimizeBtn = document.querySelector('.btn-aside-minimize');
+                if (minimizeBtn) {
+                    minimizeBtn.addEventListener('click', function() {
+                        if (window.innerWidth > 768) {
+                            const navbar = document.querySelector('.navbar-aside');
+                            navbar.classList.toggle('minimized');
+                            document.querySelector('.main-wrap').classList.toggle('ml-minimal');
+                            
+                            // Store state in localStorage
+                            localStorage.setItem('menuMinimized', navbar.classList.contains('minimized'));
+                        } else {
+                            document.querySelector('.navbar-aside').classList.remove('show');
+                            document.querySelector('.screen-overlay').classList.remove('show');
+                        }
+                    });
+                }
+                
+                // Get the current URL path and highlight active menu item
+                const currentPath = window.location.pathname;
+                document.querySelectorAll('.menu-item a.menu-link').forEach(function(link) {
+                    if (link.getAttribute('href') === currentPath) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    // On larger screens, check if menu should be minimized based on stored preference
+                    if (localStorage.getItem('menuMinimized') === 'true') {
+                        document.querySelector('.navbar-aside').classList.add('minimized');
+                        document.querySelector('.main-wrap').classList.add('ml-minimal');
+                    } else {
+                        document.querySelector('.navbar-aside').classList.remove('minimized');
+                        document.querySelector('.main-wrap').classList.remove('ml-minimal');
+                    }
+                    
+                    // Always hide mobile overlay on larger screens
+                    document.querySelector('.navbar-aside').classList.remove('show');
+                    document.querySelector('.screen-overlay').classList.remove('show');
+                }
+            });
+        }
+        
+        // Initialize menu state as soon as possible
+        initMenuState();
+    </script>
+
     <div class="screen-overlay"></div>
     <aside class="navbar-aside" id="offcanvas_aside">
         <div class="aside-top flex justify-between items-center p-4">
@@ -280,5 +409,3 @@
                 </a>
             </div>
         </header>
-        
-       
