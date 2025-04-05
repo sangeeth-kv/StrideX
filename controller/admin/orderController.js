@@ -97,6 +97,7 @@ const orderController={
         }
     },changeOrderStatus:async (req,res) => {
         try {
+            console.log("here reaches for change order status ::????")
            
             const { orderId, userId, status } = req.body;
             console.log(orderId)
@@ -119,12 +120,22 @@ const orderController={
             }
 
             if( status==="returned"){
-                for (const item of order.items) {
-                    await productSchema.updateOne(
+                // for (const item of order.items) {
+                //     await productSchema.updateOne(
+                //         { _id: item.productId, "variants.size": item.size },
+                //         { $inc: { "variants.$.quantity": item.quantity } }
+                //     );
+                // }
+
+                for (let item of order.items) {
+                    if (item.itemStatus !== "cancelled" && item.itemStatus !== "returned") {
+                      await productSchema.updateOne(
                         { _id: item.productId, "variants.size": item.size },
-                        { $inc: { "variants.$.quantity": item.quantity } }
-                    );
-                }
+                        { $inc: { "variants.$.quantity": item.quantity } } // Restock only if not cancelled/returned
+                      );
+                    }
+                  }
+                  
 
                 let wallet=await walletSchema.findOne({userId})
 
@@ -134,7 +145,10 @@ const orderController={
                 }
                 console.log(orderId)
 
+                console.log(order.total)
+
                 if(order.total>0){
+                    console.log("order total condition passed...")
                 wallet.transactions.push({
                     type: "credit",
                     transactionId:uuidv4(),
@@ -148,11 +162,14 @@ const orderController={
               }
                 console.log("Refund processed successfully!");
 
-                order.items.forEach((itm)=>{
-                    itm.itemStatus="returned"
-                })
+                order.items.forEach((itm) => {
+                    if (itm.itemStatus !== "cancelled") {
+                      itm.itemStatus = "returned";
+                    }
+                  });
+                  
                  
-                order.paymentStatus="refund"
+                order.paymentStatus="refunded"
 
                 await order.save();
 
@@ -199,7 +216,7 @@ const orderController={
         //for return,when quanty increase and price back to walet
         if(item.itemStatus=="returned"){
 
-            const product = await productSchema.findById(item.productId);
+            const product = await productSchema.findById(item.productId).populate("categoryId");
 
             if (!product) {
                 return res.status(404).json({ message: "Product details not found." });
@@ -213,9 +230,13 @@ const orderController={
             variant.quantity += item.quantity; 
             await product.save();
 
+            console.log("product fouund in the return requser order approve :",product)
+
             const regularPrice = variant.regularPrice;
-            const offerPercentage = variant.offer || 0;
-            const salePrice = regularPrice - (regularPrice * offerPercentage / 100);
+            const maxOffer=Math.max(product.offer,product.categoryId.offer)
+            console.log("max offer in the retrun item requser approve  : ",maxOffer)
+            const offerPercentage = variant.offer || 0;//////////////////////////////////here...
+            const salePrice = regularPrice - (regularPrice * maxOffer / 100);/////..........
 
             const userId=order.userId
 
@@ -239,7 +260,8 @@ const orderController={
                 wallet.balance += item.itemSalePrice * item.quantity;
                 await wallet.save();
 
-                order.total-=item.itemSalePrice*item.quantity
+                order.total-=(item.itemSalePrice*item.quantity)
+                console.log("here is the totoal in the order aftere the price substracted from the total in the order :",order.total)
                 await order.save()
             }
 
@@ -252,13 +274,6 @@ const orderController={
             order.status = "cancelled"; // Cancel the entire order
         }
        
-
-
-                order.total -= item.itemSalePrice * item.quantity;
-
-                order.paymentStatus="refund"
-
-                await order.save()
 
         }
 

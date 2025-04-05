@@ -48,7 +48,7 @@
                                         <p class="text-sm text-gray-500">Price: ₹<%= data[i].salePrice %></p>
                                     </td>
                                     <td class="px-6 py-4 text-center"><%= data[i].quantity %></td>
-                                    <td class="px-6 py-4 text-right font-medium">₹<%= data[i].subtotal %></td>
+                                    <td class="px-6 py-4 text-right font-medium">₹<%= data[i].subtotal.toFixed(2) %></td>
                                     <td class="px-6 py-4 text-center">
                                        <button onclick="removeFromCart('<%= data[i].productId %>')"
                                        class="text-red-500 hover:text-red-700 transition-colors"> 

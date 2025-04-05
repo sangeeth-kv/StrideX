@@ -79,15 +79,18 @@
                     <% } %>
                     
                     <!-- Wishlist Icon -->
-                    <a href="/user/wishlist" class="relative">
-                        <i class="fas fa-heart text-xl text-gray-700"></i>
-                    </a>
-                    
-                    <!-- Cart Icon -->
-                    <a href="/user/cart" class="relative">
-                        <i class="fas fa-shopping-cart text-xl text-gray-700"></i>
-                        <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full"></span>
-                    </a>
+                   <!-- Wishlist Icon -->
+<a href="/user/wishlist" class="relative">
+    <i class="fas fa-heart text-xl text-gray-700"></i>
+    <span id="wishlist-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full hidden"></span>
+</a>
+
+<!-- Cart Icon -->
+<a href="/user/cart" class="relative">
+    <i class="fas fa-shopping-cart text-xl text-gray-700"></i>
+    <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full hidden"></span>
+</a>
+
                 </div>
             </div>
             
@@ -122,15 +125,18 @@
                     
                     <div class="flex items-center space-x-6">
                         <!-- Wishlist Icon -->
-                        <a href="/user/wishlist" class="relative">
-                            <i class="fas fa-heart text-xl text-gray-700"></i>
-                        </a>
-                        
-                        <!-- Cart Icon -->
-                        <a href="/user/cart" class="relative">
-                            <i class="fas fa-shopping-cart text-xl text-gray-700"></i>
-                            <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full"></span>
-                        </a>
+                        <!-- Wishlist Icon -->
+<a href="/user/wishlist" class="relative">
+    <i class="fas fa-heart text-xl text-gray-700"></i>
+    <span id="wishlist-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full hidden"></span>
+</a>
+
+<!-- Cart Icon -->
+<a href="/user/cart" class="relative">
+    <i class="fas fa-shopping-cart text-xl text-gray-700"></i>
+    <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full hidden"></span>
+</a>
+
                     </div>
                 </div>
             </div>
@@ -138,7 +144,9 @@
     </header>
 
     <script>
+        
         document.addEventListener("DOMContentLoaded", function () {
+            fetchCategoryandWishlistCount()
             // Desktop user dropdown
             const userButton = document.getElementById("user-button");
             const dropdownMenu = document.getElementById("user-dropdown");
@@ -183,6 +191,43 @@
                 });
             }
         });
+
+        async function fetchCategoryandWishlistCount() {
+    try {
+        console.log("function called >>");
+
+        const response = await fetch("/user/fetchcounts", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        const result = await response.json();
+        console.log("Fetched category and wishlist count: ", result);
+
+        // Show wishlist count if available
+        if (result.wishlistCount > 0) {
+            const wishlistEl = document.getElementById("wishlist-count");
+            wishlistEl.textContent = result.wishlistCount;
+            wishlistEl.classList.remove("hidden");
+        }
+
+        // Show cart count if available
+        if (result.cartCount > 0) {
+            const cartEl = document.getElementById("cart-count");
+            cartEl.textContent = result.cartCount;
+            cartEl.classList.remove("hidden");
+        }
+
+    } catch (error) {
+        console.error("Error fetching category and wishlist count:", error);
+    }
+}
+
+
+
+        
     </script>
 </body>
 </html>

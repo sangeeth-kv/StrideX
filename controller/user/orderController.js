@@ -313,6 +313,8 @@ const orderController = {
       const itemIndex = order.items.findIndex(
         (item) => item.productId.toString() === productId
       );
+
+      console.log("this is item status >> : ",itemIndex)
       if (itemIndex === -1) {
         return res
           .status(404)
@@ -321,7 +323,8 @@ const orderController = {
 
       //if razor payyy
       order.items[itemIndex].itemStatus = "cancelled";
-      const product = order.items[itemIndex];
+      let product = order.items[itemIndex];
+      console.log("this is product is here the >>>>>>>: ",product)
 
       await productSchema.updateOne(
         { _id: product.productId, "variants.size": product.size },
@@ -337,16 +340,18 @@ const orderController = {
           return vari.regularPrice;
         }
       });
+
+      console.log("this is the get pro : ",getpro)
       const maxOffer = Math.max(retProduct.categoryId.offer, retProduct.offer);
-      console.log("this is max offerv : ", maxOffer);
+      // console.log("this is max offerv : ", maxOffer);
       const regularAmount = getpro[0].regularPrice;
       console.log("This is regulat amountt : ", regularAmount);
       const saleAmount = regularAmount - regularAmount * (maxOffer / 100);
       console.log("this is sale amouont : ", saleAmount);
 
-      console.log("this is get produt  : ", getpro);
+      // console.log("this is get produt  : ", getpro);
       console.log("this is return amound", retProduct);
-      console.log("this is product", product);
+      // console.log("this is product", product);
 
       const allCancelled = order.items.every(
         (item) =>
@@ -356,7 +361,7 @@ const orderController = {
         order.status = "cancelled";
       }
 
-      order.total = order.total - saleAmount;
+      order.total = order.total - saleAmount*product.quantity;
       await order.save();
       /////////////////////////pyemnt less than 0
       if (order.paymentMethod === "Razorpay") {
@@ -372,12 +377,12 @@ const orderController = {
         wallet.transactions.push({
           type: "credit",
           transactionId: uuidv4(),
-          amount: saleAmount,
+          amount: saleAmount *product.quantity,
           reason: `Refund for OrderId #${order.orderId} ,${retProduct.name}`,
           orderId: order._id,
         });
 
-        wallet.balance += saleAmount;
+        wallet.balance += saleAmount * product.quantity;
         await wallet.save();
         console.log(
           "Refund processed successfully in cancel individual item  >>!"
@@ -409,11 +414,15 @@ const orderController = {
       if (order.paymentMethod === "Razorpay") {
 
         for (let item of order.items) {
-          await productSchema.updateOne(
-            { _id: item.productId, "variants.size": item.size },
-            { $inc: { "variants.$.quantity": item.quantity } } // Restock product quantity
-          );
+          if (item.itemStatus !== "cancelled" && item.itemStatus !== "returned") {
+            await productSchema.updateOne(
+              { _id: item.productId, "variants.size": item.size },
+              { $inc: { "variants.$.quantity": item.quantity } } // Restock only if not cancelled/returned
+            );
+          }
         }
+        
+        
 
         let wallet = await walletSchema.findOne({ userId });
         if (!wallet) {

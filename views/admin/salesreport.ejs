@@ -1,4 +1,10 @@
 <%- include("partials/header") %>
+<!-- SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6">
   <div class="max-w-7xl mx-auto">
@@ -59,12 +65,14 @@
               <input 
                 type="date" 
                 id="startDate" 
+                value="<%= startDate %>"
                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" 
                 placeholder="Start Date"
               />
               <input 
                 type="date" 
                 id="endDate" 
+                value="<%= endDate %>"
                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" 
                 placeholder="End Date"
               />
@@ -95,7 +103,7 @@
           </div>
           <div>
             <p class="text-sm text-gray-500 font-medium">Total Orders</p>
-            <h3 class="text-xl md:text-2xl font-bold text-gray-800"><%= overallSalesCount %></h3>
+            <h3 class="text-xl md:text-2xl font-bold text-gray-800"><%= totalOrders %></h3>
           </div>
         </div>
       </div>
@@ -110,7 +118,7 @@
           </div>
           <div>
             <p class="text-sm text-gray-500 font-medium">Total Sales</p>
-            <h3 class="text-xl md:text-2xl font-bold text-gray-800">₹<%= overallOrderAmount.toFixed(2) %></h3>
+            <h3 class="text-xl md:text-2xl font-bold text-gray-800">₹ <%= totalPaid.toFixed(2) %></h3>
           </div>
         </div>
       </div>
@@ -125,7 +133,7 @@
           </div>
           <div>
             <p class="text-sm text-gray-500 font-medium">Total Discount for coupons</p>
-            <h3 class="text-xl md:text-2xl font-bold text-gray-800">₹<%= overallDiscount %></h3>
+            <h3 class="text-xl md:text-2xl font-bold text-gray-800">₹ 0.00</h3>
           </div>
         </div>
       </div>
@@ -136,78 +144,88 @@
       <div class="p-5 border-b border-gray-200">
         <h2 class="text-lg font-semibold text-gray-800">Sales Data</h2>
       </div>
+      
       <div class="overflow-x-auto">
-        <table id="salesTable" class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+        <table id="salesTable" class="min-w-full border-collapse border border-gray-300">
+          <thead class="bg-gray-100 border-b border-gray-300">
             <tr>
-              <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
-              <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data ID</th>
-              <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-              <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-              <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment</th>
-              <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th scope="col" class="px-3 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total Price</th>
+              <th class="px-4 py-2 border border-gray-300 text-left text-xs font-medium text-gray-600 uppercase">#</th>
+              <th class="px-4 py-2 border border-gray-300 text-left text-xs font-medium text-gray-600 uppercase">Order ID</th>
+              <th class="px-4 py-2 border border-gray-300 text-left text-xs font-medium text-gray-600 uppercase">Customer</th>
+              <th class="px-4 py-2 border border-gray-300 text-left text-xs font-medium text-gray-600 uppercase">Product</th>
+              <th class="px-4 py-2 border border-gray-300 text-left text-xs font-medium text-gray-600 uppercase">Date</th>
+              <th class="px-4 py-2 border border-gray-300 text-left text-xs font-medium text-gray-600 uppercase">Payment</th>
+              <th class="px-4 py-2 border border-gray-300 text-left text-xs font-medium text-gray-600 uppercase">Quantity</th>
+              <th class="px-4 py-2 border border-gray-300 text-right text-xs font-medium text-gray-600 uppercase">Price</th>
+              <th class="px-4 py-2 border border-gray-300 text-right text-xs font-medium text-gray-600 uppercase">Total</th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
+          
+          <tbody class="bg-white divide-y divide-gray-300">
             <% let grandTotal = 0; %> 
             <% for (let i = 0; i < data.length; i++) { %>
-            <tr class="hover:bg-gray-50 transition-colors duration-150">
-              <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500"><%= i + 1 %></td>
-              <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500"><%= data[i].orderId %></td>
-              <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900"><%= data[i].address.name %></td>
-              <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900"><%= data[i].items && data[i].items.length > 0 ? data[i].items[0].productId?.name : "N/A" %></td>
-              <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500"><%= data[i].orderDate.toLocaleString('en-IN') %></td>
-              <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
-                <span class="<%= data[i].paymentMethod === 'COD' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' %> px-2 py-1 rounded-full text-xs font-medium">
-                  <%= data[i].paymentMethod %>
-                </span>
-              </td>
-              <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm">
-                <% if (data[i].status === 'Delivered') { %>
-                  <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Delivered</span>
-                <% } else if (data[i].status === 'Shipped') { %>
-                  <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">Shipped</span>
-                <% } else if (data[i].status === 'Cancelled') { %>
-                  <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">Cancelled</span>
-                <% } else if (data[i].status === 'Pending') { %>
-                  <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">Pending</span>
-                <% } else { %>
-                  <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium"><%= data[i].status %></span>
-                <% } %>
-              </td>
-              <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-right font-medium text-gray-900"><%= data[i].total %></td>
-            </tr>
-            <% grandTotal += data[i].total; %> 
+              <% let item = data[i]; %>
+              <% grandTotal += item.totalSale; %>
+              <tr class="hover:bg-gray-50 transition-colors duration-150">
+                <td class="px-4 py-2 border border-gray-300 text-xs sm:text-sm text-gray-500 text-center"><%= i + 1 %></td>
+                <td class="px-4 py-2 border border-gray-300 text-xs sm:text-sm text-gray-500"><%= item.orderId %></td>
+                <td class="px-4 py-2 border border-gray-300 text-xs sm:text-sm font-medium text-gray-900"><%= item.user %></td>
+                <td class="px-4 py-2 border border-gray-300 text-xs sm:text-sm text-gray-900">
+                  <%= item.product %>
+                  <% if (item.size) { %>
+                    <span class="ml-1 text-xs text-gray-500">(Size: <%= item.size %>)</span>
+                  <% } %>
+                  <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                    delivered
+                  </span>
+                </td>
+                <td class="px-4 py-2 border border-gray-300 text-xs sm:text-sm text-gray-500"><%= new Date(item.orderDate).toLocaleString('en-IN') %></td>
+                <td class="px-4 py-2 border border-gray-300 text-xs sm:text-sm">
+                  <span class="<%= item.paymentMethod === 'COD' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' %> px-2 py-1 rounded-full text-xs font-medium">
+                    <%= item.paymentMethod %>
+                  </span>
+                </td>
+                <td class="px-4 py-2 border border-gray-300 text-xs sm:text-sm text-center"><%= item.quantity %></td>
+                <td class="px-4 py-2 border border-gray-300 text-xs sm:text-sm text-right">₹ <%= item.itemSalePrice.toFixed(2) %></td>
+                <td class="px-4 py-2 border border-gray-300 text-xs sm:text-sm text-right font-medium text-gray-900">₹ <%= item.totalSale.toFixed(2) %></td>
+              </tr>
             <% } %>
           </tbody>
-          <tfoot>
-            <tr class="bg-gray-50">
-              <td colspan="7" class="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm font-bold text-right text-gray-900">Grand Total:</td>
-              <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm font-bold text-right text-gray-900"><%= grandTotal %></td>
+          
+          <tfoot class="bg-gray-100 border-t border-gray-300">
+            <tr>
+              <td colspan="8" class="px-4 py-2 border border-gray-300 text-xs sm:text-sm font-bold text-right text-gray-900">Grand Total:</td>
+              <td class="px-4 py-2 border border-gray-300 text-xs sm:text-sm font-bold text-right text-gray-900">₹ <%= grandTotal.toFixed(2) %></td>
             </tr>
           </tfoot>
         </table>
       </div>
     </div>
+    
+    <!-- Pagination -->
+    <% let queryParams = `day=${selectedDay || ''}&startDate=${startDate || ''}&endDate=${endDate || ''}`; %>
 
-    <!-- Pagination (if needed) -->
     <nav class="flex justify-center mt-6">
       <ul class="flex flex-wrap gap-2">
         <% if (currentPage > 1) { %>
           <li>
-            <a class="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50" href="?page=<%= currentPage - 1 %>">Previous</a>
+            <a class="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+              href="?page=<%= currentPage - 1 %>&<%= queryParams %>">Previous</a>
           </li>
         <% } %>
+        
         <% for (let i = 1; i <= totalPages; i++) { %>
           <li>
-            <a class="px-3 py-2 <%= i === currentPage ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50' %> border border-gray-300 rounded-md text-sm font-medium" href="?page=<%= i %>"><%= i %></a>
+            <a class="px-3 py-2 <%= i === currentPage ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50' %> 
+              border border-gray-300 rounded-md text-sm font-medium"
+              href="?page=<%= i %>&<%= queryParams %>"><%= i %></a>
           </li>
         <% } %>
+    
         <% if (currentPage < totalPages) { %>
           <li>
-            <a class="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50" href="?page=<%= currentPage + 1 %>">Next</a>
+            <a class="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+              href="?page=<%= currentPage + 1 %>&<%= queryParams %>">Next</a>
           </li>
         <% } %>
       </ul>
@@ -218,36 +236,91 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <script>
+  // Fix for the initMenuState function causing errors
+  function initMenuState() {
+    const mobileMenuBtn = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    // Only proceed if the elements exist
+    if (mobileMenuBtn && mobileMenu) {
+      // Initialize menu state
+      mobileMenu.classList.add('hidden');
+      
+      // Add event listener
+      mobileMenuBtn.addEventListener('click', function() {
+        mobileMenu.classList.toggle('hidden');
+      });
+    }
+  }
+  
+  // Safe initialization - checks if document is ready
+  document.addEventListener('DOMContentLoaded', function() {
+    // Only call initMenuState if it needs to be called in this page
+    try {
+      initMenuState();
+    } catch (error) {
+      console.log("Menu initialization skipped or encountered an error:", error);
+    }
+  });
+  
   document.getElementById("createSalesReport").addEventListener("click", async (event) => {
     event.preventDefault();
-    const salesData = collectSalesData(); // Collect filtered sales data
+    console.log("User clicked on generate PDF button");
+    const salesData = collectSalesData();
+    
+    console.log("Sales data : ", salesData);
     await fetch("/admin/generatePdf", {
         method: "post",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(salesData),
     }).then((response) => response.blob())
-      .then((blob) => downloadFile(blob, "report.pdf"));
+      .then((blob) => downloadFile(blob, "report.pdf"))
+      .catch(error => {
+        console.error("Error generating PDF:", error);
+        alert("Error generating PDF. Please try again.");
+      });
   });
 
   document.getElementById("downloadExcelReport").addEventListener("click", async (event) => {
     event.preventDefault();
+    console.log("User clicked on download Excel button");
     const salesData = collectSalesData();
     await fetch("/admin/downloadExcel", {
         method: "post",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(salesData),
     }).then((response) => response.blob())
-      .then((blob) => downloadFile(blob, "report.xlsx"));
+      .then((blob) => downloadFile(blob, "report.xlsx"))
+      .catch(error => {
+        console.error("Error downloading Excel:", error);
+        alert("Error downloading Excel. Please try again.");
+      });
   });
 
   function collectSalesData() {
-    return [...document.querySelectorAll("#salesTable tbody tr")].map(row => ({
-        orderId: row.cells[1].textContent.trim(),
-        name: row.cells[2].textContent,
-        date: row.cells[4].textContent,
-        paymentMethod:row.cells[5].textContent,
-        totalAmount: parseFloat(row.cells[7].textContent.replace(/[^0-9]/g, "")),
-    }));
+    console.log("Collecting sales data...");
+    
+    const salesData = [];
+    const rows = document.querySelectorAll("#salesTable tbody tr");
+    
+    rows.forEach((row, index) => {
+      if (row.cells.length >= 9) {
+        salesData.push({
+          id: index + 1,
+          orderId: row.cells[1].textContent.trim(),
+          customer: row.cells[2].textContent.trim(),
+          product: row.cells[3].textContent.trim().split('(')[0].trim(),
+          date: row.cells[4].textContent.trim(),
+          payment: row.cells[5].querySelector('span').textContent.trim(),
+          quantity: parseInt(row.cells[6].textContent.trim()) || 0,
+          price: parseFloat(row.cells[7].textContent.replace(/[^0-9.-]/g, "")) || 0,
+          totalSale: parseFloat(row.cells[8].textContent.replace(/[^0-9.-]/g, "")) || 0
+        });
+      }
+    });
+    
+    console.log("Collected sales data:", salesData);
+    return salesData;
   }
 
   function downloadFile(blob, filename) {
@@ -257,6 +330,7 @@
     a.download = filename;
     document.body.appendChild(a);
     a.click();
+    window.URL.revokeObjectURL(url); // Clean up
     document.body.removeChild(a);
   }
 
@@ -264,11 +338,17 @@
     let startDate = document.getElementById("startDate").value;
     let endDate = document.getElementById("endDate").value;
     if (!startDate || !endDate) {
-      alert("Please select both start and end date");
+      Swal.fire({
+  icon: 'warning',
+  title: 'Missing Date Range',
+  text: 'Please select both start and end date.',
+  confirmButtonColor: '#6366f1', // indigo
+});
+
       return;
     }
     window.location.href = `/admin/sale-reports?startDate=${startDate}&endDate=${endDate}`;
   }
 </script>
 
-<%- include("partials/footer") %>
+<%- include("partials/footer") %>          

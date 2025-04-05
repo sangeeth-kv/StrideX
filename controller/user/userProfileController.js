@@ -1,4 +1,6 @@
 const addressSchema=require("../../model/addressModel")
+const wishlistSchema=require("../../model/wishlistmodel")
+const cartSchema=require("../../model/cartModel")
 const userSchema=require("../../model/userModel")
 const orderSchema=require("../../model/orderModel")
 const walletSchema=require("../../model/walletModel")
@@ -8,12 +10,15 @@ const {sendOTPByEmail}=require("../../controller/user/otpverification")
 const saltRounds=10;
 const bcrypt=require("bcrypt");
 const { findById, countDocuments } = require("../../model/adminModel");
+const { json } = require("stream/consumers")
 
 const generateOTP=()=>crypto.randomInt(100000, 999999).toString();
 
 const userProfileController={
     loadProfilePage:async (req,res) => {
         try {
+
+
             const userId=req.session.user?.id
            
             console.log("req.sessioj ",req.session.user.id)
@@ -22,9 +27,9 @@ const userProfileController={
                 return res.redirect("/user/login?error=User not found");
             }
             console.log("here 1")
-           
 
-             let wallet=await walletSchema.findOne({userId})
+
+             let wallet=await walletSchema.findOne({userId}).sort({"transactions.date":-1})
              console.log("wallet found by:",wallet)
              console.log("here 2")
             
@@ -36,6 +41,7 @@ const userProfileController={
             const addresses = await addressSchema.find({ userId, isDeleted: false });
             const orders = await orderSchema
             .find({ userId }) 
+            .sort({orderDate: -1})
             .populate('items.productId', 'name');
             console.log("here 4")
 
@@ -287,6 +293,32 @@ const userProfileController={
             console.log(error)
         }
     },
+    getCounts: async (req, res) => {
+        try {
+            console.log("works here for getting count:");
+            const userId = req.session.user?.id;
+            let wishlistCount = 0;
+            let cartCount = 0;
+    
+            if (!userId) {
+                return res.json({ wishlistCount, cartCount });
+            }
+    
+            const wishlist = await wishlistSchema.findOne({ userId });
+            wishlistCount = wishlist ? wishlist.items?.length : 0;
+
+            const cart = await cartSchema.findOne({ userId });
+            cartCount=cart ? cart.items?.length : 0;
+    
+            console.log("wishlist count:", wishlistCount, "cart count:", cartCount);
+            return res.status(200).json({ cartCount, wishlistCount });
+        } catch (error) {
+            console.log("Error getting counts:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    }
+    
+    
    
     
 }

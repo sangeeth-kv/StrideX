@@ -81,6 +81,7 @@ router.get("/shop",userProductController.loadShopPage)
 
 
 //for user profile
+router.post("/fetchcounts",userProfileController.getCounts)
 router.get("/view-profile",userEnsure,authMiddlewire.isAuthenticated,authMiddlewire.isBlocked,userProfileController.loadProfilePage)
 router.post("/upload-profile-image",upload.single("profileImage"),userProfileController.uploadImage)
 router.get("/change-email-otp/:id",authMiddlewire.isAuthenticated,authMiddlewire.isBlocked,userProfileController.loadEmailOtpPage)

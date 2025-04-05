@@ -83,10 +83,12 @@
                                     </td>
                                     <td class="border border-gray-300 px-4 py-2"><%= item.size %></td>
                                     <td class="border border-gray-300 px-4 py-2"><%= item.quantity %></td>
-                                    <td class="border border-gray-300 px-4 py-2">₹<%= item.itemSalePrice %></td>
-                                    <td class="border border-gray-300 px-4 py-2">₹<%= item.itemSalePrice * item.quantity %></td>
+                                    <td class="border border-gray-300 px-4 py-2">₹<%= item.itemSalePrice.toFixed(2) %></td>
+                                    <%let totalFund= item.itemSalePrice * item.quantity%>
+                                    <td class="border border-gray-300 px-4 py-2">₹ <%=totalFund.toFixed(2) %></td>
                                     <td class="border border-gray-300 px-4 py-2 font-semibold">
-                                        <% let disabledStatuses = ["delivered", "returned"]; %>
+                                        <% let disabledStatuses = ["delivered", "returned", "cancelled",]; %>
+
                                         <select 
                                             class="border px-2 py-1 rounded text-sm"
                                             onchange="updateItemStatus('<%= orders.orderId %>', '<%= item.productId._id %>', this.value)"
@@ -121,7 +123,8 @@
                 
                 <label for="status" class="block text-sm font-medium text-gray-700">Select Status:</label>
                 
-                <% let disableFields = orders.status === "delivered" || orders.status === "returned"; %>
+                <% let disableFields = ["delivered", "returned", "cancelled"].includes(orders.status); %>
+
             
                 <select name="status" id="status" class="mt-1 p-2 border rounded-md w-full" 
                     <%= disableFields ? "disabled class='bg-gray-200 cursor-not-allowed'" : "" %>>

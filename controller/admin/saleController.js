@@ -4,82 +4,106 @@ const moment = require("moment");
 const PDFDocument = require("pdfkit"); // For PDF generation
 const ExcelJS = require("exceljs");
 const saleController={
-    loadSaleReport:async (req,res) => {
-        try {
-            try {
-                let { day, startDate, endDate } = req.query;
-                console.log("daya",day)
-                let page=parseInt(req.query.page)||1
-        let limit=5;
-        let skip=(page-1)*limit;
-        
-                    const totalProducts= await orderSchema.countDocuments(); // Total count
-                    const totalPages = Math.ceil(totalProducts/ limit);
 
-                let filter = {};
-        
-                if (day) {
-                    const today = moment().startOf("day");
-                    switch (day) {
-                        case "salesToday":
-                            filter.orderDate = { $gte: today.toDate(), $lte: moment(today).endOf("day").toDate() };
-                            break;
-                        case "salesWeekly":
-                            filter.orderDate = { $gte: moment().subtract(7, "days").toDate() };
-                            break;
-                        case "salesMonthly":
-                            filter.orderDate = { $gte: moment().subtract(1, "months").toDate() };
-                            break;
-                        case "salesYearly":
-                            filter.orderDate = { $gte: moment().subtract(1, "years").toDate() };
-                            break;
-                    }
-                }
-        
-                if (startDate && endDate) {
-                    filter.orderDate = { $gte: new Date(startDate), $lte: new Date(endDate) };
-                }
-        
-                const salesData = await orderSchema.find(filter)
-    .populate("userId", "name")
-    .populate("items.productId", "name price") // ✅ Ensure products are populated
-    .populate("couponId", "offerPrice")
-    .populate("address")
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit)
-    .lean();  
-
-
-        
-                // Calculate Sales Metrics
-                let overallSalesCount = salesData.length;
-                let overallOrderAmount = salesData.reduce((sum, order) => sum + order.total, 0);
-                let overallDiscount = salesData.reduce((sum, order) => sum + (order.couponId?.offerPrice || 0), 0);
-                // console.log(JSON.stringify(salesData, null, 2));
-
-                console.log("there are sale data : ====>>",salesData)
-        
-                res.render("admin/salesreport", {
-                    data: salesData,
-                    overallSalesCount,
-                    overallOrderAmount,
-                    overallDiscount,
-                    selectedDay: day,
-                    startDate,
-                    endDate,currentPage: page,totalPages
-                });
-            } catch (err) {
-                console.error(err);
-                res.status(500).send("Server Error");
-            }
-        } catch (error) {
-           console.log(error) 
+    
+    loadSaleReport: async (req, res) => {
+      try {
+        let { day, startDate, endDate } = req.query;
+        day = day || "salesToday";
+        let page = parseInt(req.query.page) || 1;
+        let limit = 5;
+        let skip = (page - 1) * limit;
+    
+        let filter = {};
+    
+        // Date-based filtering
+        const today = moment().startOf("day");
+        switch (day) {
+          case "salesToday":
+            filter.orderDate = { $gte: today.toDate(), $lte: moment(today).endOf("day").toDate() };
+            break;
+          case "salesWeekly":
+            filter.orderDate = { $gte: moment().subtract(7, "days").toDate() };
+            break;
+          case "salesMonthly":
+            filter.orderDate = { $gte: moment().subtract(1, "months").toDate() };
+            break;
+          case "salesYearly":
+            filter.orderDate = { $gte: moment().subtract(1, "years").toDate() };
+            break;
         }
+    
+        if (startDate && endDate) {
+          filter.orderDate = { $gte: new Date(startDate), $lte: new Date(endDate) };
+        }
+    
+        // Get matching orders
+        const orders = await orderSchema
+          .find(filter)
+          .populate("userId", "fullname")
+          .populate("items.productId", "name")
+          .lean();
+    
+        // Extract and filter only 'delivered' items
+        let deliveredItems = [];
+    
+        for (let order of orders) {
+          const user = order.userId;
+          const orderId = order.orderId;
+          const paymentMethod = order.paymentMethod;
+          const orderDate = order.orderDate;
+    
+          for (let item of order.items) {
+            if (item.itemStatus === "delivered") {
+              deliveredItems.push({
+                orderId,
+                user: user.fullname,
+                paymentMethod,
+                orderDate,
+                product: item.productId?.name || "Product Deleted",
+                size: item.size,
+                quantity: item.quantity,
+                itemSalePrice: item.itemSalePrice,
+                totalSale: item.itemSalePrice * item.quantity,
+              });
+            }
+          }
+        }
+    
+        // Pagination
+        const totalItems = deliveredItems.length;
+        const totalPages = Math.ceil(totalItems / limit);
+        const paginatedItems = deliveredItems.slice(skip, skip + limit);
+    
+        // Totals
+        const overallSaleAmount = deliveredItems.reduce((sum, item) => sum + item.totalSale, 0);
+
+        console.log("paginanted items :",paginatedItems)
+        console.log("delivered items : ",deliveredItems)
+    
+        res.render("admin/salesreport", {
+          data: paginatedItems,
+          overallSalesCount: deliveredItems.length,
+          overallOrderAmount: overallSaleAmount,
+          totalOrders: totalItems,
+          totalPaid: overallSaleAmount,
+          currentPage: page,
+          totalPages,
+          startDate: startDate || "",
+          endDate: endDate || "",
+          selectedDay: day || "",
+        });
+    
+      } catch (err) {
+        console.error("Error in loadSaleReport:", err);
+        res.status(500).send("Server Error");
+      }
     },
+    
     generatePDF:async (req,res) => {
         try {
             const salesData = req.body;
+            console.log("sales data in the generate pdf ccontroler : ",salesData)
         const doc = new PDFDocument();
         res.setHeader("Content-Disposition", "attachment; filename=sales_report.pdf");
         res.setHeader("Content-Type", "application/pdf");
